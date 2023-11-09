@@ -22,7 +22,7 @@ const globalStyles = StyleSheet.create({
   },
   // Shared
   container: {
-    padding: 16,
+    padding: 18,
     minHeight: "100%",
   },
   h1: {
@@ -33,6 +33,11 @@ const globalStyles = StyleSheet.create({
   p: {
     fontSize: 18,
     fontWeight: "400",
+  },
+  h5: {
+    fontSize: 18,
+    fontWeight: "500",
+    marginBottom: 4,
   },
   label: {
     fontSize: 18,
