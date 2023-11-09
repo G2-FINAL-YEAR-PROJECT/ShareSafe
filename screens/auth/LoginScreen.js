@@ -21,7 +21,7 @@ const LoginScreen = ({ navigation }) => {
         <View style={globalStyles.flex}>
           <Text style={globalStyles.label}>Password</Text>
 
-          <TouchableOpacity onPress={() => navigation.navigate("Register")}>
+          <TouchableOpacity onPress={() => navigation.navigate("ForgotPassword")}>
             <Text style={[globalStyles.link, { fontSize: 16 }]}>Forgot Password?</Text>
           </TouchableOpacity>
         </View>

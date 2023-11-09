@@ -27,8 +27,8 @@ const globalStyles = StyleSheet.create({
   },
   h1: {
     marginBottom: 6,
-    fontSize: 28,
-    fontWeight: "600",
+    fontSize: 30,
+    fontWeight: "700",
   },
   p: {
     fontSize: 18,
