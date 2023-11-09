@@ -2,6 +2,7 @@ import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { globalStyles } from "../../constants";
 import styles from "./styles";
+import { Button } from "../../ui";
 
 const RegisterScreen = ({ navigation }) => {
   return (
@@ -26,9 +27,7 @@ const RegisterScreen = ({ navigation }) => {
         <TextInput style={styles.input} secureTextEntry={true} placeholder="**********" />
       </View>
 
-      <TouchableOpacity style={styles.button}>
-        <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 18 }}>Sign Up</Text>
-      </TouchableOpacity>
+      <Button>Sign Up</Button>
 
       <View style={{ marginTop: 26, alignItems: "center" }}>
         <Text style={[globalStyles.h5]}>Have an account?</Text>

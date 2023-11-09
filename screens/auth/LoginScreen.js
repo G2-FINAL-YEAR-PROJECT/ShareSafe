@@ -2,6 +2,7 @@ import React from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { globalStyles } from "../../constants";
 import styles from "./styles";
+import { Button } from "../../ui";
 
 const LoginScreen = ({ navigation }) => {
   return (
@@ -27,9 +28,7 @@ const LoginScreen = ({ navigation }) => {
         <TextInput style={styles.input} secureTextEntry={true} placeholder="**********" />
       </View>
 
-      <TouchableOpacity style={styles.button}>
-        <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 18 }}>Login</Text>
-      </TouchableOpacity>
+      <Button>Login</Button>
 
       <View style={{ marginTop: 26, alignItems: "center" }}>
         <Text style={[globalStyles.h5]}>Don’t have an account?</Text>
