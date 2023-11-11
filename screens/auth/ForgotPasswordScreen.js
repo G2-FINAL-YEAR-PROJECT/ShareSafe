@@ -17,7 +17,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
         <TextInput style={styles.input} placeholder="hello@example.com" />
       </View>
 
-      <Button>Submit</Button>
+      <Button onPress={() => navigation.navigate("ResetPassword")}>Submit</Button>
 
       <View style={{ marginTop: 12, alignItems: "center" }}>
         <TouchableOpacity onPress={() => navigation.navigate("Login")}>
