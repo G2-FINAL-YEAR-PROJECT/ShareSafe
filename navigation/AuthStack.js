@@ -7,18 +7,15 @@ import ResetPasswordScreen from "../screens/auth/ResetPasswordScreen";
 
 const Stack = createNativeStackNavigator();
 
-const AppNavigator = () => {
+const AuthStack = () => {
   return (
     <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
-      {/* AUTH */}
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} />
       <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
       <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
-
-      {/* HOME */}
     </Stack.Navigator>
   );
 };
 
-export default AppNavigator;
+export default AuthStack;
