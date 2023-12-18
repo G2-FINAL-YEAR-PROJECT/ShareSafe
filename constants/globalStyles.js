@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 
 const globalStyles = StyleSheet.create({
   // Helpers
@@ -22,6 +22,7 @@ const globalStyles = StyleSheet.create({
   },
   // Shared
   container: {
+    marginTop: Platform.OS === "android" ? 25 : 0, // Android SafeArea
     padding: 18,
     minHeight: "100%",
   },

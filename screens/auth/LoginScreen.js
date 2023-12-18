@@ -4,14 +4,16 @@ import { globalStyles } from "../../constants";
 import styles from "./styles";
 import { Button } from "../../ui";
 import { useNavigation } from "@react-navigation/native";
+import { useAuth } from "../../context/AuthContext";
 
 const LoginScreen = () => {
   const navigator = useNavigation();
+  const auth = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     // Validate email address
     const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
     if (!emailRegex.test(email)) {
@@ -19,13 +21,13 @@ const LoginScreen = () => {
       return;
     }
     // Validate password
-    if (password.length < 8) {
-      alert("Password must be at least 8 characters");
+    if (!password.length) {
+      alert("Password is required");
       return;
     }
 
-    // console.log(email, password);
-    alert("Email: " + email + " Password: " + password);
+    // Authenticate
+    await auth.login(email, password);
   };
 
   return (

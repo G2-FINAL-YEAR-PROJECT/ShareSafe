@@ -2,7 +2,7 @@ import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
   header: {
-    marginTop: 90,
+    marginTop: 80,
     marginBottom: 60,
   },
   formGroup: {

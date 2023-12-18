@@ -1,4 +1,7 @@
+import axios from "axios";
 import { createContext, useContext, useState } from "react";
+
+const baseUrl = "https://share-safe-kn9v.onrender.com/auth";
 
 const AuthContext = createContext();
 
@@ -7,14 +10,38 @@ const AuthProvider = ({ children }) => {
   const [userData, setUserData] = useState({ name: "user" });
 
   const login = async (email, password) => {
-    // console.log(email, password);
+    // TODO: implement loading state
+
+    try {
+      const res = await axios.post(baseUrl + "/login", { email, password });
+      const token = res?.data?.data?.access?.token;
+      // Error handling
+      if (!token) handleErrorMessage(res?.data?.message);
+      // Save token and user info
+      setToken(token);
+      setUserData(res?.data?.user);
+    } catch (error) {
+      console.log(error);
+      handleErrorMessage();
+    }
   };
 
-  const signUp = async () => {
+  const register = async (data) => {
     //
   };
 
-  return <AuthContext.Provider value={{ token, userData, login, signUp }}>{children}</AuthContext.Provider>;
+  const logout = async () => {};
+
+  const handleErrorMessage = (errorMessage) => {
+    alert(errorMessage ?? "An error occurred. Please try again");
+    return;
+  };
+
+  return (
+    <AuthContext.Provider value={{ token, userData, login, register, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 const useAuth = () => {
