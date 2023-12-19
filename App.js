@@ -1,20 +1,45 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { AuthProvider, useAuth } from "./store";
+import { NavigationContainer } from "@react-navigation/native";
+import { StatusBar } from "expo-status-bar";
+import { useCallback } from "react";
+import { useFonts } from "expo-font";
+import { HomeStack, AuthStack } from "./navigation";
+
+import * as SplashScreen from "expo-splash-screen";
+import { ActivityIndicator, View } from "react-native";
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    light: require("./assets/fonts/Poppins-Light.ttf"),
+    regular: require("./assets/fonts/Poppins-Regular.ttf"),
+    medium: require("./assets/fonts/Poppins-Medium.ttf"),
+    semibold: require("./assets/fonts/Poppins-SemiBold.ttf"),
+    bold: require("./assets/fonts/Poppins-Bold.ttf"),
+    extrabold: require("./assets/fonts/Poppins-ExtraBold.ttf"),
+  });
+
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded) {
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) {
+    return null;
+  }
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
+    <AuthProvider>
+      <AppNavigation />
       <StatusBar style="auto" />
-    </View>
+    </AuthProvider>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+const AppNavigation = () => {
+  const { token } = useAuth();
+  return (
+    <NavigationContainer>
+      {token ? <HomeStack /> : <AuthStack />}
+    </NavigationContainer>
+  );
+};
