@@ -3,7 +3,11 @@ import { COLORS } from "../../constants";
 
 const Button = ({ onPress, children, textStyle, buttonStyle, loading }) => {
   return (
-    <TouchableOpacity onPress={onPress} style={[styles.buttonStyle(loading), buttonStyle]}>
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.7}
+      style={[styles.buttonStyle(loading), buttonStyle]}
+    >
       {loading ? (
         <ActivityIndicator color={"#fff"} size={32} />
       ) : (
