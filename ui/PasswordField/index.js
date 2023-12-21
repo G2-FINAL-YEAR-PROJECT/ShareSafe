@@ -19,7 +19,7 @@ const PasswordField = ({ password, setPassword }) => {
         <Ionicons
           name={showPassword ? "eye-off-outline" : "eye-outline"}
           size={24}
-          color={COLORS.gray4}
+          color={COLORS.gray5}
         />
       </TouchableOpacity>
     </View>
