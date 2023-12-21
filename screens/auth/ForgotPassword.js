@@ -3,7 +3,7 @@ import { globalStyles } from "../../constants";
 import styles from "./styles";
 import { Button } from "../../ui";
 
-const ForgotPassword = () => {
+const ForgotPassword = ({ navigation }) => {
   return (
     <View style={globalStyles.container}>
       <View style={styles.header}>

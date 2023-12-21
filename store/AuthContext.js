@@ -14,7 +14,7 @@ const AuthProvider = ({ children }) => {
 
     try {
       const res = await axios.post(baseUrl + "/login", { email, password });
-      const token = res?.data?.data?.access?.token;
+      const token = res?.data?.data?.tokens?.access?.token;
       // Error handling
       if (!token) handleErrorMessage(res?.data?.message);
       // Save token and user info

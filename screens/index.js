@@ -1,7 +1,13 @@
+export { default as CreatePost } from "./CreatePost";
+export { default as Emergencies } from "./Home/Emergencies";
 export { default as ForgotPassword } from "./auth/ForgotPassword";
+export { default as Home } from "./Home";
 export { default as Loading } from "./Loading";
 export { default as Login } from "./auth/Login";
+export { default as Messages } from "./Messages";
 export { default as Onboarding } from "./Onboarding";
+export { default as Profile } from "./Profile";
 export { default as Register } from "./auth/Register";
+export { default as Report } from "./Report";
 export { default as ResetPassword } from "./auth/ResetPassword";
 export { default as Welcome } from "./Welcome";

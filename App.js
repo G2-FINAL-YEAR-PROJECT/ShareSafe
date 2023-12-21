@@ -1,10 +1,10 @@
+import "react-native-gesture-handler";
 import { AuthProvider, useAuth } from "./store";
 import { NavigationContainer } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { useCallback } from "react";
 import { useFonts } from "expo-font";
 import { HomeStack, AuthStack } from "./navigation";
-
 import * as SplashScreen from "expo-splash-screen";
 import { ActivityIndicator, View } from "react-native";
 
@@ -40,6 +40,7 @@ const AppNavigation = () => {
   return (
     <NavigationContainer>
       {token ? <HomeStack /> : <AuthStack />}
+      {/* <HomeStack /> */}
     </NavigationContainer>
   );
 };
