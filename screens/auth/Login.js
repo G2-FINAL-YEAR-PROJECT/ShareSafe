@@ -7,28 +7,29 @@ import { useAuth } from "../../store";
 import { Button } from "../../ui";
 import styles from "./styles";
 
-const Login = ({ navigation }) => {
+const Login = () => {
   const navigator = useNavigation();
   const auth = useAuth();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
     // await AsyncStorage.removeItem("@viewedOnboarding");
+
     // Validate email address
     const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-    if (!emailRegex.test(email)) {
+    if (!emailRegex.test(email.trim())) {
       alert("Please enter a valid email address");
       return;
     }
     // Validate password
-    if (!password.length) {
+    if (!password.trim()) {
       alert("Password is required");
       return;
     }
     // Authenticate
-    await auth.login(email, password);
+    const data = { email: email.trim(), password: password };
+    await auth.login(data);
   };
   return (
     <View style={globalStyles.container}>
@@ -50,12 +51,8 @@ const Login = ({ navigation }) => {
       <View style={styles.formGroup}>
         <View style={globalStyles.flex}>
           <Text style={globalStyles.label}>Password</Text>
-          <TouchableOpacity
-            onPress={() => navigator.navigate("ForgotPassword")}
-          >
-            <Text style={[globalStyles.link, { fontSize: 16 }]}>
-              Forgot Password?
-            </Text>
+          <TouchableOpacity onPress={() => navigator.navigate("ForgotPassword")}>
+            <Text style={[globalStyles.link, { fontSize: 16 }]}>Forgot Password?</Text>
           </TouchableOpacity>
         </View>
 
@@ -68,7 +65,9 @@ const Login = ({ navigation }) => {
         />
       </View>
 
-      <Button onPress={handleLogin}>Login</Button>
+      <Button onPress={handleLogin} loading={auth.loading}>
+        Login
+      </Button>
 
       <View style={{ marginTop: 26, alignItems: "center" }}>
         <Text style={[globalStyles.h5]}>Don’t have an account?</Text>
