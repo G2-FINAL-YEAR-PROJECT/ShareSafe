@@ -4,7 +4,7 @@ import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { globalStyles } from "../../constants";
 import { useNavigation } from "@react-navigation/native";
 import { useAuth } from "../../store";
-import { Button } from "../../ui";
+import { Button, PasswordField } from "../../ui";
 import styles from "./styles";
 
 const Login = () => {
@@ -41,7 +41,7 @@ const Login = () => {
       <View style={styles.formGroup}>
         <Text style={globalStyles.label}>Email Address</Text>
         <TextInput
-          style={styles.input}
+          style={globalStyles.input}
           placeholder="hello@example.com"
           value={email}
           onChangeText={(text) => setEmail(text)}
@@ -56,13 +56,7 @@ const Login = () => {
           </TouchableOpacity>
         </View>
 
-        <TextInput
-          style={styles.input}
-          secureTextEntry={true}
-          placeholder="**********"
-          value={password}
-          onChangeText={(text) => setPassword(text)}
-        />
+        <PasswordField password={password} setPassword={setPassword} />
       </View>
 
       <Button onPress={handleLogin} loading={auth.loading}>

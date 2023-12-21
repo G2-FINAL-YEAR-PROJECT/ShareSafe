@@ -2,7 +2,7 @@ import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useState } from "react";
 import { globalStyles } from "../../constants";
 import styles from "./styles";
-import { Button } from "../../ui";
+import { Button, PasswordField } from "../../ui";
 
 const Register = ({ navigation }) => {
   const [name, setName] = useState("");
@@ -17,7 +17,7 @@ const Register = ({ navigation }) => {
     }
     // Validate email address
     const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-    if (!emailRegex.test(email)) {
+    if (!emailRegex.test(email.trim())) {
       alert("Please enter a valid email address");
       return;
     }
@@ -41,7 +41,7 @@ const Register = ({ navigation }) => {
       <View style={styles.formGroup}>
         <Text style={globalStyles.label}>Name</Text>
         <TextInput
-          style={styles.input}
+          style={globalStyles.input}
           placeholder="Your Name"
           value={name}
           onChangeText={(text) => setName(text)}
@@ -51,7 +51,7 @@ const Register = ({ navigation }) => {
       <View style={styles.formGroup}>
         <Text style={globalStyles.label}>Email Address</Text>
         <TextInput
-          style={styles.input}
+          style={globalStyles.input}
           placeholder="hello@example.com"
           value={email}
           onChangeText={(text) => setEmail(text)}
@@ -60,13 +60,7 @@ const Register = ({ navigation }) => {
 
       <View style={styles.formGroup}>
         <Text style={globalStyles.label}>Password</Text>
-        <TextInput
-          style={styles.input}
-          secureTextEntry={true}
-          placeholder="**********"
-          value={password}
-          onChangeText={(text) => setPassword(text)}
-        />
+        <PasswordField password={password} setPassword={setPassword} />
       </View>
 
       <Button onPress={handleRegister}>Sign Up</Button>

@@ -3,7 +3,7 @@ import { globalStyles } from "../../constants";
 import styles from "./styles";
 import { Button } from "../../ui";
 
-const ForgotPassword = () => {
+const ForgotPassword = ({ navigation }) => {
   return (
     <View style={globalStyles.container}>
       <View style={styles.header}>
@@ -13,12 +13,10 @@ const ForgotPassword = () => {
 
       <View style={styles.formGroup}>
         <Text style={globalStyles.label}>Email Address</Text>
-        <TextInput style={styles.input} placeholder="hello@example.com" />
+        <TextInput style={globalStyles.input} placeholder="hello@example.com" />
       </View>
 
-      <Button onPress={() => navigation.navigate("ResetPassword")}>
-        Submit
-      </Button>
+      <Button onPress={() => navigation.navigate("ResetPassword")}>Submit</Button>
 
       <View style={{ marginTop: 12, alignItems: "center" }}>
         <TouchableOpacity onPress={() => navigation.navigate("Login")}>

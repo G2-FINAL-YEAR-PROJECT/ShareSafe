@@ -50,4 +50,12 @@ export const globalStyles = StyleSheet.create({
     fontFamily: "medium",
     color: COLORS.primary,
   },
+  input: {
+    padding: 8,
+    fontSize: 15,
+    paddingHorizontal: 12,
+    borderColor: COLORS.gray2,
+    borderWidth: 1,
+    borderRadius: 4,
+  },
 });

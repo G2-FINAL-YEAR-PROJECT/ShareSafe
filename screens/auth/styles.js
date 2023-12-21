@@ -9,22 +9,6 @@ const styles = StyleSheet.create({
   formGroup: {
     marginBottom: 30,
   },
-  input: {
-    padding: 8,
-    fontSize: 15,
-    paddingHorizontal: 12,
-    borderColor: COLORS.gray2,
-    borderWidth: 1,
-    borderRadius: 4,
-  },
-  button: {
-    width: "100%",
-    padding: 14,
-    marginBottom: 18,
-    borderRadius: 4,
-    alignItems: "center",
-    backgroundColor: COLORS.primary,
-  },
 });
 
 export default styles;
