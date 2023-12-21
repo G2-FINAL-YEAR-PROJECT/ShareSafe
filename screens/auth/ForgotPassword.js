@@ -8,7 +8,7 @@ const ForgotPassword = ({ navigation }) => {
     <View style={globalStyles.container}>
       <View style={styles.header}>
         <Text style={globalStyles.h1}>Forgot Password?</Text>
-        <Text style={globalStyles.p}>Reset your password</Text>
+        <Text style={styles.subHeading}>Reset your password</Text>
       </View>
 
       <View style={styles.formGroup}>

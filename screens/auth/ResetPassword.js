@@ -8,7 +8,7 @@ const ResetPassword = ({ navigation }) => {
     <View style={globalStyles.container}>
       <View style={styles.header}>
         <Text style={globalStyles.h1}>Reset Password</Text>
-        <Text style={globalStyles.p}>The OTP code has been sent to your email</Text>
+        <Text style={styles.subHeading}>The OTP code has been sent to your email</Text>
       </View>
 
       <View style={styles.formGroup}>

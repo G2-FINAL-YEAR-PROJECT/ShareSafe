@@ -35,7 +35,7 @@ const Login = () => {
     <View style={globalStyles.container}>
       <View style={styles.header}>
         <Text style={globalStyles.h1}>Login</Text>
-        <Text style={globalStyles.p}>Welcome back to ShareSafe</Text>
+        <Text style={styles.subHeading}>Welcome back to ShareSafe</Text>
       </View>
 
       <View style={styles.formGroup}>

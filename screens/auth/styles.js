@@ -6,6 +6,10 @@ const styles = StyleSheet.create({
     marginTop: 80,
     marginBottom: 60,
   },
+  subHeading: {
+    fontSize: 18,
+    fontFamily: "medium",
+  },
   formGroup: {
     marginBottom: 30,
   },
