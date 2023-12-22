@@ -1,15 +1,15 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 import { COLORS, globalStyles } from "../../constants";
 import { useAuth } from "../../store";
 import { Button } from "../../ui";
 import { useState } from "react";
+import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Welcome = () => {
+  const navigator = useNavigation();
   const { userData, logout } = useAuth();
   const [selectedItems, setSelectedItems] = useState([]);
-
-  console.log("Welcome: ", userData);
-  console.log("selectedItems: ", selectedItems);
 
   const welcomeData = [
     { id: "40", name: "Lasu News" },
@@ -35,42 +35,47 @@ const Welcome = () => {
     setSelectedItems(updatedSelection);
   };
 
-  const handleSubmit = () => {
-    //
-    console.log("selectedItems: ", selectedItems);
+  const handleSubmit = async () => {
+    // console.log("selectedItems: ", selectedItems);
+    if (selectedItems.length < 3) {
+      alert("Select at least 3 accounts to follow!");
+      return;
+    }
+
+    // TODO: API call
+    await AsyncStorage.setItem("@hideWelcomeScreen", "true");
+    navigator.navigate("BottomTabStack");
   };
 
   return (
-    <View style={styles.container}>
-      <View>
-        <Text style={[globalStyles.h2, { textAlign: "center" }]}>
-          Hi {userData?.fullName}, Welcome
-        </Text>
+    <ScrollView style={styles.container}>
+      <Text style={[globalStyles.h2, { textAlign: "center" }]}>
+        Hi {userData?.fullName}, Welcome
+      </Text>
 
-        <Text style={styles.heading}>Select who to follow</Text>
-        <Text style={styles.sub}>We have made available the reliable sources just for you</Text>
+      <Text style={styles.heading}>Select who to follow</Text>
+      <Text style={styles.sub}>We have made available the reliable sources just for you</Text>
 
-        <View style={styles.welcomeGrid}>
-          {welcomeData.map((item) => (
-            <TouchableOpacity
-              key={item.id}
-              activeOpacity={0.7}
-              style={{ marginBottom: 18, marginRight: 15 }}
-              onPress={() => onItemClick(item.id)}
-            >
-              <Text style={[styles.gridItem, selectedItems.includes(item.id) && styles.selected]}>
-                {item.name}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        <Button onPress={handleSubmit} buttonStyle={{ marginTop: 60 }}>
-          Continue
-        </Button>
-        {/* <Button onPress={() => logout()}>Logout</Button> */}
+      <View style={styles.welcomeGrid}>
+        {welcomeData.map((item) => (
+          <TouchableOpacity
+            key={item.id}
+            activeOpacity={0.7}
+            style={{ marginBottom: 16, marginRight: 15 }}
+            onPress={() => onItemClick(item.id)}
+          >
+            <Text style={[styles.gridItem, selectedItems.includes(item.id) && styles.selected]}>
+              {item.name}
+            </Text>
+          </TouchableOpacity>
+        ))}
       </View>
-    </View>
+
+      <Button onPress={handleSubmit} buttonStyle={{ marginTop: 60 }}>
+        Continue
+      </Button>
+      {/* <Button onPress={() => logout()}>Logout</Button> */}
+    </ScrollView>
   );
 };
 
@@ -102,7 +107,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 25,
     fontSize: 17,
     fontFamily: "medium",
-    borderRadius: 26,
+    borderRadius: 22,
+    overflow: "hidden",
     color: COLORS.black,
     backgroundColor: COLORS.gray2,
   },
