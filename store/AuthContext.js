@@ -42,7 +42,7 @@ const AuthProvider = ({ children }) => {
       setToken(token);
       setUserData(userData);
       // Persist data
-      AsyncStorage.setItem("@AuthData", JSON.stringify({ token, userData }));
+      await AsyncStorage.setItem("@AuthData", JSON.stringify({ token, userData }));
     } catch (error) {
       console.log(error);
       handleErrorMessage();
@@ -50,7 +50,27 @@ const AuthProvider = ({ children }) => {
   };
 
   const register = async (data) => {
-    //
+    try {
+      setLoading(true);
+      const res = await axios.post(baseUrl + "/register", data);
+      const token = res?.data?.data?.tokens?.access?.token;
+      const userData = res?.data?.data?.signUpUserData;
+      setLoading(false);
+
+      // Error handling
+      if (!token) {
+        handleErrorMessage(res?.data?.message);
+        return;
+      }
+      // Save token and user data
+      setToken(token);
+      setUserData(userData);
+      // Persist data
+      await AsyncStorage.setItem("@AuthData", JSON.stringify({ token, userData }));
+    } catch (error) {
+      console.log(error);
+      handleErrorMessage();
+    }
   };
 
   const logout = async () => {

@@ -1,23 +1,24 @@
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useState } from "react";
 import { globalStyles } from "../../constants";
 import styles from "./styles";
 import { Button, PasswordField } from "../../ui";
+import { validateEmail } from "../../helpers";
+import { useAuth } from "../../store";
 
 const Register = ({ navigation }) => {
+  const auth = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleRegister = () => {
-    // Validate name field
+  const handleRegister = async () => {
     if (!name.trim()) {
       alert("Name is required");
       return;
     }
     // Validate email address
-    const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-    if (!emailRegex.test(email.trim())) {
+    if (!validateEmail(email)) {
       alert("Please enter a valid email address");
       return;
     }
@@ -27,12 +28,12 @@ const Register = ({ navigation }) => {
       return;
     }
 
-    // console.log(email, password);
-    alert("Name: " + name + " Email: " + email + " Password: " + password);
+    const data = { fullName: name.trim(), email: email.trim(), password };
+    await auth.register(data);
   };
 
   return (
-    <View style={globalStyles.container}>
+    <ScrollView style={globalStyles.container}>
       <View style={styles.header}>
         <Text style={globalStyles.h1}>Create and account</Text>
         <Text style={styles.subHeading}>Be a part of SafeShare</Text>
@@ -63,7 +64,9 @@ const Register = ({ navigation }) => {
         <PasswordField password={password} setPassword={setPassword} />
       </View>
 
-      <Button onPress={handleRegister}>Sign Up</Button>
+      <Button onPress={handleRegister} loading={auth.loading}>
+        Sign Up
+      </Button>
 
       <View style={{ marginTop: 26, alignItems: "center" }}>
         <Text style={[globalStyles.h5]}>Have an account?</Text>
@@ -72,7 +75,7 @@ const Register = ({ navigation }) => {
           <Text style={[globalStyles.link]}>Login</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
