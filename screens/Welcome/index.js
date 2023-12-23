@@ -8,7 +8,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Welcome = () => {
   const navigator = useNavigation();
-  const { userData, logout } = useAuth();
+  const { userData } = useAuth();
   const [selectedItems, setSelectedItems] = useState([]);
 
   const welcomeData = [
@@ -20,9 +20,15 @@ const Welcome = () => {
     { id: "47", name: "The Nations" },
     { id: "26", name: "LASEMA" },
     { id: "36", name: "Tribune" },
+    { id: "72", name: "Lasu Connect" },
+    { id: "67", name: "The Punch" },
     { id: "42", name: "TVC" },
-    { id: "67", name: "Lasusu" },
-    { id: "61", name: "Nigeria Police" },
+    { id: "61", name: "Lasu Health Center" },
+    // { id: "142", name: "TVC" },
+    // { id: "185", name: "Nigeria Police" },
+    // { id: "140", name: "Lasu News" },
+    // { id: "167", name: "Lasusu" },
+    // { id: "136", name: "Tribune" },
   ];
 
   const onItemClick = (id) => {
@@ -48,33 +54,34 @@ const Welcome = () => {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={[globalStyles.h2, { textAlign: "center" }]}>
-        Hi {userData?.fullName}, Welcome
-      </Text>
+    <ScrollView>
+      <View style={styles.container}>
+        <Text style={[globalStyles.h2, { textAlign: "center" }]}>
+          Hi {userData?.fullName}, Welcome
+        </Text>
 
-      <Text style={styles.heading}>Select who to follow</Text>
-      <Text style={styles.sub}>We have made available the reliable sources just for you</Text>
+        <Text style={styles.heading}>Select who to follow</Text>
+        <Text style={styles.sub}>We have made available the reliable sources just for you</Text>
 
-      <View style={styles.welcomeGrid}>
-        {welcomeData.map((item) => (
-          <TouchableOpacity
-            key={item.id}
-            activeOpacity={0.7}
-            style={{ marginBottom: 16, marginRight: 15 }}
-            onPress={() => onItemClick(item.id)}
-          >
-            <Text style={[styles.gridItem, selectedItems.includes(item.id) && styles.selected]}>
-              {item.name}
-            </Text>
-          </TouchableOpacity>
-        ))}
+        <View style={styles.welcomeGrid}>
+          {welcomeData.map((item) => (
+            <TouchableOpacity
+              key={item.id}
+              activeOpacity={0.7}
+              style={{ marginBottom: 16, marginRight: 15 }}
+              onPress={() => onItemClick(item.id)}
+            >
+              <Text style={[styles.gridItem, selectedItems.includes(item.id) && styles.selected]}>
+                {item.name}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <Button onPress={handleSubmit} buttonStyle={{ marginTop: 45 }}>
+          Continue
+        </Button>
       </View>
-
-      <Button onPress={handleSubmit} buttonStyle={{ marginTop: 60 }}>
-        Continue
-      </Button>
-      {/* <Button onPress={() => logout()}>Logout</Button> */}
     </ScrollView>
   );
 };
@@ -84,7 +91,7 @@ export default Welcome;
 const styles = StyleSheet.create({
   container: {
     ...globalStyles.container,
-    marginTop: 60,
+    paddingTop: 35,
   },
   heading: {
     fontSize: 26,
@@ -95,12 +102,13 @@ const styles = StyleSheet.create({
   sub: {
     ...globalStyles.p,
     textAlign: "center",
+    paddingBottom: 10,
   },
   welcomeGrid: {
     display: "flex",
     flexDirection: "row",
     flexWrap: "wrap",
-    marginTop: 45,
+    marginTop: 30,
   },
   gridItem: {
     padding: 10,
