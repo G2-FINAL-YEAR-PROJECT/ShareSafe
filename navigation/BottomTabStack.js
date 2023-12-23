@@ -1,8 +1,10 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Text, View, Image } from "react-native";
+import { Text } from "react-native";
 import { Report, CreatePost, Messages, Profile } from "../screens";
-import { Ionicons, AntDesign, MaterialIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import TopTabStack from "./TopTabStack";
+import ProfileTabStack from "./ProfileTabStack";
+import MessageTabStack from "./MessageTabStack";
 import { COLORS } from "../constants";
 import { Header } from "../ui";
 
@@ -65,7 +67,11 @@ const BottomTabStack = () => {
         options={{
           tabBarIcon: () => {
             return (
-              <AntDesign name="notification" size={24} color={COLORS.white} />
+              <Ionicons
+                name="ios-megaphone-outline"
+                size={24}
+                color={COLORS.white}
+              />
             );
           },
 
@@ -114,8 +120,8 @@ const BottomTabStack = () => {
         }}
       />
       <Tab.Screen
-        name="Messages"
-        component={Messages}
+        name="MessageTabStack"
+        component={MessageTabStack}
         options={{
           tabBarIcon: ({ focused }) => {
             return (
@@ -139,11 +145,15 @@ const BottomTabStack = () => {
               </Text>
             );
           },
+          headerTitle: () => <Header showBack showSearchNotify />,
+          headerStyle: {
+            elevation: 0,
+          },
         }}
       />
       <Tab.Screen
-        name="Profile"
-        component={Profile}
+        name="ProfileTabStack"
+        component={ProfileTabStack}
         options={{
           tabBarIcon: ({ focused }) => {
             return (
@@ -154,7 +164,7 @@ const BottomTabStack = () => {
               />
             );
           },
-          tabBarShowLabel: true,
+
           tabBarLabel: ({ focused }) => {
             return (
               <Text
@@ -166,6 +176,11 @@ const BottomTabStack = () => {
                 Profile
               </Text>
             );
+          },
+          headerTitle: () => <Header showBack showSearchNotify showProfile />,
+          headerStyle: {
+            elevation: 0,
+            height: 280,
           },
         }}
       />

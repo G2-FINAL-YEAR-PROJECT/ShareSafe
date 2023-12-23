@@ -2,30 +2,54 @@ import {
   View,
   Text,
   ScrollView,
-  StyleSheet,
   TouchableOpacity,
   TextInput,
 } from "react-native";
-import { COLORS, SIZES } from "../../constants";
-import { reportType } from "../../data";
-import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
 import { Button } from "../../ui";
+import { COLORS, SIZES } from "../../constants";
+import { Ionicons } from "@expo/vector-icons";
+import { reportType, channels } from "../../data";
+import { useState, useEffect } from "react";
 
-const Report = () => {
+import SelectDropdown from "react-native-select-dropdown";
+import styles from "./styles";
+
+const Report = ({ navigation }) => {
   const [reportTypeId, setReportTypeId] = useState("");
   const [inputIsFocused, setInputIsFocused] = useState(false);
   const [locationIsFocused, setLocationIsFocused] = useState(false);
 
   const [reportText, setReportText] = useState("");
   const [locationText, setLocationText] = useState("");
+  const [channelValue, setChannelValue] = useState("");
+  const [channelContact, setChannelContact] = useState("");
+
+  const filteredChannel = channels[reportTypeId];
 
   const handleChooseReportType = (id) => {
     setReportTypeId((prevId) => (prevId === id ? "" : id));
+    setChannelValue("");
+  };
+
+  useEffect(() => {
+    navigation.addListener("focus", () => {
+      setReportTypeId("");
+      setInputIsFocused(false);
+      setLocationIsFocused(false);
+      setReportText("");
+      setLocationText("");
+      setChannelValue("");
+      setChannelContact("");
+    });
+  }, [navigation]);
+
+  const handleSubmit = () => {
+    navigation.navigate("ReportSuccess", { channelValue, channelContact });
   };
   return (
     <View style={[SIZES.safeAreaView, styles.view]}>
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+        {/* CHOOSE REPORT TYPE */}
         <View>
           <Text
             style={[
@@ -66,6 +90,7 @@ const Report = () => {
           </View>
         </View>
 
+        {/* DESCRIBE REPORT */}
         <View style={styles.reportContainer}>
           <Text
             style={[
@@ -92,6 +117,8 @@ describe your situation..."
           </View>
         </View>
 
+        {/* CHANNEL TO REPORT */}
+
         <View style={styles.reportContainer}>
           <Text
             style={[
@@ -101,8 +128,48 @@ describe your situation..."
           >
             Channel to report to
           </Text>
+
+          <View style={{ marginTop: 14 }}>
+            <SelectDropdown
+              data={
+                reportTypeId
+                  ? filteredChannel
+                  : ["Please choose report type first"]
+              }
+              onSelect={(selectedItem) => {
+                if (!selectedItem.name) {
+                  alert("Please choose report type first");
+                  return;
+                }
+                setChannelValue(selectedItem.name);
+                setChannelContact(selectedItem.contact);
+                console.log(selectedItem.name);
+              }}
+              buttonTextAfterSelection={(selectedItem) => {
+                return selectedItem.name ? selectedItem.name : selectedItem;
+              }}
+              rowTextForSelection={(item) => {
+                return item.name ? item.name : item;
+              }}
+              renderDropdownIcon={() => (
+                <Ionicons
+                  name="chevron-down-outline"
+                  size={24}
+                  color={channelValue ? COLORS.white : COLORS.black}
+                />
+              )}
+              buttonStyle={styles.buttonStyle(channelValue)}
+              buttonTextStyle={styles.buttonTextStyle(channelValue)}
+              dropdownStyle={{ marginTop: -22, borderRadius: 10 }}
+              rowTextStyle={styles.rowTextStyle}
+              selectedRowStyle={styles.selectedRowStyle}
+              selectedRowTextStyle={styles.selectedRowTextStyle}
+              defaultButtonText="Select channel..."
+            />
+          </View>
         </View>
 
+        {/* CHOOSE LOCATION */}
         <View style={styles.reportContainer}>
           <Text
             style={[
@@ -127,6 +194,7 @@ describe your situation..."
           </View>
         </View>
 
+        {/* SHARE FILE */}
         <View style={{ marginTop: 17 }}>
           <Text
             style={[
@@ -136,86 +204,27 @@ describe your situation..."
           >
             Share file (Video, Audio, Image)
           </Text>
+
+          <TouchableOpacity style={{ maxWidth: "36%", marginTop: 17 }}>
+            <View style={styles.upload}>
+              <Text style={styles.uploadText}>Choose file</Text>
+              <Ionicons
+                name="attach-sharp"
+                size={22}
+                color={COLORS.white}
+                style={{ transform: [{ rotate: "45deg" }] }}
+              />
+            </View>
+          </TouchableOpacity>
         </View>
 
-        <Button buttonStyle={{ marginTop: 43 }}>Submit</Button>
+        {/* SUBMIT REPORT */}
+        <Button buttonStyle={{ marginTop: 43 }} onPress={handleSubmit}>
+          Submit
+        </Button>
       </ScrollView>
     </View>
   );
 };
 
 export default Report;
-
-const styles = StyleSheet.create({
-  view: {
-    backgroundColor: COLORS.white,
-    paddingTop: 15,
-    width: SIZES.width,
-    paddingBottom: 80,
-  },
-
-  titleText: (size, weight, spacing, itemId, reportId) => {
-    return {
-      fontSize: size,
-      fontFamily: weight,
-      letterSpacing: spacing,
-      color: itemId === reportId ? COLORS.white : COLORS.black,
-    };
-  },
-
-  categories: {
-    flexDirection: "row",
-    gap: 10,
-    flexWrap: "wrap",
-    marginTop: 10,
-  },
-
-  reportTypeBox: (itemId, reportId) => {
-    return {
-      borderWidth: 2,
-      borderColor: COLORS.primary,
-      borderRadius: 50,
-      backgroundColor: itemId === reportId ? COLORS.primary : "transparent",
-    };
-  },
-
-  reportContainer: {
-    marginTop: 21,
-  },
-
-  inputContainer: (inputIsFocused) => {
-    return {
-      height: 130,
-      marginTop: 12,
-      paddingHorizontal: 12,
-      paddingVertical: 10,
-      borderColor: COLORS.black,
-      borderWidth: inputIsFocused ? 2 : 1,
-      borderRadius: 10,
-    };
-  },
-  reportInput: {
-    fontSize: 15,
-    textAlignVertical: "top",
-  },
-
-  locationContainer: (locationIsFocused) => {
-    return {
-      flexDirection: "row",
-      alignItems: "center",
-      borderWidth: locationIsFocused ? 2 : 1,
-      borderColor: locationIsFocused ? COLORS.black : COLORS.gray4,
-      borderRadius: 5,
-      paddingRight: 13,
-      marginTop: 15,
-    };
-  },
-
-  locationInput: {
-    flex: 1,
-    paddingLeft: 18,
-    paddingVertical: 12,
-    fontSize: 12,
-    fontFamily: "medium",
-  },
-});

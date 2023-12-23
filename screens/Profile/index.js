@@ -1,9 +1,9 @@
 import { View, Text } from "react-native";
-import React from "react";
+import { COLORS, SIZES } from "../../constants";
 
 const Profile = () => {
   return (
-    <View>
+    <View style={[SIZES.safeAreaView, { backgroundColor: COLORS.white }]}>
       <Text>Profile</Text>
     </View>
   );

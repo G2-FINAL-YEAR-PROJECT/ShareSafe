@@ -1,5 +1,5 @@
 import { View, FlatList, Text } from "react-native";
-import { RecommendedItem } from "../../ui";
+import RecommendedItem from "../RecommendedItem";
 import { recommended } from "../../data";
 
 const Recommended = () => {

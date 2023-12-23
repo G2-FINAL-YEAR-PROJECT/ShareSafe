@@ -1,12 +1,12 @@
 import { View, Text } from "react-native";
-import { COLORS, SIZES } from "../../../constants";
+import { SIZES, COLORS } from "../../constants";
 
-const Emergencies = () => {
+const ArchiveTab = () => {
   return (
     <View style={[SIZES.safeAreaView, { backgroundColor: COLORS.white }]}>
-      <Text>Emergencies</Text>
+      <Text>ArchiveTab</Text>
     </View>
   );
 };
 
-export default Emergencies;
+export default ArchiveTab;
