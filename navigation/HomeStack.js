@@ -3,8 +3,10 @@ import BottomTabStack from "./BottomTabStack";
 import { Ionicons } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native";
 import { COLORS } from "../constants";
-import { Welcome, ReportSuccess, Notifications, Search } from "../screens";
+import { Welcome, ReportSuccess, Notifications, Search, Loading } from "../screens";
 import { useNavigation } from "@react-navigation/native";
+import { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Stack = createNativeStackNavigator();
 

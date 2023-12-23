@@ -7,6 +7,7 @@ import { useFonts } from "expo-font";
 import { HomeStack, AuthStack } from "./navigation";
 import * as SplashScreen from "expo-splash-screen";
 import { ActivityIndicator, View } from "react-native";
+import { Loading } from "./screens";
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -36,11 +37,16 @@ export default function App() {
 }
 
 const AppNavigation = () => {
-  const { token } = useAuth();
+  const { token, loadingAuth } = useAuth();
+
+  if (loadingAuth) {
+    return <Loading />;
+  }
+
   return (
     <NavigationContainer>
-      {/* {token ? <HomeStack /> : <AuthStack />} */}
-      <HomeStack />
+      {token ? <HomeStack /> : <AuthStack />}
+      {/* <HomeStack /> */}
     </NavigationContainer>
   );
 };

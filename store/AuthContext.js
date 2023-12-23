@@ -7,31 +7,50 @@ const baseUrl = "https://share-safe-kn9v.onrender.com/auth";
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
-  const [loading, setLoading] = useState(false);
+  const [loadingAuth, setLoadingAuth] = useState(true);
+  const [loadingLogin, setLoadingLogin] = useState(false);
+  const [loadingRegister, setLoadingRegister] = useState(false);
+
   const [token, setToken] = useState(null);
   const [userData, setUserData] = useState(null);
+  const [viewedOnboarding, setViewedOnboarding] = useState(false);
 
   useEffect(() => {
     getAuthData();
   }, []);
 
   const getAuthData = async () => {
-    let authData = await AsyncStorage.getItem("@AuthData");
-    authData = JSON.parse(authData);
+    // await AsyncStorage.clear();
+    // await AsyncStorage.removeItem("@AuthData");
 
-    if (authData?.token && authData?.userData) {
-      setToken(authData.token);
-      setUserData(authData.userData);
+    try {
+      let authData = await AsyncStorage.getItem("@AuthData");
+      const viewedOnboarding = await AsyncStorage.getItem("@viewedOnboarding");
+
+      authData = JSON.parse(authData);
+
+      if (authData?.token && authData?.userData) {
+        setToken(authData.token);
+        setUserData(authData.userData);
+      }
+
+      if (viewedOnboarding) {
+        setViewedOnboarding(true);
+      }
+    } catch (error) {
+      console.log("AuthContext: ", error);
+    } finally {
+      setLoadingAuth(false);
     }
   };
 
   const login = async ({ email, password }) => {
     try {
-      setLoading(true);
+      setLoadingLogin(true);
       const res = await axios.post(baseUrl + "/login", { email, password });
       const token = res?.data?.data?.tokens?.access?.token;
       const userData = res?.data?.data?.user;
-      setLoading(false);
+      setLoadingLogin(false);
 
       // Error handling
       if (!token) {
@@ -51,11 +70,11 @@ const AuthProvider = ({ children }) => {
 
   const register = async (data) => {
     try {
-      setLoading(true);
+      setLoadingRegister(true);
       const res = await axios.post(baseUrl + "/register", data);
       const token = res?.data?.data?.tokens?.access?.token;
       const userData = res?.data?.data?.signUpUserData;
-      setLoading(false);
+      setLoadingRegister(false);
 
       // Error handling
       if (!token) {
@@ -84,7 +103,19 @@ const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ token, userData, loading, login, register, logout }}>
+    <AuthContext.Provider
+      value={{
+        token,
+        userData,
+        loadingAuth,
+        loadingLogin,
+        loadingRegister,
+        login,
+        register,
+        logout,
+        viewedOnboarding,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -64,7 +64,7 @@ const Register = ({ navigation }) => {
         <PasswordField password={password} setPassword={setPassword} />
       </View>
 
-      <Button onPress={handleRegister} loading={auth.loading}>
+      <Button onPress={handleRegister} loading={auth.loadingRegister}>
         Sign Up
       </Button>
 
