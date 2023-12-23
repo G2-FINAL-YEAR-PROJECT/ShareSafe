@@ -24,7 +24,7 @@ export const globalStyles = StyleSheet.create({
   // Shared
   container: {
     padding: 18,
-    marginTop: Platform.OS === "android" ? 26 : 0,
+    marginTop: Platform.OS === "android" ? 30 : 0,
     minHeight: "100%",
   },
   h1: {

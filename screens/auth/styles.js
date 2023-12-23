@@ -3,7 +3,7 @@ import { COLORS } from "../../constants";
 
 const styles = StyleSheet.create({
   header: {
-    marginTop: 80,
+    marginTop: 65,
     marginBottom: 60,
   },
   subHeading: {

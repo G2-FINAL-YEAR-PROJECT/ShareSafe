@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 // import AsyncStorage from "@react-native-async-storage/async-storage";
 import { globalStyles } from "../../constants";
 import { useNavigation } from "@react-navigation/native";
 import { useAuth } from "../../store";
 import { Button, PasswordField } from "../../ui";
 import styles from "./styles";
+import { validateEmail } from "../../helpers";
 
 const Login = () => {
   const navigator = useNavigation();
@@ -17,8 +18,7 @@ const Login = () => {
     // await AsyncStorage.removeItem("@viewedOnboarding");
 
     // Validate email address
-    const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-    if (!emailRegex.test(email.trim())) {
+    if (!validateEmail(email)) {
       alert("Please enter a valid email address");
       return;
     }
@@ -31,8 +31,9 @@ const Login = () => {
     const data = { email: email.trim(), password: password };
     await auth.login(data);
   };
+
   return (
-    <View style={globalStyles.container}>
+    <ScrollView style={globalStyles.container}>
       <View style={styles.header}>
         <Text style={globalStyles.h1}>Login</Text>
         <Text style={styles.subHeading}>Welcome back to ShareSafe</Text>
@@ -70,7 +71,7 @@ const Login = () => {
           <Text style={[globalStyles.link]}>Sign up</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
