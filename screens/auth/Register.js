@@ -1,23 +1,25 @@
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useState } from "react";
 import { globalStyles } from "../../constants";
 import styles from "./styles";
-import { Button } from "../../ui";
+import { Button, PasswordField } from "../../ui";
+import { validateEmail } from "../../helpers";
+import { useAuth } from "../../store";
 
 const Register = ({ navigation }) => {
+  const { register, loadingRegister } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleRegister = () => {
-    // Validate name field
+  const handleRegister = async () => {
     if (!name.trim()) {
       alert("Name is required");
       return;
     }
     // Validate email address
-    const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-    if (!emailRegex.test(email)) {
+    if (!validateEmail(email)) {
       alert("Please enter a valid email address");
       return;
     }
@@ -27,58 +29,72 @@ const Register = ({ navigation }) => {
       return;
     }
 
-    // console.log(email, password);
-    alert("Name: " + name + " Email: " + email + " Password: " + password);
+    if (password !== confirmPassword) {
+      alert("Password does not match!");
+      return;
+    }
+
+    const data = { fullName: name.trim(), email: email.trim(), password };
+    await register(data);
   };
 
   return (
-    <View style={globalStyles.container}>
-      <View style={styles.header}>
-        <Text style={globalStyles.h1}>Create and account</Text>
-        <Text style={globalStyles.p}>Be a part of SafeShare</Text>
+    <ScrollView>
+      <View style={globalStyles.container}>
+        <View style={styles.header}>
+          <Text style={globalStyles.h1}>Create and account</Text>
+          <Text style={styles.subHeading}>Be a part of SafeShare</Text>
+        </View>
+
+        <View style={styles.formGroup}>
+          <Text style={globalStyles.label}>Name</Text>
+          <TextInput
+            style={globalStyles.input}
+            placeholder="Your Name"
+            value={name}
+            autoComplete="name"
+            onChangeText={(text) => setName(text)}
+          />
+        </View>
+
+        <View style={styles.formGroup}>
+          <Text style={globalStyles.label}>Email Address</Text>
+          <TextInput
+            style={globalStyles.input}
+            placeholder="hello@example.com"
+            value={email}
+            autoComplete="email"
+            onChangeText={(text) => setEmail(text)}
+          />
+        </View>
+
+        <View style={styles.formGroup}>
+          <Text style={globalStyles.label}>Password</Text>
+          <PasswordField password={password} setPassword={setPassword} />
+        </View>
+
+        <View style={styles.formGroup}>
+          <Text style={globalStyles.label}>Confirm Password</Text>
+          <PasswordField password={confirmPassword} setPassword={setConfirmPassword} />
+        </View>
+
+        <Button onPress={handleRegister} loading={loadingRegister}>
+          Sign Up
+        </Button>
+
+        <View style={{ marginTop: 26, alignItems: "center" }}>
+          <Text style={[globalStyles.h5]}>Have an account?</Text>
+
+          <TouchableOpacity
+            onPress={() => {
+              return loadingRegister ? null : navigation.navigate("Login");
+            }}
+          >
+            <Text style={[globalStyles.link]}>Login</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-
-      <View style={styles.formGroup}>
-        <Text style={globalStyles.label}>Name</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Your Name"
-          value={name}
-          onChangeText={(text) => setName(text)}
-        />
-      </View>
-
-      <View style={styles.formGroup}>
-        <Text style={globalStyles.label}>Email Address</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="hello@example.com"
-          value={email}
-          onChangeText={(text) => setEmail(text)}
-        />
-      </View>
-
-      <View style={styles.formGroup}>
-        <Text style={globalStyles.label}>Password</Text>
-        <TextInput
-          style={styles.input}
-          secureTextEntry={true}
-          placeholder="**********"
-          value={password}
-          onChangeText={(text) => setPassword(text)}
-        />
-      </View>
-
-      <Button onPress={handleRegister}>Sign Up</Button>
-
-      <View style={{ marginTop: 26, alignItems: "center" }}>
-        <Text style={[globalStyles.h5]}>Have an account?</Text>
-
-        <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-          <Text style={[globalStyles.link]}>Login</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    </ScrollView>
   );
 };
 

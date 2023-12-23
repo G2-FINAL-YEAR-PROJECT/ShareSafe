@@ -8,27 +8,18 @@ const ResetPassword = ({ navigation }) => {
     <View style={globalStyles.container}>
       <View style={styles.header}>
         <Text style={globalStyles.h1}>Reset Password</Text>
-        <Text style={globalStyles.p}>
-          The OTP code has been sent to your email
-        </Text>
+        <Text style={styles.subHeading}>The OTP code has been sent to your email</Text>
       </View>
 
       <View style={styles.formGroup}>
         <Text style={globalStyles.label}>Enter OTP</Text>
-        <TextInput style={styles.input} placeholder="" />
+        <TextInput style={globalStyles.input} placeholder="" />
       </View>
 
       <Button>Verify</Button>
 
-      <View
-        style={[
-          globalStyles.flexCenter,
-          { marginTop: 26, alignItems: "center" },
-        ]}
-      >
-        <Text style={[globalStyles.h5, { marginBottom: 0 }]}>
-          Didn't receive the OTP?
-        </Text>
+      <View style={[globalStyles.flexCenter, { marginTop: 26, alignItems: "center" }]}>
+        <Text style={[globalStyles.h5, { marginBottom: 0 }]}>Didn't receive the OTP?</Text>
 
         <TouchableOpacity style={{ marginLeft: 8 }}>
           <Text style={[globalStyles.link]}>Resend</Text>

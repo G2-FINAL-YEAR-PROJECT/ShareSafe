@@ -1,48 +1,51 @@
 import { useState } from "react";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 // import AsyncStorage from "@react-native-async-storage/async-storage";
 import { globalStyles } from "../../constants";
 import { useNavigation } from "@react-navigation/native";
 import { useAuth } from "../../store";
-import { Button } from "../../ui";
+import { Button, PasswordField } from "../../ui";
 import styles from "./styles";
+import { validateEmail } from "../../helpers";
 
-const Login = ({ navigation }) => {
+const Login = () => {
   const navigator = useNavigation();
-  const auth = useAuth();
-
+  const { login, loadingLogin } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
     // await AsyncStorage.removeItem("@viewedOnboarding");
+
     // Validate email address
-    const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-    if (!emailRegex.test(email)) {
+    if (!validateEmail(email)) {
       alert("Please enter a valid email address");
       return;
     }
     // Validate password
-    if (!password.length) {
+    if (!password.trim()) {
       alert("Password is required");
       return;
     }
     // Authenticate
-    await auth.login(email, password);
+    const data = { email: email.trim(), password: password };
+    await login(data);
   };
+
   return (
-    <View style={globalStyles.container}>
+    <ScrollView style={globalStyles.container}>
       <View style={styles.header}>
         <Text style={globalStyles.h1}>Login</Text>
-        <Text style={globalStyles.p}>Welcome back to ShareSafe</Text>
+        <Text style={styles.subHeading}>Welcome back to ShareSafe</Text>
       </View>
 
       <View style={styles.formGroup}>
         <Text style={globalStyles.label}>Email Address</Text>
         <TextInput
-          style={styles.input}
+          style={globalStyles.input}
           placeholder="hello@example.com"
           value={email}
+          autoComplete="email"
           onChangeText={(text) => setEmail(text)}
         />
       </View>
@@ -51,33 +54,33 @@ const Login = ({ navigation }) => {
         <View style={globalStyles.flex}>
           <Text style={globalStyles.label}>Password</Text>
           <TouchableOpacity
-            onPress={() => navigator.navigate("ForgotPassword")}
+            onPress={() => {
+              return loadingLogin ? null : navigator.navigate("ForgotPassword");
+            }}
           >
-            <Text style={[globalStyles.link, { fontSize: 16 }]}>
-              Forgot Password?
-            </Text>
+            <Text style={[globalStyles.link, { fontSize: 16 }]}>Forgot Password?</Text>
           </TouchableOpacity>
         </View>
 
-        <TextInput
-          style={styles.input}
-          secureTextEntry={true}
-          placeholder="**********"
-          value={password}
-          onChangeText={(text) => setPassword(text)}
-        />
+        <PasswordField password={password} setPassword={setPassword} />
       </View>
 
-      <Button onPress={handleLogin}>Login</Button>
+      <Button onPress={handleLogin} loading={loadingLogin}>
+        Login
+      </Button>
 
       <View style={{ marginTop: 26, alignItems: "center" }}>
         <Text style={[globalStyles.h5]}>Don’t have an account?</Text>
 
-        <TouchableOpacity onPress={() => navigator.navigate("Register")}>
+        <TouchableOpacity
+          onPress={() => {
+            return loadingLogin ? null : navigator.navigate("Register");
+          }}
+        >
           <Text style={[globalStyles.link]}>Sign up</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 

@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 import { COLORS } from "./theme";
 
 export const globalStyles = StyleSheet.create({
@@ -24,15 +24,23 @@ export const globalStyles = StyleSheet.create({
   // Shared
   container: {
     padding: 18,
+    marginTop: Platform.OS === "android" ? 30 : 0,
     minHeight: "100%",
   },
   h1: {
-    marginBottom: 6,
     fontSize: 30,
     fontFamily: "bold",
   },
+  h2: {
+    fontSize: 28,
+    fontFamily: "bold",
+  },
+  h3: {
+    fontSize: 24,
+    fontFamily: "semibold",
+  },
   p: {
-    fontSize: 18,
+    fontSize: 16,
     fontFamily: "regular",
   },
   h5: {
@@ -49,5 +57,14 @@ export const globalStyles = StyleSheet.create({
     fontSize: 18,
     fontFamily: "medium",
     color: COLORS.primary,
+  },
+  input: {
+    padding: 10,
+    fontSize: 15,
+    // fontFamily: "regular",
+    paddingHorizontal: 12,
+    borderColor: COLORS.gray2,
+    borderWidth: 1,
+    borderRadius: 4,
   },
 });
