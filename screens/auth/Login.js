@@ -29,17 +29,8 @@ const Login = () => {
     }
     // Authenticate
     const data = { email: email.trim(), password: password };
-    setLoadingLogin(true);
-
-    setLoadingLogin(false);
     await auth.login(data);
   };
-
-  console.log("auth.token: ", auth.token);
-
-  if (auth.token) {
-    return null;
-  }
 
   return (
     <ScrollView style={globalStyles.container}>

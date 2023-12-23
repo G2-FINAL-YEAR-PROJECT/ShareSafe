@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Login, Register, ForgotPassword, ResetPassword, Onboarding, Loading } from "../screens";
+import { useAuth } from "../store";
 
 const Stack = createNativeStackNavigator();
 const AuthStack = () => {
