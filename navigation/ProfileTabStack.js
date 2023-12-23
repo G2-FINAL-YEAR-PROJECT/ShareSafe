@@ -1,12 +1,13 @@
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import { Emergencies, Home } from "../screens";
 import { COLORS } from "../constants";
 import { Text } from "react-native";
+import { Profile, ReportsTab, LikesTab } from "../screens";
 
-const TopTab = createMaterialTopTabNavigator();
-const TopTabStack = () => {
+const ProfileTab = createMaterialTopTabNavigator();
+
+const ProfileTabStack = () => {
   return (
-    <TopTab.Navigator
+    <ProfileTab.Navigator
       screenOptions={{
         tabBarLabelStyle: {
           textTransform: "capitalize",
@@ -16,9 +17,9 @@ const TopTabStack = () => {
         },
       }}
     >
-      <TopTab.Screen
-        name="Posts"
-        component={Home}
+      <ProfileTab.Screen
+        name="Profile"
+        component={Profile}
         options={{
           tabBarLabel: ({ focused }) => {
             return (
@@ -36,13 +37,13 @@ const TopTabStack = () => {
             height: 3,
             backgroundColor: COLORS.primary,
             maxWidth: "19%",
-            marginLeft: 73,
+            marginLeft: 48,
           },
         }}
       />
-      <TopTab.Screen
-        name="Emergencies"
-        component={Emergencies}
+      <ProfileTab.Screen
+        name="Reports"
+        component={ReportsTab}
         options={{
           tabBarLabel: ({ focused }) => {
             return (
@@ -52,20 +53,44 @@ const TopTabStack = () => {
                   fontFamily: "semibold",
                 }}
               >
-                Emergencies
+                Reports
               </Text>
             );
           },
           tabBarIndicatorStyle: {
             height: 3,
             backgroundColor: COLORS.primary,
-            maxWidth: "39%",
-            marginLeft: 51,
+            maxWidth: "34%",
+            marginLeft: 37,
           },
         }}
       />
-    </TopTab.Navigator>
+      <ProfileTab.Screen
+        name="Likes"
+        component={LikesTab}
+        options={{
+          tabBarLabel: ({ focused }) => {
+            return (
+              <Text
+                style={{
+                  color: focused ? COLORS.primary : COLORS.gray3,
+                  fontFamily: "semibold",
+                }}
+              >
+                Likes
+              </Text>
+            );
+          },
+          tabBarIndicatorStyle: {
+            height: 3,
+            backgroundColor: COLORS.primary,
+            maxWidth: "19%",
+            marginLeft: 50,
+          },
+        }}
+      />
+    </ProfileTab.Navigator>
   );
 };
 
-export default TopTabStack;
+export default ProfileTabStack;

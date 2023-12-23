@@ -1,19 +1,21 @@
 import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Recommended } from "../../components";
+import { Recommended, ProfileHeader } from "../../components";
 import { COLORS } from "../../constants";
+import { useNavigation } from "@react-navigation/native";
 
 const Header = ({
   showBack,
   showSearchNotify,
   showLogo,
   showCancel,
+  showProfile,
   showRecommended,
 }) => {
-  //<Ionicons name="arrow-back" size={24} color="black" />
+  const navigation = useNavigation();
 
   return (
-    <View style={{ marginTop: showRecommended && 30 }}>
+    <View style={{ marginTop: (showRecommended || showProfile) && 30 }}>
       <View style={[styles.header, { width: "100%" }]}>
         <View style={styles.headerLeft}>
           {showLogo && (
@@ -25,7 +27,10 @@ const Header = ({
           )}
 
           {showBack && (
-            <TouchableOpacity style={{ alignItems: "center" }}>
+            <TouchableOpacity
+              style={{ alignItems: "center" }}
+              onPressIn={() => navigation.goBack()}
+            >
               <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
             </TouchableOpacity>
           )}
@@ -36,10 +41,15 @@ const Header = ({
             <>
               <TouchableOpacity
                 style={{ alignItems: "center", marginRight: 18 }}
+                onPressIn={() => navigation.navigate("Search")}
               >
                 <Ionicons name="search" size={24} color={COLORS.primary} />
               </TouchableOpacity>
-              <TouchableOpacity style={{ alignItems: "center" }}>
+
+              <TouchableOpacity
+                style={{ alignItems: "center" }}
+                onPressIn={() => navigation.navigate("Notifications")}
+              >
                 <Ionicons
                   name="notifications"
                   size={24}
@@ -51,6 +61,7 @@ const Header = ({
         </View>
       </View>
       {showRecommended && <Recommended />}
+      {showProfile && <ProfileHeader />}
     </View>
   );
 };

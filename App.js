@@ -39,8 +39,8 @@ const AppNavigation = () => {
   const { token } = useAuth();
   return (
     <NavigationContainer>
-      {token ? <HomeStack /> : <AuthStack />}
-      {/* <HomeStack /> */}
+      {/* {token ? <HomeStack /> : <AuthStack />} */}
+      <HomeStack />
     </NavigationContainer>
   );
 };

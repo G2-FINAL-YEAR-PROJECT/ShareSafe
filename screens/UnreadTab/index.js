@@ -1,12 +1,12 @@
 import { View, Text } from "react-native";
-import { COLORS, SIZES } from "../../../constants";
+import { COLORS, SIZES } from "../../constants";
 
-const Emergencies = () => {
+const UnreadTab = () => {
   return (
     <View style={[SIZES.safeAreaView, { backgroundColor: COLORS.white }]}>
-      <Text>Emergencies</Text>
+      <Text>UnreadTab</Text>
     </View>
   );
 };
 
-export default Emergencies;
+export default UnreadTab;
