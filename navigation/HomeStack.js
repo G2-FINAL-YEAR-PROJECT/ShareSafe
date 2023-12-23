@@ -13,12 +13,14 @@ const Stack = createNativeStackNavigator();
 const HomeStack = () => {
   const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
-  const [hideWelcomeScreen, setHideWelcomeScreen] = useState(false);
+  const [showWelcomeScreen, setShowWelcomeScreen] = useState(false);
 
   const checkWelcomeStatus = async () => {
     try {
-      const value = await AsyncStorage.getItem("@hideWelcomeScreen");
-      if (value) setHideWelcomeScreen(true);
+      const value = await AsyncStorage.getItem("@showWelcomeScreen");
+      if (value !== null) {
+        setShowWelcomeScreen(true);
+      }
     } catch (error) {
       console.log("Error @checkWelcomeStatus: ", error);
     } finally {
@@ -32,9 +34,11 @@ const HomeStack = () => {
 
   return (
     <Stack.Navigator screenOptions={{ headerTitle: "" }}>
-      {loading && <Stack.Screen name="Loading" component={Loading} />}
+      {loading && (
+        <Stack.Screen name="Loading" component={Loading} options={{ headerShown: false }} />
+      )}
 
-      {!hideWelcomeScreen && (
+      {showWelcomeScreen && (
         <Stack.Screen name="Welcome" component={Welcome} options={{ headerShown: false }} />
       )}
 

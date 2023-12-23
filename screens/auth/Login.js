@@ -10,7 +10,7 @@ import { validateEmail } from "../../helpers";
 
 const Login = () => {
   const navigator = useNavigation();
-  const auth = useAuth();
+  const { login, loadingLogin } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -29,7 +29,7 @@ const Login = () => {
     }
     // Authenticate
     const data = { email: email.trim(), password: password };
-    await auth.login(data);
+    await login(data);
   };
 
   return (
@@ -45,6 +45,7 @@ const Login = () => {
           style={globalStyles.input}
           placeholder="hello@example.com"
           value={email}
+          autoComplete="email"
           onChangeText={(text) => setEmail(text)}
         />
       </View>
@@ -52,7 +53,11 @@ const Login = () => {
       <View style={styles.formGroup}>
         <View style={globalStyles.flex}>
           <Text style={globalStyles.label}>Password</Text>
-          <TouchableOpacity onPress={() => navigator.navigate("ForgotPassword")}>
+          <TouchableOpacity
+            onPress={() => {
+              return loadingLogin ? null : navigator.navigate("ForgotPassword");
+            }}
+          >
             <Text style={[globalStyles.link, { fontSize: 16 }]}>Forgot Password?</Text>
           </TouchableOpacity>
         </View>
@@ -60,14 +65,18 @@ const Login = () => {
         <PasswordField password={password} setPassword={setPassword} />
       </View>
 
-      <Button onPress={handleLogin} loading={auth.loadingLogin}>
+      <Button onPress={handleLogin} loading={loadingLogin}>
         Login
       </Button>
 
       <View style={{ marginTop: 26, alignItems: "center" }}>
         <Text style={[globalStyles.h5]}>Don’t have an account?</Text>
 
-        <TouchableOpacity onPress={() => navigator.navigate("Register")}>
+        <TouchableOpacity
+          onPress={() => {
+            return loadingLogin ? null : navigator.navigate("Register");
+          }}
+        >
           <Text style={[globalStyles.link]}>Sign up</Text>
         </TouchableOpacity>
       </View>

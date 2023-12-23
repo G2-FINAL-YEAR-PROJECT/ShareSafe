@@ -7,10 +7,11 @@ import { validateEmail } from "../../helpers";
 import { useAuth } from "../../store";
 
 const Register = ({ navigation }) => {
-  const auth = useAuth();
+  const { register, loadingRegister } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleRegister = async () => {
     if (!name.trim()) {
@@ -28,52 +29,70 @@ const Register = ({ navigation }) => {
       return;
     }
 
+    if (password !== confirmPassword) {
+      alert("Password does not match!");
+      return;
+    }
+
     const data = { fullName: name.trim(), email: email.trim(), password };
-    await auth.register(data);
+    await register(data);
   };
 
   return (
-    <ScrollView style={globalStyles.container}>
-      <View style={styles.header}>
-        <Text style={globalStyles.h1}>Create and account</Text>
-        <Text style={styles.subHeading}>Be a part of SafeShare</Text>
-      </View>
+    <ScrollView>
+      <View style={globalStyles.container}>
+        <View style={styles.header}>
+          <Text style={globalStyles.h1}>Create and account</Text>
+          <Text style={styles.subHeading}>Be a part of SafeShare</Text>
+        </View>
 
-      <View style={styles.formGroup}>
-        <Text style={globalStyles.label}>Name</Text>
-        <TextInput
-          style={globalStyles.input}
-          placeholder="Your Name"
-          value={name}
-          onChangeText={(text) => setName(text)}
-        />
-      </View>
+        <View style={styles.formGroup}>
+          <Text style={globalStyles.label}>Name</Text>
+          <TextInput
+            style={globalStyles.input}
+            placeholder="Your Name"
+            value={name}
+            autoComplete="name"
+            onChangeText={(text) => setName(text)}
+          />
+        </View>
 
-      <View style={styles.formGroup}>
-        <Text style={globalStyles.label}>Email Address</Text>
-        <TextInput
-          style={globalStyles.input}
-          placeholder="hello@example.com"
-          value={email}
-          onChangeText={(text) => setEmail(text)}
-        />
-      </View>
+        <View style={styles.formGroup}>
+          <Text style={globalStyles.label}>Email Address</Text>
+          <TextInput
+            style={globalStyles.input}
+            placeholder="hello@example.com"
+            value={email}
+            autoComplete="email"
+            onChangeText={(text) => setEmail(text)}
+          />
+        </View>
 
-      <View style={styles.formGroup}>
-        <Text style={globalStyles.label}>Password</Text>
-        <PasswordField password={password} setPassword={setPassword} />
-      </View>
+        <View style={styles.formGroup}>
+          <Text style={globalStyles.label}>Password</Text>
+          <PasswordField password={password} setPassword={setPassword} />
+        </View>
 
-      <Button onPress={handleRegister} loading={auth.loadingRegister}>
-        Sign Up
-      </Button>
+        <View style={styles.formGroup}>
+          <Text style={globalStyles.label}>Confirm Password</Text>
+          <PasswordField password={confirmPassword} setPassword={setConfirmPassword} />
+        </View>
 
-      <View style={{ marginTop: 26, alignItems: "center" }}>
-        <Text style={[globalStyles.h5]}>Have an account?</Text>
+        <Button onPress={handleRegister} loading={loadingRegister}>
+          Sign Up
+        </Button>
 
-        <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-          <Text style={[globalStyles.link]}>Login</Text>
-        </TouchableOpacity>
+        <View style={{ marginTop: 26, alignItems: "center" }}>
+          <Text style={[globalStyles.h5]}>Have an account?</Text>
+
+          <TouchableOpacity
+            onPress={() => {
+              return loadingRegister ? null : navigation.navigate("Login");
+            }}
+          >
+            <Text style={[globalStyles.link]}>Login</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </ScrollView>
   );

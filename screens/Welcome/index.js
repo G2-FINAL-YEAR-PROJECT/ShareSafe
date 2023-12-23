@@ -49,7 +49,7 @@ const Welcome = () => {
     }
 
     // TODO: API call
-    await AsyncStorage.setItem("@hideWelcomeScreen", "true");
+    await AsyncStorage.removeItem("@showWelcomeScreen");
     navigator.navigate("BottomTabStack");
   };
 
