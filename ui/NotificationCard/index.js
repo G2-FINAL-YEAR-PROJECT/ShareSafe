@@ -1,5 +1,4 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
-import React from "react";
 
 const NotificationCard = ({ item, forPosts }) => {
   return (
@@ -28,6 +27,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    // paddingLeft: 8,
+    // paddingRight: 8,
+    // paddingVertical: 6,
   },
 
   imageBox: {

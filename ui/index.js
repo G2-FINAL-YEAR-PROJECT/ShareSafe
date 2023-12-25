@@ -2,3 +2,4 @@ export { default as Button } from "./Button";
 export { default as PasswordField } from "./PasswordField";
 export { default as Header } from "./Header";
 export { default as NotificationCard } from "./NotificationCard";
+export { default as PostCard } from "./PostCard";

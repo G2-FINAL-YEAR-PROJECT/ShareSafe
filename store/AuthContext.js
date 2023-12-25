@@ -21,7 +21,6 @@ const AuthProvider = ({ children }) => {
 
   const getAuthData = async () => {
     // await AsyncStorage.clear();
-    // await AsyncStorage.removeItem("@AuthData");
 
     try {
       let authData = await AsyncStorage.getItem("@AuthData");
@@ -61,7 +60,10 @@ const AuthProvider = ({ children }) => {
       setToken(token);
       setUserData(userData);
       // Persist data
-      await AsyncStorage.setItem("@AuthData", JSON.stringify({ token, userData }));
+      await AsyncStorage.setItem(
+        "@AuthData",
+        JSON.stringify({ token, userData })
+      );
     } catch (error) {
       console.log(error);
       handleErrorMessage();
@@ -83,7 +85,10 @@ const AuthProvider = ({ children }) => {
       }
 
       // Persist data
-      await AsyncStorage.setItem("@AuthData", JSON.stringify({ token, userData }));
+      await AsyncStorage.setItem(
+        "@AuthData",
+        JSON.stringify({ token, userData })
+      );
       await AsyncStorage.setItem("@showWelcomeScreen", "true");
 
       // Save token and user data

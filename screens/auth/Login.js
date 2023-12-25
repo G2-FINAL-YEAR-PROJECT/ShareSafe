@@ -1,6 +1,11 @@
 import { useState } from "react";
-import { ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
-// import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { globalStyles } from "../../constants";
 import { useNavigation } from "@react-navigation/native";
 import { useAuth } from "../../store";
@@ -15,8 +20,6 @@ const Login = () => {
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
-    // await AsyncStorage.removeItem("@viewedOnboarding");
-
     // Validate email address
     if (!validateEmail(email)) {
       alert("Please enter a valid email address");
@@ -58,7 +61,9 @@ const Login = () => {
               return loadingLogin ? null : navigator.navigate("ForgotPassword");
             }}
           >
-            <Text style={[globalStyles.link, { fontSize: 16 }]}>Forgot Password?</Text>
+            <Text style={[globalStyles.link, { fontSize: 16 }]}>
+              Forgot Password?
+            </Text>
           </TouchableOpacity>
         </View>
 

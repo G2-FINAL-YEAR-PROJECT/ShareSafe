@@ -9,6 +9,7 @@ export { default as Loading } from "./Loading";
 export { default as Login } from "./auth/Login";
 export { default as Notifications } from "./Notifications";
 export { default as Onboarding } from "./Onboarding";
+export { default as PostDetails } from "./PostDetails";
 export { default as Profile } from "./Profile";
 export { default as Register } from "./auth/Register";
 export { default as Report } from "./Report";
