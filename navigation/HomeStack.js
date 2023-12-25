@@ -11,6 +11,7 @@ import {
   Loading,
   PostDetails,
   EmergencyDetails,
+  EditProfile,
 } from "../screens";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
@@ -208,6 +209,22 @@ const HomeStack = () => {
                 />
               </TouchableOpacity>
             </View>
+          ),
+        }}
+      />
+
+      <Stack.Screen
+        name="EditProfile"
+        component={EditProfile}
+        options={{
+          headerShadowVisible: false,
+          headerLeft: () => (
+            <TouchableOpacity
+              style={{ alignItems: "center" }}
+              onPressIn={() => navigation.goBack()}
+            >
+              <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
+            </TouchableOpacity>
           ),
         }}
       />
