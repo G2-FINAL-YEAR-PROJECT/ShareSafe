@@ -1,36 +1,79 @@
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { globalStyles } from "../../constants";
 import styles from "./styles";
-import { Button } from "../../ui";
+import { Button, PasswordField } from "../../ui";
+import { useState } from "react";
+import axios from "axios";
 
-const ResetPassword = ({ navigation }) => {
+const ResetPassword = ({ route, navigation }) => {
+  const { token } = route.params?.token;
+  const [loading, setLoading] = useState(false);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const handleSubmit = async () => {
+    // Validate password
+    if (password.length < 8) {
+      alert("Password must be at least 8 characters");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      alert("Password does not match!");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const baseUrl = "https://share-safe-kn9v.onrender.com/auth";
+      const res = await axios.post(baseUrl + "/reset_password?token=" + token, {
+        password,
+        confirm_password: confirmPassword,
+      });
+      console.log(res.data);
+
+      // Error handling
+      if (res.data.status !== 200) {
+        alert(res?.data?.message ?? "An error occurred. Please try again");
+        return;
+      }
+
+      alert("Password reset successfully. Please log in");
+      navigation.navigate("Login");
+    } catch (error) {
+      console.log(error);
+      alert("An error occurred. Please try again");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <View style={globalStyles.container}>
       <View style={styles.header}>
         <Text style={globalStyles.h1}>Reset Password</Text>
-        <Text style={styles.subHeading}>The OTP code has been sent to your email</Text>
+        <Text style={styles.subHeading}>Set the new password for your account</Text>
       </View>
 
       <View style={styles.formGroup}>
-        <Text style={globalStyles.label}>Enter OTP</Text>
-        <TextInput style={globalStyles.input} placeholder="" />
+        <Text style={globalStyles.label}>New Password</Text>
+        <PasswordField password={password} setPassword={setPassword} />
       </View>
 
-      <Button>Verify</Button>
-
-      <View style={[globalStyles.flexCenter, { marginTop: 26, alignItems: "center" }]}>
-        <Text style={[globalStyles.h5, { marginBottom: 0 }]}>Didn't receive the OTP?</Text>
-
-        <TouchableOpacity style={{ marginLeft: 8 }}>
-          <Text style={[globalStyles.link]}>Resend</Text>
-        </TouchableOpacity>
+      <View style={styles.formGroup}>
+        <Text style={globalStyles.label}>Confirm Password</Text>
+        <PasswordField password={confirmPassword} setPassword={setConfirmPassword} />
       </View>
 
-      <View style={{ marginTop: 16, alignItems: "center" }}>
+      <Button onPress={handleSubmit} loading={loading}>
+        Reset Password
+      </Button>
+
+      {/* <View style={{ marginTop: 16, alignItems: "center" }}>
         <TouchableOpacity onPress={() => navigation.navigate("ForgotPassword")}>
           <Text style={[globalStyles.link]}>Go back</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
     </View>
   );
 };

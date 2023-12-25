@@ -3,8 +3,11 @@ import { useState } from "react";
 import { globalStyles } from "../../constants";
 import styles from "./styles";
 import { Button } from "../../ui";
+import axios from "axios";
 
-const VerifyOTP = ({ navigation }) => {
+const VerifyOTP = ({ route, navigation }) => {
+  const { email } = route.params;
+  const [loading, setLoading] = useState(false);
   const [optCode, setOptCode] = useState("");
 
   const handleSubmit = async () => {
@@ -13,7 +16,25 @@ const VerifyOTP = ({ navigation }) => {
       return;
     }
 
-    navigation.navigate("ResetPassword");
+    try {
+      setLoading(true);
+      const baseUrl = "https://share-safe-kn9v.onrender.com/auth";
+      const res = await axios.post(baseUrl + "/verify_email", { token: optCode, email });
+      const token = res?.data?.data?.tokens?.access?.token;
+
+      // Error handling
+      if (!token) {
+        alert(res?.data?.message ?? "An error occurred. Please try again");
+        return;
+      }
+
+      navigation.navigate("ResetPassword", { email, token });
+    } catch (error) {
+      console.log(error);
+      alert("An error occurred. Please try again");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -34,7 +55,9 @@ const VerifyOTP = ({ navigation }) => {
           />
         </View>
 
-        <Button onPress={handleSubmit}>Continue</Button>
+        <Button onPress={handleSubmit} loading={loading}>
+          Continue
+        </Button>
 
         <View style={[globalStyles.flexCenter, { marginTop: 26, alignItems: "center" }]}>
           <Text style={[globalStyles.h5, { marginBottom: 0 }]}>Didn't receive the OTP?</Text>
