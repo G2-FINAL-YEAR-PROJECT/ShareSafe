@@ -1,22 +1,13 @@
 import { View, Text, TouchableOpacity, Image, Pressable } from "react-native";
-import { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "../../constants";
 import { useNavigation } from "@react-navigation/native";
+import { useAspectRatio } from "../../hooks";
 import styles from "./styles";
 
 const PostCard = ({ post, postDetailIsActive }) => {
-  const [aspectRatio, setAspectRatio] = useState(1);
+  const { aspectRatio } = useAspectRatio(1, post);
   const navigation = useNavigation();
-
-  useEffect(() => {
-    if (post && post.postImage) {
-      Image.getSize(post.postImage, (width, height) => {
-        const calculatedAspectRatio = width / height;
-        setAspectRatio(calculatedAspectRatio);
-      });
-    }
-  }, [post]);
 
   return (
     <TouchableOpacity

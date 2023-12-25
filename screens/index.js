@@ -1,6 +1,7 @@
 export { default as ArchiveTab } from "./ArchiveTab";
 export { default as CreatePost } from "./CreatePost";
 export { default as Emergencies } from "./Home/Emergencies";
+export { default as EmergencyDetails } from "./EmergencyDetails";
 export { default as ForgotPassword } from "./auth/ForgotPassword";
 export { default as Home } from "./Home";
 export { default as InboxTab } from "./InboxTab";

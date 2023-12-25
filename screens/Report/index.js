@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   TextInput,
 } from "react-native";
-import { Button } from "../../ui";
+import { Button, SearchInput } from "../../ui";
 import { COLORS, SIZES } from "../../constants";
 import { Ionicons } from "@expo/vector-icons";
 import { reportType, channels } from "../../data";
@@ -179,18 +179,15 @@ describe your situation..."
           >
             Location
           </Text>
-          <View style={styles.locationContainer(locationIsFocused)}>
-            <TextInput
-              style={styles.locationInput}
-              placeholderTextColor="#252525"
-              cursorColor={COLORS.black}
-              placeholder="Search Location"
+          <View style={{ marginTop: 15 }}>
+            <SearchInput
               value={locationText}
-              onChangeText={(text) => setLocationText(text)}
-              onFocus={() => setLocationIsFocused(true)}
-              onBlur={() => setLocationIsFocused(false)}
+              inputIsFocused={locationIsFocused}
+              placeholder="Search Location"
+              handleChange={(text) => setLocationText(text)}
+              handleFocus={() => setLocationIsFocused(true)}
+              handleBlur={() => setLocationIsFocused(false)}
             />
-            <Ionicons name="search" size={24} color="#252525" />
           </View>
         </View>
 

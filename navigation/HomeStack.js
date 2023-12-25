@@ -10,6 +10,7 @@ import {
   Search,
   Loading,
   PostDetails,
+  EmergencyDetails,
 } from "../screens";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
@@ -134,6 +135,46 @@ const HomeStack = () => {
       <Stack.Screen
         name="PostDetails"
         component={PostDetails}
+        options={{
+          headerShadowVisible: false,
+          headerLeft: () => (
+            <TouchableOpacity
+              style={{ alignItems: "center" }}
+              onPressIn={() => navigation.goBack()}
+            >
+              <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
+            </TouchableOpacity>
+          ),
+
+          headerRight: () => (
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 15 }}
+            >
+              <TouchableOpacity
+                style={{ alignItems: "center" }}
+                onPressIn={() => navigation.navigate("Search")}
+              >
+                <Ionicons name="search" size={24} color={COLORS.primary} />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={{ alignItems: "center" }}
+                onPressIn={() => navigation.navigate("Notifications")}
+              >
+                <Ionicons
+                  name="notifications"
+                  size={24}
+                  color={COLORS.primary}
+                />
+              </TouchableOpacity>
+            </View>
+          ),
+        }}
+      />
+
+      <Stack.Screen
+        name="EmergencyDetails"
+        component={EmergencyDetails}
         options={{
           headerShadowVisible: false,
           headerLeft: () => (

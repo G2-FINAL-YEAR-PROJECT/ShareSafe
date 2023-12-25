@@ -87,25 +87,6 @@ const styles = StyleSheet.create({
     fontFamily: "semibold",
     textAlign: "left",
   },
-  locationContainer: (locationIsFocused) => {
-    return {
-      flexDirection: "row",
-      alignItems: "center",
-      borderWidth: locationIsFocused ? 2 : 1,
-      borderColor: locationIsFocused ? COLORS.black : COLORS.gray4,
-      borderRadius: 5,
-      paddingRight: 13,
-      marginTop: 15,
-    };
-  },
-
-  locationInput: {
-    flex: 1,
-    paddingLeft: 18,
-    paddingVertical: 12,
-    fontSize: 12,
-    fontFamily: "medium",
-  },
 
   upload: {
     flexDirection: "row",
