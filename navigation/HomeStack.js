@@ -1,9 +1,17 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import BottomTabStack from "./BottomTabStack";
 import { Ionicons } from "@expo/vector-icons";
-import { TouchableOpacity } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { COLORS } from "../constants";
-import { Welcome, ReportSuccess, Notifications, Search, Loading } from "../screens";
+import {
+  Welcome,
+  ReportSuccess,
+  Notifications,
+  Search,
+  Loading,
+  PostDetails,
+  EmergencyDetails,
+} from "../screens";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -35,11 +43,19 @@ const HomeStack = () => {
   return (
     <Stack.Navigator screenOptions={{ headerTitle: "" }}>
       {loading && (
-        <Stack.Screen name="Loading" component={Loading} options={{ headerShown: false }} />
+        <Stack.Screen
+          name="Loading"
+          component={Loading}
+          options={{ headerShown: false }}
+        />
       )}
 
       {showWelcomeScreen && (
-        <Stack.Screen name="Welcome" component={Welcome} options={{ headerShown: false }} />
+        <Stack.Screen
+          name="Welcome"
+          component={Welcome}
+          options={{ headerShown: false }}
+        />
       )}
 
       <Stack.Screen
@@ -101,12 +117,7 @@ const HomeStack = () => {
               style={{ alignItems: "center" }}
               onPressIn={() => navigation.goBack()}
             >
-              <Ionicons
-                name="arrow-back"
-                onPress={() => navigation.goBack()}
-                size={24}
-                color={COLORS.primary}
-              />
+              <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
             </TouchableOpacity>
           ),
 
@@ -117,6 +128,86 @@ const HomeStack = () => {
             >
               <Ionicons name="notifications" size={24} color={COLORS.primary} />
             </TouchableOpacity>
+          ),
+        }}
+      />
+
+      <Stack.Screen
+        name="PostDetails"
+        component={PostDetails}
+        options={{
+          headerShadowVisible: false,
+          headerLeft: () => (
+            <TouchableOpacity
+              style={{ alignItems: "center" }}
+              onPressIn={() => navigation.goBack()}
+            >
+              <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
+            </TouchableOpacity>
+          ),
+
+          headerRight: () => (
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 15 }}
+            >
+              <TouchableOpacity
+                style={{ alignItems: "center" }}
+                onPressIn={() => navigation.navigate("Search")}
+              >
+                <Ionicons name="search" size={24} color={COLORS.primary} />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={{ alignItems: "center" }}
+                onPressIn={() => navigation.navigate("Notifications")}
+              >
+                <Ionicons
+                  name="notifications"
+                  size={24}
+                  color={COLORS.primary}
+                />
+              </TouchableOpacity>
+            </View>
+          ),
+        }}
+      />
+
+      <Stack.Screen
+        name="EmergencyDetails"
+        component={EmergencyDetails}
+        options={{
+          headerShadowVisible: false,
+          headerLeft: () => (
+            <TouchableOpacity
+              style={{ alignItems: "center" }}
+              onPressIn={() => navigation.goBack()}
+            >
+              <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
+            </TouchableOpacity>
+          ),
+
+          headerRight: () => (
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 15 }}
+            >
+              <TouchableOpacity
+                style={{ alignItems: "center" }}
+                onPressIn={() => navigation.navigate("Search")}
+              >
+                <Ionicons name="search" size={24} color={COLORS.primary} />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={{ alignItems: "center" }}
+                onPressIn={() => navigation.navigate("Notifications")}
+              >
+                <Ionicons
+                  name="notifications"
+                  size={24}
+                  color={COLORS.primary}
+                />
+              </TouchableOpacity>
+            </View>
           ),
         }}
       />
