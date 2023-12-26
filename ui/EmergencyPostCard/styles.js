@@ -31,6 +31,21 @@ const styles = StyleSheet.create({
     fontFamily: "semibold",
   },
 
+  actionBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 15,
+  },
+
+  respondent: {
+    width: 32,
+    height: 32,
+    borderWidth: 2,
+    borderColor: COLORS.green,
+    borderRadius: 50,
+    resizeMode: "contain",
+  },
+
   followBtn: {
     backgroundColor: COLORS.primary,
     alignItems: "center",

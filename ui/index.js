@@ -5,3 +5,4 @@ export { default as NotificationCard } from "./NotificationCard";
 export { default as PasswordField } from "./PasswordField";
 export { default as PostCard } from "./PostCard";
 export { default as SearchInput } from "./SearchInput";
+export { default as TextAreaInput } from "./TextAreaInput";
