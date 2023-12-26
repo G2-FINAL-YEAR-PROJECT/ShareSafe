@@ -1,13 +1,22 @@
-import { View, Text, Image, TouchableOpacity } from "react-native";
+import { View, Text, Image, TouchableOpacity, Modal } from "react-native";
 import { Entypo, Ionicons } from "@expo/vector-icons";
 import { COLORS } from "../../constants";
 import { useNavigation } from "@react-navigation/native";
 import { useAspectRatio } from "../../hooks";
 import styles from "./styles";
+import { useState } from "react";
+
+const lasema = require("../../assets/images/lasema.png");
 
 const EmergencyPostCard = ({ post, emergencyDetailIsActive }) => {
   const navigation = useNavigation();
   const { aspectRatio } = useAspectRatio(1, post);
+
+  const [isModalVisible, setModalVisible] = useState(false);
+
+  const toggleModal = () => {
+    setModalVisible((prev) => !prev);
+  };
 
   return (
     <TouchableOpacity
@@ -24,11 +33,25 @@ const EmergencyPostCard = ({ post, emergencyDetailIsActive }) => {
             </Text>
           </View>
 
-          {emergencyDetailIsActive && (
-            <TouchableOpacity style={styles.followBtn}>
-              <Text style={styles.followText}>Follow</Text>
+          <View style={styles.actionBox}>
+            <TouchableOpacity>
+              <Image source={lasema} style={styles.respondent} />
             </TouchableOpacity>
-          )}
+
+            {emergencyDetailIsActive && (
+              <TouchableOpacity style={styles.followBtn}>
+                <Text style={styles.followText}>Follow</Text>
+              </TouchableOpacity>
+            )}
+
+            <TouchableOpacity onPress={toggleModal}>
+              <Ionicons
+                name="ellipsis-vertical-sharp"
+                size={24}
+                color={COLORS.primary}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
         {/* HEADER ENDS */}
 

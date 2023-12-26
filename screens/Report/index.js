@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   TextInput,
 } from "react-native";
-import { Button, SearchInput } from "../../ui";
+import { Button, SearchInput, TextAreaInput } from "../../ui";
 import { COLORS, SIZES } from "../../constants";
 import { Ionicons } from "@expo/vector-icons";
 import { reportType, channels } from "../../data";
@@ -100,19 +100,18 @@ const Report = ({ navigation }) => {
           >
             Describe report
           </Text>
-          <View style={styles.inputContainer(inputIsFocused)}>
-            <TextInput
-              style={styles.reportInput}
-              multiline={true}
-              numberOfLines={70}
-              placeholderTextColor="rgba(0, 0, 0, 0.50)"
-              cursorColor={COLORS.black}
+
+          <View style={{ marginTop: 12 }}>
+            <TextAreaInput
+              value={reportText}
+              inputIsFocused={inputIsFocused}
               placeholder="Help will be readily available, kindly 
 describe your situation..."
-              value={reportText}
-              onChangeText={(text) => setReportText(text)}
-              onFocus={() => setInputIsFocused(true)}
-              onBlur={() => setInputIsFocused(false)}
+              numberOfLines={70}
+              height={130}
+              handleChange={(text) => setReportText(text)}
+              handleFocus={() => setInputIsFocused(true)}
+              handleBlur={() => setInputIsFocused(false)}
             />
           </View>
         </View>
