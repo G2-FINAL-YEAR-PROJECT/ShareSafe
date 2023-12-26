@@ -85,11 +85,7 @@ const Register = ({ navigation }) => {
         <View style={{ marginTop: 26, alignItems: "center" }}>
           <Text style={[globalStyles.h5]}>Have an account?</Text>
 
-          <TouchableOpacity
-            onPress={() => {
-              return loadingRegister ? null : navigation.navigate("Login");
-            }}
-          >
+          <TouchableOpacity onPress={() => navigation.navigate("Login")} disabled={loadingRegister}>
             <Text style={[globalStyles.link]}>Login</Text>
           </TouchableOpacity>
         </View>
