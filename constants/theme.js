@@ -16,6 +16,16 @@ export const COLORS = {
   black2: "#252525",
   red: "#e81e4d",
   green: "#24FF00",
+  aConBg: "#F7E7D0",
+  aConText: "#85715A",
+  conBg: "#4CAF50",
+  conText: "#C8E6C9",
+  respondBg: "#FFC107",
+  respondText: "#FFF59D",
+  resolveBg: "#009688",
+  resolveText: "#B2DFDB",
+  dismissBg: "#F44336",
+  dismissText: "#FFEBEE",
 };
 
 export const SIZES = {

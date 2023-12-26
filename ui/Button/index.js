@@ -1,8 +1,19 @@
-import { StyleSheet, Text, TouchableOpacity, ActivityIndicator } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import { COLORS } from "../../constants";
 
-const Button = ({ onPress, children, textStyle, buttonStyle, loading, icon }) => {
-  console.log(loading);
+const Button = ({
+  onPress,
+  children,
+  textStyle,
+  buttonStyle,
+  loading,
+  icon,
+}) => {
   return (
     <TouchableOpacity
       onPress={onPress}

@@ -9,8 +9,20 @@ const styles = StyleSheet.create({
 
   header: {
     flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+
+  userBox: {
+    flexDirection: "row",
     alignItems: "center",
     gap: 6,
+  },
+
+  actionBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 20,
   },
 
   headerImage: {
@@ -33,6 +45,18 @@ const styles = StyleSheet.create({
     marginTop: -4,
   },
 
+  followBtn: {
+    backgroundColor: COLORS.primary,
+    alignItems: "center",
+    paddingHorizontal: 15,
+    paddingVertical: 2.8,
+    borderRadius: 20,
+  },
+  followText: {
+    color: COLORS.white,
+    fontSize: 14,
+    fontFamily: "semibold",
+  },
   postImage: {
     flex: 1,
     width: undefined,

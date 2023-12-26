@@ -3,7 +3,6 @@ import { COLORS } from "../../constants";
 
 const styles = StyleSheet.create({
   cardBox: {
-    // paddingHorizontal: 11,
     paddingVertical: 14,
   },
   header: {
@@ -41,7 +40,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderWidth: 2,
-    borderColor: COLORS.green,
+    borderColor: COLORS.respondBg,
     borderRadius: 50,
     resizeMode: "contain",
   },
@@ -77,8 +76,64 @@ const styles = StyleSheet.create({
   date: {
     fontSize: 11,
     fontFamily: "regular",
+  },
+
+  // STATUS STYLE
+
+  statusBox: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginTop: 10,
   },
+
+  statusText: {
+    fontFamily: "semibold",
+  },
+
+  confirmed: {
+    paddingHorizontal: 10,
+    borderRadius: 50,
+    alignItems: "center",
+    backgroundColor: COLORS.conBg,
+    borderWidth: 2,
+    borderColor: COLORS.conText,
+  },
+  responding: {
+    paddingHorizontal: 10,
+    borderRadius: 50,
+    alignItems: "center",
+    backgroundColor: COLORS.respondBg,
+    borderWidth: 2,
+    borderColor: COLORS.respondText,
+  },
+  resolved: {
+    paddingHorizontal: 10,
+    borderRadius: 50,
+    alignItems: "center",
+    backgroundColor: COLORS.resolveBg,
+    borderWidth: 2,
+    borderColor: COLORS.resolveText,
+  },
+
+  awaiting: {
+    paddingHorizontal: 10,
+    borderRadius: 50,
+    alignItems: "center",
+    backgroundColor: COLORS.aConBg,
+    borderWidth: 2,
+    borderColor: COLORS.aConText,
+  },
+  dismiss: {
+    paddingHorizontal: 10,
+    borderRadius: 50,
+    alignItems: "center",
+    backgroundColor: COLORS.dismissBg,
+    borderWidth: 2,
+    borderColor: COLORS.dismissText,
+  },
+
+  // STATUS STYLE ENDS
 
   intBox: {
     flexDirection: "row",
