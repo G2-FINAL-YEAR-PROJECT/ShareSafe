@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   TextInput,
 } from "react-native";
-import { Button } from "../../ui";
+import { Button, SearchInput, TextAreaInput } from "../../ui";
 import { COLORS, SIZES } from "../../constants";
 import { Ionicons } from "@expo/vector-icons";
 import { reportType, channels } from "../../data";
@@ -100,19 +100,18 @@ const Report = ({ navigation }) => {
           >
             Describe report
           </Text>
-          <View style={styles.inputContainer(inputIsFocused)}>
-            <TextInput
-              style={styles.reportInput}
-              multiline={true}
-              numberOfLines={70}
-              placeholderTextColor="rgba(0, 0, 0, 0.50)"
-              cursorColor={COLORS.black}
+
+          <View style={{ marginTop: 12 }}>
+            <TextAreaInput
+              value={reportText}
+              inputIsFocused={inputIsFocused}
               placeholder="Help will be readily available, kindly 
 describe your situation..."
-              value={reportText}
-              onChangeText={(text) => setReportText(text)}
-              onFocus={() => setInputIsFocused(true)}
-              onBlur={() => setInputIsFocused(false)}
+              numberOfLines={70}
+              height={130}
+              handleChange={(text) => setReportText(text)}
+              handleFocus={() => setInputIsFocused(true)}
+              handleBlur={() => setInputIsFocused(false)}
             />
           </View>
         </View>
@@ -179,18 +178,15 @@ describe your situation..."
           >
             Location
           </Text>
-          <View style={styles.locationContainer(locationIsFocused)}>
-            <TextInput
-              style={styles.locationInput}
-              placeholderTextColor="#252525"
-              cursorColor={COLORS.black}
-              placeholder="Search Location"
+          <View style={{ marginTop: 15 }}>
+            <SearchInput
               value={locationText}
-              onChangeText={(text) => setLocationText(text)}
-              onFocus={() => setLocationIsFocused(true)}
-              onBlur={() => setLocationIsFocused(false)}
+              inputIsFocused={locationIsFocused}
+              placeholder="Search Location"
+              handleChange={(text) => setLocationText(text)}
+              handleFocus={() => setLocationIsFocused(true)}
+              handleBlur={() => setLocationIsFocused(false)}
             />
-            <Ionicons name="search" size={24} color="#252525" />
           </View>
         </View>
 

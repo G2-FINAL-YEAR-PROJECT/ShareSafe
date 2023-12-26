@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
-// import AsyncStorage from "@react-native-async-storage/async-storage";
 import { globalStyles } from "../../constants";
 import { useNavigation } from "@react-navigation/native";
 import { useAuth } from "../../store";
@@ -15,8 +14,6 @@ const Login = () => {
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
-    // await AsyncStorage.removeItem("@viewedOnboarding");
-
     // Validate email address
     if (!validateEmail(email)) {
       alert("Please enter a valid email address");
@@ -54,9 +51,8 @@ const Login = () => {
         <View style={globalStyles.flex}>
           <Text style={globalStyles.label}>Password</Text>
           <TouchableOpacity
-            onPress={() => {
-              return loadingLogin ? null : navigator.navigate("ForgotPassword");
-            }}
+            onPress={() => navigator.navigate("ForgotPassword")}
+            disabled={loadingLogin}
           >
             <Text style={[globalStyles.link, { fontSize: 16 }]}>Forgot Password?</Text>
           </TouchableOpacity>
@@ -72,11 +68,7 @@ const Login = () => {
       <View style={{ marginTop: 26, alignItems: "center" }}>
         <Text style={[globalStyles.h5]}>Don’t have an account?</Text>
 
-        <TouchableOpacity
-          onPress={() => {
-            return loadingLogin ? null : navigator.navigate("Register");
-          }}
-        >
+        <TouchableOpacity onPress={() => navigator.navigate("Register")} disabled={loadingLogin}>
           <Text style={[globalStyles.link]}>Sign up</Text>
         </TouchableOpacity>
       </View>

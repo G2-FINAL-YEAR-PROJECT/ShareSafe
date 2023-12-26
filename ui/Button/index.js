@@ -1,19 +1,14 @@
 import { StyleSheet, Text, TouchableOpacity, ActivityIndicator } from "react-native";
 import { COLORS } from "../../constants";
 
-const Button = ({
-  onPress,
-  children,
-  textStyle,
-  buttonStyle,
-  loading,
-  icon,
-}) => {
+const Button = ({ onPress, children, textStyle, buttonStyle, loading, icon }) => {
+  console.log(loading);
   return (
     <TouchableOpacity
       onPress={onPress}
       activeOpacity={0.7}
       style={[styles.buttonStyle(loading), buttonStyle]}
+      disabled={loading}
     >
       {icon && icon}
       {loading ? (
