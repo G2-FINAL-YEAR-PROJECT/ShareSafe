@@ -12,6 +12,7 @@ import {
   PostDetails,
   EmergencyDetails,
   EditProfile,
+  ChatDetails,
 } from "../screens";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
@@ -216,6 +217,22 @@ const HomeStack = () => {
       <Stack.Screen
         name="EditProfile"
         component={EditProfile}
+        options={{
+          headerShadowVisible: false,
+          headerLeft: () => (
+            <TouchableOpacity
+              style={{ alignItems: "center" }}
+              onPressIn={() => navigation.goBack()}
+            >
+              <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
+            </TouchableOpacity>
+          ),
+        }}
+      />
+
+      <Stack.Screen
+        name="ChatDetails"
+        component={ChatDetails}
         options={{
           headerShadowVisible: false,
           headerLeft: () => (
