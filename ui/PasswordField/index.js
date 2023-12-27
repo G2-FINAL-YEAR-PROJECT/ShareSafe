@@ -12,6 +12,7 @@ const PasswordField = ({ password, setPassword }) => {
         style={globalStyles.input}
         secureTextEntry={!showPassword}
         placeholder="**********"
+        autoComplete="password"
         value={password}
         onChangeText={(text) => setPassword(text)}
       />
