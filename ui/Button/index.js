@@ -2,7 +2,6 @@ import { StyleSheet, Text, TouchableOpacity, ActivityIndicator } from "react-nat
 import { COLORS } from "../../constants";
 
 const Button = ({ onPress, children, textStyle, buttonStyle, loading, icon }) => {
-  console.log(loading);
   return (
     <TouchableOpacity
       onPress={onPress}

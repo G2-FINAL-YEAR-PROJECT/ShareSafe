@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import { COLORS } from "../../constants";
 import { useAuth } from "../../store";
 import { useNavigation } from "@react-navigation/native";
@@ -14,7 +14,7 @@ const ProfileHeader = () => {
       <View style={[styles.cardBox]}>
         <View style={styles.user}>
           <Image
-            source={require("../../assets/images/man.jpg")}
+            source={require("../../assets/images/girl.jpg")}
             style={styles.image}
           />
           <View>
@@ -31,13 +31,23 @@ const ProfileHeader = () => {
           </View>
         </View>
 
-        <TouchableOpacity onPress={() => navigation.navigate("EditProfile")}>
-          <MaterialCommunityIcons
-            name="pencil-outline"
-            size={24}
-            color={COLORS.white}
-          />
-        </TouchableOpacity>
+        <View style={styles.profileAction}>
+          {/* <TouchableOpacity>
+            <Ionicons name="chatbubbles" size={24} color={COLORS.white} />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.followBtn}>
+            <Text style={styles.followText}>Follow</Text>
+          </TouchableOpacity> */}
+
+          <TouchableOpacity onPress={() => navigation.navigate("EditProfile")}>
+            <MaterialCommunityIcons
+              name="pencil-outline"
+              size={24}
+              color={COLORS.white}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
       {/* PROFILE CARD ENDS */}
 
@@ -84,6 +94,24 @@ const styles = StyleSheet.create({
     borderColor: COLORS.white,
     borderRadius: 50,
     resizeMode: "contain",
+  },
+
+  profileAction: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  followBtn: {
+    backgroundColor: COLORS.white,
+    alignItems: "center",
+    paddingHorizontal: 15,
+    paddingVertical: 2.8,
+    borderRadius: 20,
+  },
+  followText: {
+    color: COLORS.black,
+    fontSize: 14,
+    fontFamily: "semibold",
   },
 
   metric: {

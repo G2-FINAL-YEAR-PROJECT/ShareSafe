@@ -51,7 +51,7 @@ export const globalStyles = StyleSheet.create({
   label: {
     fontSize: 18,
     fontFamily: "medium",
-    marginBottom: 12,
+    marginBottom: 10,
   },
   link: {
     fontSize: 18,
