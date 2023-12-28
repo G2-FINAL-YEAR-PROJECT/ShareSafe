@@ -99,6 +99,7 @@ const BottomTabStack = () => {
         name="CreatePost"
         component={CreatePost}
         options={{
+          headerShown: false,
           tabBarIcon: () => {
             return (
               <MaterialIcons name="add-box" size={35} color={COLORS.white} />

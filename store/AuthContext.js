@@ -1,8 +1,14 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import * as Location from "expo-location";
 import { createContext, useContext, useEffect, useState } from "react";
+import * as TaskManager from "expo-task-manager";
+import { API_KEY } from "@env";
 
-const baseUrl = "https://share-safe-kn9v.onrender.com/auth";
+const LOCATION_TASK_NAME = "background-location-task";
+
+const baseUrl = "https://share-safe-85lb.onrender.com/auth";
+const locationBaseUrl = "https://geocode.maps.co/reverse";
 
 const AuthContext = createContext();
 
@@ -14,10 +20,94 @@ const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [userData, setUserData] = useState(null);
   const [viewedOnboarding, setViewedOnboarding] = useState(false);
+  const [locationGranted, setLocationGranted] = useState(false);
+
+  const [currentLocation, setCurrentLocation] = useState({});
 
   useEffect(() => {
+    requestLocationPermission();
     getAuthData();
   }, []);
+
+  const requestLocationPermission = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+
+      if (status == "granted") {
+        const { status } = await Location.requestBackgroundPermissionsAsync();
+        if (status === "granted") {
+          setLocationGranted(true);
+        } else {
+          setLocationGranted(false);
+        }
+      } else {
+        setLocationGranted(false);
+      }
+    } catch (error) {
+      setLocationGranted(false);
+    }
+  };
+
+  TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
+    if (error) {
+      console.log("TaskManager error");
+      return;
+    }
+
+    // Process location data
+    const { locations } = data;
+    const {
+      coords: { latitude, longitude },
+    } = locations[0];
+    setCurrentLocation({ longitude, latitude });
+    // console.log("Background location update:", locations);
+  });
+
+  useEffect(() => {
+    if (locationGranted) {
+      // Start background tracking when component mounts
+      startBackgroundTracking();
+
+      // Cleanup function to stop background tracking when component unmounts
+      return () => {
+        stopBackgroundTracking();
+      };
+    }
+  }, [locationGranted]); // Empty dependency array ensures this effect runs only once when the component mounts
+
+  const startBackgroundTracking = async () => {
+    await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+      accuracy: Location.Accuracy.High,
+      timeInterval: 120000, // Update every 60 seconds
+      distanceInterval: 0,
+      showsBackgroundLocationIndicator: true, // Show location icon in status bar
+    });
+  };
+
+  const stopBackgroundTracking = async () => {
+    await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
+  };
+
+  // const fetchAddress = async () => {
+  //   const { longitude, latitude } = currentLocation;
+
+  //   try {
+
+  //     const { data } = await axios.get(
+  //       `${locationBaseUrl}?lat=${latitude}&lon=${longitude}&api_key=${API_KEY}`
+  //     );
+
+  //     console.log("address", data);
+  //   } catch (error) {
+  //     console.log("error", error);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   if (currentLocation) {
+  //     // update backend with users current coordinates
+  //   }
+  // }, [currentLocation]);
 
   const getAuthData = async () => {
     // await AsyncStorage.clear();
@@ -73,7 +163,10 @@ const AuthProvider = ({ children }) => {
   const register = async (data) => {
     try {
       setLoadingRegister(true);
-      const res = await axios.post(baseUrl + "/register", data);
+      const res = await axios.post(baseUrl + "/register", {
+        ...data,
+        location: "New York",
+      });
       const token = res?.data?.data?.tokens?.access?.token;
       const userData = res?.data?.data?.signUpUserData;
       setLoadingRegister(false);
@@ -122,6 +215,7 @@ const AuthProvider = ({ children }) => {
         register,
         logout,
         viewedOnboarding,
+        locationGranted,
       }}
     >
       {children}

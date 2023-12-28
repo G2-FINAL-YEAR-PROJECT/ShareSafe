@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
+import { View, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Recommended, ProfileHeader } from "../../components";
 import { COLORS } from "../../constants";
@@ -8,7 +8,6 @@ const Header = ({
   showBack,
   showSearchNotify,
   showLogo,
-  showCancel,
   showProfile,
   showRecommended,
 }) => {

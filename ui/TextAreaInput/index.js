@@ -8,13 +8,23 @@ const TextAreaInput = ({
   cursorColor,
   borderColor,
   height,
+  padding,
+  hideBorder,
   inputIsFocused,
   handleChange,
   handleBlur,
   handleFocus,
 }) => {
   return (
-    <View style={styles.inputContainer(inputIsFocused, borderColor, height)}>
+    <View
+      style={styles.inputContainer(
+        inputIsFocused,
+        borderColor,
+        height,
+        hideBorder,
+        padding
+      )}
+    >
       <TextInput
         style={styles.reportInput}
         multiline={true}
@@ -24,8 +34,8 @@ const TextAreaInput = ({
         placeholder={placeholder}
         value={value}
         onChangeText={(text) => handleChange(text)}
-        onFocus={() => handleFocus()}
-        onBlur={() => handleBlur()}
+        onFocus={() => handleFocus && handleFocus()}
+        onBlur={() => handleBlur && handleBlur()}
       />
     </View>
   );
@@ -34,14 +44,19 @@ const TextAreaInput = ({
 export default TextAreaInput;
 
 const styles = StyleSheet.create({
-  inputContainer: (inputIsFocused, borderColor, height) => {
+  inputContainer: (
+    inputIsFocused,
+    borderColor,
+    height,
+    hideBorder,
+    padding
+  ) => {
     return {
       height: height,
-      // marginTop: 12,
-      paddingHorizontal: 12,
-      paddingVertical: 10,
+      paddingHorizontal: padding ?? 12,
+      paddingVertical: padding ?? 10,
+      borderWidth: hideBorder ? null : inputIsFocused ? 2 : 1.5,
       borderColor: borderColor ? borderColor : COLORS.black,
-      borderWidth: inputIsFocused ? 2 : 1.5,
       borderRadius: 10,
       backgroundColor: COLORS.white,
     };
