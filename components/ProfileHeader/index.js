@@ -6,6 +6,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import styles from "./styles";
 import { apiClient } from "../../config";
+import placeHolderImg from "../../assets/images/placeholder.jpg";
 
 const ProfileHeader = () => {
   const route = useRoute();
@@ -65,7 +66,11 @@ const ProfileHeader = () => {
           <>
             <View style={styles.user}>
               <Image
-                source={currentUser?.profilePicture ? { uri: currentUser?.profilePicture } : girl}
+                source={
+                  currentUser?.profilePicture
+                    ? { uri: currentUser?.profilePicture }
+                    : placeHolderImg
+                }
                 style={styles.image}
               />
               <View style={{ flexBasis: "40%" }}>

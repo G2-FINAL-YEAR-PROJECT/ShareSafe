@@ -3,7 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Recommended } from "../../components";
 import { COLORS } from "../../constants";
 import { useNavigation } from "@react-navigation/native";
-
+import placeHolderImg from "../../assets/images/placeholder.jpg";
 import { useAuth } from "../../store";
 
 const Header = ({ showBack, showSearchProfile, showLogo, showRecommended }) => {
@@ -16,11 +16,7 @@ const Header = ({ showBack, showSearchProfile, showLogo, showRecommended }) => {
       <View style={[styles.header, { width: "100%" }]}>
         <View style={styles.headerLeft}>
           {showLogo && (
-            <Image
-              source={require("../../assets/images/Logo.png")}
-              width={37}
-              height={34}
-            />
+            <Image source={require("../../assets/images/Logo.png")} width={37} height={34} />
           )}
 
           {showBack && (
@@ -53,7 +49,9 @@ const Header = ({ showBack, showSearchProfile, showLogo, showRecommended }) => {
                 }
               >
                 <Image
-                  source={{ uri: userData?.profilePicture }}
+                  source={
+                    userData?.profilePicture ? { uri: userData?.profilePicture } : placeHolderImg
+                  }
                   style={{
                     width: 37,
                     height: 37,
