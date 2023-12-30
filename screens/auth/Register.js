@@ -1,40 +1,86 @@
-import { ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ScrollView, Text, TextInput, TouchableOpacity, View, Linking, Alert } from "react-native";
 import { useState } from "react";
-import { globalStyles } from "../../constants";
+import { COLORS, globalStyles } from "../../constants";
 import styles from "./styles";
 import { Button, PasswordField } from "../../ui";
 import { validateEmail } from "../../helpers";
 import { useAuth } from "../../store";
+import SelectDropdown from "react-native-select-dropdown";
+import { reportType } from "../../data";
 
 const Register = ({ navigation }) => {
-  const { register, loadingRegister } = useAuth();
+  const { register, loadingRegister, locationGranted } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phoneNo, setPhoneNo] = useState("");
+  const [role, setRole] = useState("");
+  const [accountCategory, setAccountCategory] = useState({});
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  const openAppSettings = () => {
+    Linking.openSettings();
+  };
+
   const handleRegister = async () => {
+    // if (!locationGranted) {
+    //   Alert.alert(
+    //     "Confirm",
+    //     "Give location access",
+    //     [
+    //       {
+    //         text: "No",
+    //         style: "cancel",
+    //       },
+    //       {
+    //         text: "Yes",
+    //         onPress: () => {
+    //           openAppSettings();
+    //         },
+    //       },
+    //     ],
+    //     { cancelable: false }
+    //   );
+    //   return;
+    // }
+
+    // Validations
     if (!name.trim()) {
       alert("Name is required");
       return;
     }
-    // Validate email address
+
     if (!validateEmail(email)) {
       alert("Please enter a valid email address");
       return;
     }
+
+    if (!phoneNo) {
+      alert("Phone Number is required");
+      return;
+    }
+
+    if (!role) {
+      alert("Account Type is required");
+      return;
+    }
+
+    if (!accountCategory.length && role == "Respondent") {
+      alert("Account Category is required");
+      return;
+    }
+
     // Validate password
     if (password.length < 8) {
       alert("Password must be at least 8 characters");
       return;
     }
-
     if (password !== confirmPassword) {
       alert("Password does not match!");
       return;
     }
 
-    const data = { fullName: name.trim(), email: email.trim(), password };
+    const data = { fullName: name.trim(), email: email.trim(), role: role.toUpperCase(), password };
     await register(data);
   };
 
@@ -69,6 +115,56 @@ const Register = ({ navigation }) => {
         </View>
 
         <View style={styles.formGroup}>
+          <Text style={globalStyles.label}>Phone Number</Text>
+          <TextInput
+            style={globalStyles.input}
+            placeholder="Your Phone Number"
+            value={phoneNo}
+            autoComplete="tel"
+            keyboardType="numeric"
+            onChangeText={(text) => setPhoneNo(text)}
+          />
+        </View>
+
+        <View style={[styles.formGroup]}>
+          <Text style={globalStyles.label}>Account Type</Text>
+
+          <SelectDropdown
+            data={["User", "Respondent"]}
+            defaultButtonText="Select an option"
+            onSelect={(selectedItem, index) => {
+              console.log(selectedItem, index);
+              setRole(selectedItem);
+            }}
+            buttonStyle={buttonStyle}
+            buttonTextStyle={buttonTextStyle(role)}
+          />
+        </View>
+
+        {role == "Respondent" && (
+          <View style={[styles.formGroup]}>
+            <Text style={globalStyles.label}>Account category</Text>
+
+            <SelectDropdown
+              data={reportType}
+              defaultButtonText="Select an option"
+              onSelect={(selectedItem, index) => {
+                console.log(selectedItem.type, selectedItem);
+                setAccountCategory(selectedItem);
+              }}
+              buttonTextAfterSelection={(selectedItem) => {
+                return selectedItem.type ? selectedItem.type : selectedItem;
+              }}
+              rowTextForSelection={(item) => {
+                return item.type ? item.type : item;
+              }}
+              buttonStyle={buttonStyle}
+              buttonTextStyle={buttonTextStyle(accountCategory)}
+            />
+          </View>
+        )}
+
+        <View style={styles.formGroup}>
           <Text style={globalStyles.label}>Password</Text>
           <PasswordField password={password} setPassword={setPassword} />
         </View>
@@ -92,6 +188,24 @@ const Register = ({ navigation }) => {
       </View>
     </ScrollView>
   );
+};
+
+// SelectDropdown Styles
+const buttonStyle = {
+  width: "100%",
+  borderColor: COLORS.gray2,
+  borderWidth: 1,
+  borderRadius: 4,
+  backgroundColor: "transparent",
+};
+
+const buttonTextStyle = (state) => {
+  return {
+    fontSize: 15,
+    color: state ? COLORS.black : "#5f5f5f",
+    fontFamily: "regular",
+    textAlign: "left",
+  };
 };
 
 export default Register;

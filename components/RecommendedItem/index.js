@@ -1,15 +1,25 @@
 import { View, Text, Image, StyleSheet, Pressable } from "react-native";
 import React from "react";
 import { COLORS } from "../../constants";
+import { useNavigation } from "@react-navigation/native";
 
-const RecommendedItem = ({ item }) => {
+const RecommendedItem = ({ user }) => {
+  const navigator = useNavigation();
+
+  const goToUserProfile = () => {
+    navigator.navigate("ProfileTabStack", {
+      screen: "Profile",
+      params: { user: user },
+    });
+  };
+
   return (
-    <Pressable style={{ marginRight: 20 }}>
+    <Pressable style={{ marginRight: 20 }} onPress={goToUserProfile}>
       <View style={{ justifyContent: "center", alignItems: "center" }}>
         <View style={styles.imageContainer}>
-          <Image source={item.image} style={styles.image} />
+          <Image source={{ uri: user.profilePicture }} style={styles.image} />
         </View>
-        <Text style={styles.imageText}>{item.title}</Text>
+        <Text style={styles.imageText}>{user.fullName}</Text>
       </View>
     </Pressable>
   );

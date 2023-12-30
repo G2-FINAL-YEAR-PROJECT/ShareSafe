@@ -1,12 +1,23 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
+// import axios from "axios";
+import * as Location from "expo-location";
 import { createContext, useContext, useEffect, useState } from "react";
 
-const baseUrl = "https://share-safe-kn9v.onrender.com/auth";
+import * as TaskManager from "expo-task-manager";
+import { API_KEY } from "@env";
+import { Alert, Linking, AppState } from "react-native";
+import { apiClient } from "../config";
+
+const LOCATION_TASK_NAME = "background-location-task";
+
+const locationBaseUrl = "https://geocode.maps.co/reverse";
 
 const AuthContext = createContext();
 
+let locationWatcher;
+
 const AuthProvider = ({ children }) => {
+  const [userProfile, setUserProfile] = useState({});
   const [loadingAuth, setLoadingAuth] = useState(true);
   const [loadingLogin, setLoadingLogin] = useState(false);
   const [loadingRegister, setLoadingRegister] = useState(false);
@@ -14,10 +25,116 @@ const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [userData, setUserData] = useState(null);
   const [viewedOnboarding, setViewedOnboarding] = useState(false);
+  const [locationGranted, setLocationGranted] = useState(false);
+
+  const [currentLocation, setCurrentLocation] = useState({});
 
   useEffect(() => {
+    // requestLocationPermission();
+
     getAuthData();
   }, []);
+
+  // const requestLocationPermission = async () => {
+  //   try {
+  //     const { status } = await Location.requestForegroundPermissionsAsync();
+
+  //     if (status === "granted") {
+  //       const { status } = await Location.requestBackgroundPermissionsAsync();
+  //       if (status === "granted") {
+  //         setLocationGranted(true);
+  //       } else {
+  //         setLocationGranted(false);
+  //         showLocationPermissionAlert();
+  //       }
+  //     } else {
+  //       setLocationGranted(false);
+  //       showLocationPermissionAlert();
+  //     }
+  //   } catch (error) {
+  //     setLocationGranted(false);
+  //     showLocationPermissionAlert();
+  //   }
+  // };
+
+  // const showLocationPermissionAlert = () => {
+  //   Alert.alert(
+  //     "Location Permission Required",
+  //     'To receive emergency notifications, please choose "Allow all the time" for location access. Open app settings to update your preferences.',
+  //     [
+  //       {
+  //         text: "Cancel",
+  //         style: "cancel",
+  //       },
+  //       {
+  //         text: "Open Settings",
+  //         onPress: () => Linking.openSettings(),
+  //       },
+  //     ],
+  //     { cancelable: false }
+  //   );
+  // };
+
+  // TaskManager.defineTask("backgroundLocationUpdates", ({ data, error }) => {
+  //   if (error) {
+  //     console.log("TaskManager error");
+  //     return;
+  //   }
+
+  //   // Process location data
+  //   const { locations } = data;
+  //   const {
+  //     coords: { latitude, longitude },
+  //   } = locations[0];
+  //   console.log("Background location update:", locations);
+  //   setCurrentLocation({ longitude, latitude });
+  // });
+
+  // useEffect(() => {
+  //   if (locationGranted) {
+  //     // Start background tracking when component mounts
+  //     startBackgroundTracking();
+
+  //     // Cleanup function to stop background tracking when component unmounts
+  //     return () => {
+  //       stopBackgroundTracking();
+  //     };
+  //   }
+  // }, []);
+
+  // const startBackgroundTracking = async () => {
+  //   await Location.startLocationUpdatesAsync("backgroundLocationUpdates", {
+  //     accuracy: Location.Accuracy.High,
+  //     timeInterval: 2000, // Update every 60 seconds
+  //     distanceInterval: 0,
+  //     showsBackgroundLocationIndicator: true, // Show location icon in status bar
+  //   });
+  // };
+
+  // const stopBackgroundTracking = async () => {
+  //   await Location.stopLocationUpdatesAsync("backgroundLocationUpdates");
+  // };
+
+  // const fetchAddress = async () => {
+  //   const { longitude, latitude } = currentLocation;
+
+  //   try {
+
+  //     const { data } = await axios.get(
+  //       `${locationBaseUrl}?lat=${latitude}&lon=${longitude}&api_key=${API_KEY}`
+  //     );
+
+  //     console.log("address", data);
+  //   } catch (error) {
+  //     console.log("error", error);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   if (currentLocation) {
+  //     // update backend with users current coordinates
+  //   }
+  // }, [currentLocation]);
 
   const getAuthData = async () => {
     // await AsyncStorage.clear();
@@ -31,6 +148,8 @@ const AuthProvider = ({ children }) => {
       if (authData?.token && authData?.userData) {
         setToken(authData.token);
         setUserData(authData.userData);
+        // Set the Bearer token in the headers
+        apiClient.defaults.headers.common["Authorization"] = `Bearer ${authData.token}`;
       }
 
       if (viewedOnboarding) {
@@ -46,7 +165,7 @@ const AuthProvider = ({ children }) => {
   const login = async ({ email, password }) => {
     try {
       setLoadingLogin(true);
-      const res = await axios.post(baseUrl + "/login", { email, password });
+      const res = await apiClient.post("/auth/login", { email, password });
       const token = res?.data?.data?.tokens?.access?.token;
       const userData = res?.data?.data?.user;
       setLoadingLogin(false);
@@ -59,11 +178,10 @@ const AuthProvider = ({ children }) => {
       // Save token and user data
       setToken(token);
       setUserData(userData);
+      // Set the Bearer token in the headers
+      apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       // Persist data
-      await AsyncStorage.setItem(
-        "@AuthData",
-        JSON.stringify({ token, userData })
-      );
+      await AsyncStorage.setItem("@AuthData", JSON.stringify({ token, userData }));
     } catch (error) {
       console.log(error);
       handleErrorMessage();
@@ -73,7 +191,7 @@ const AuthProvider = ({ children }) => {
   const register = async (data) => {
     try {
       setLoadingRegister(true);
-      const res = await axios.post(baseUrl + "/register", data);
+      const res = await apiClient.post("/auth/register", data);
       const token = res?.data?.data?.tokens?.access?.token;
       const userData = res?.data?.data?.signUpUserData;
       setLoadingRegister(false);
@@ -85,11 +203,10 @@ const AuthProvider = ({ children }) => {
       }
 
       // Persist data
-      await AsyncStorage.setItem(
-        "@AuthData",
-        JSON.stringify({ token, userData })
-      );
+      await AsyncStorage.setItem("@AuthData", JSON.stringify({ token, userData }));
       await AsyncStorage.setItem("@showWelcomeScreen", "true");
+      // Set the Bearer token in the headers
+      apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
       // Save token and user data
       setToken(token);
@@ -104,6 +221,8 @@ const AuthProvider = ({ children }) => {
     await AsyncStorage.removeItem("@AuthData");
     setToken(null);
     setUserData(null);
+    // Remove the Bearer token in the headers
+    delete apiClient.defaults.headers.common["Authorization"];
   };
 
   const handleErrorMessage = (errorMessage) => {
@@ -122,6 +241,9 @@ const AuthProvider = ({ children }) => {
         register,
         logout,
         viewedOnboarding,
+        locationGranted,
+        userProfile,
+        setUserProfile,
       }}
     >
       {children}

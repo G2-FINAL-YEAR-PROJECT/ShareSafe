@@ -12,17 +12,22 @@ import React, { useState } from "react";
 import Button from "../../ui/Button";
 import { PasswordField } from "../../ui";
 import { validateEmail } from "../../helpers";
+import { useAuth } from "../../store";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 const EditProfile = () => {
+  const { userData } = useAuth();
   const [loadingProfile, setLoadingProfile] = useState(false);
   const [loadingPW, setLoadingPW] = useState(false);
-  const [inputData, setInputData] = useState({});
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [inputData, setInputData] = useState(userData);
+
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleProfileUpdate = () => {
     // Validate input fields
-    if (!inputData?.name) {
+    if (!inputData?.fullName) {
       alert("Name is required");
       return;
     }
@@ -35,7 +40,7 @@ const EditProfile = () => {
     // setLoadingProfile(true);
 
     const data = {
-      fullName: inputData.name.trim(),
+      fullName: inputData.fullName.trim(),
       email: inputData.email.trim(),
       location: inputData.location,
       dob: inputData.dob,
@@ -76,9 +81,9 @@ const EditProfile = () => {
         <TextInput
           style={globalStyles.input}
           placeholder="Your Name"
-          value={inputData?.name || ""}
+          value={inputData?.fullName || ""}
           autoComplete="name"
-          onChangeText={(text) => setInputData({ ...inputData, name: text })}
+          onChangeText={(text) => setInputData({ ...inputData, fullName: text })}
         />
       </View>
 
@@ -105,12 +110,25 @@ const EditProfile = () => {
 
       <View style={styles.formGroup}>
         <Text style={globalStyles.label}>Date of Birth</Text>
-        <TextInput
-          style={globalStyles.input}
-          keyboardType="numeric"
-          value={inputData?.dob || ""}
-          onChangeText={(text) => setInputData({ ...inputData, dob: text })}
-        />
+
+        <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+          <TextInput
+            style={[globalStyles.input, { color: "black" }]}
+            placeholder="00/00/0000"
+            value={inputData?.dob || ""}
+            editable={false}
+          />
+        </TouchableOpacity>
+
+        {showDatePicker && (
+          <DateTimePicker
+            value={inputData?.dob ? new Date(inputData.dob) : new Date()}
+            onChange={(event, selectedDate) => {
+              setShowDatePicker(false);
+              setInputData({ ...inputData, dob: selectedDate.toDateString() });
+            }}
+          />
+        )}
       </View>
 
       <Button

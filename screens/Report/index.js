@@ -41,6 +41,10 @@ const Report = ({ navigation }) => {
       setChannelValue("");
       setChannelContact("");
     });
+
+    return () => {
+      navigation.removeListener("focus");
+    };
   }, [navigation]);
 
   const handleSubmit = () => {
