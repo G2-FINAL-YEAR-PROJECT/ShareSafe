@@ -23,6 +23,7 @@
     "expo-splash-screen": "~0.20.5",
     "expo-status-bar": "~1.6.0",
     "expo-task-manager": "~11.3.0",
+    "js-abbreviation-number": "^1.4.0",
     "react": "18.2.0",
     "react-native": "0.72.6",
     "react-native-dotenv": "^3.4.9",

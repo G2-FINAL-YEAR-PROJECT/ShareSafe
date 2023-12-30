@@ -7,12 +7,21 @@ import { useState } from "react";
 import { useRoute } from "@react-navigation/native";
 import styles from "./styles";
 
+const message = {
+  id: "m1",
+  username: "Fire Service",
+  image: require("../../assets/images/fire_service.jpeg"),
+  status: "online",
+  time: "1 min ago",
+  message:
+    "If you have concerns related to personal safety or believe there is a threat, I strongly advise reaching out to the appropriate authorities or ",
+};
 const ChatDetails = () => {
   const [comment, setComment] = useState("");
   const [commentIsFocused, setCommentIsFocused] = useState(false);
 
   const route = useRoute();
-  const { message } = route.params;
+  const { userId } = route.params;
 
   const commentIsValid = comment.trim().length > 0;
 

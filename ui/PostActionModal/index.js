@@ -15,6 +15,8 @@ const PostActionModal = ({
   isDrawerOpen,
   handleDelete,
   forEmergency,
+  posterId,
+  userData,
 }) => {
   return (
     <Modal
@@ -89,15 +91,16 @@ const PostActionModal = ({
                 </TouchableOpacity>
               </>
             )}
-
-            <TouchableOpacity
-              onPress={handleDelete}
-              style={styles.drawerOption}
-            >
-              <Text style={{ fontFamily: "semibold", color: COLORS.red }}>
-                Delete
-              </Text>
-            </TouchableOpacity>
+            {userData?.id === posterId && (
+              <TouchableOpacity
+                onPress={handleDelete}
+                style={styles.drawerOption}
+              >
+                <Text style={{ fontFamily: "semibold", color: COLORS.red }}>
+                  Delete
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </TouchableWithoutFeedback>
