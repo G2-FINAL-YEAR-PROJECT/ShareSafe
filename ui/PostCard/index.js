@@ -11,8 +11,6 @@ import { abbreviateNumber } from "js-abbreviation-number";
 import { useAuth } from "../../store";
 import styles from "./styles";
 
-const girlPic = require("../../assets/images/girl.jpg");
-
 const PostCard = ({ post, postDetailIsActive }) => {
   const { aspectRatio } = useAspectRatio(1, post);
   const navigation = useNavigation();
@@ -53,9 +51,7 @@ const PostCard = ({ post, postDetailIsActive }) => {
                 }
               >
                 <Image
-                  source={
-                    post?.user?.image ? { uri: post?.user?.image } : girlPic
-                  }
+                  source={{ uri: post?.user?.profilePicture }}
                   style={styles.headerImage}
                 />
               </TouchableOpacity>
