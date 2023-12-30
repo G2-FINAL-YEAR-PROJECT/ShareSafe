@@ -3,18 +3,27 @@ import { Entypo, Ionicons } from "@expo/vector-icons";
 import { COLORS } from "../../constants";
 import { useNavigation } from "@react-navigation/native";
 import { useAspectRatio } from "../../hooks";
+import { abbreviateNumber } from "js-abbreviation-number";
+import { formatDate, formatTime } from "../../helpers";
 import PostActionModal from "../PostActionModal";
 import { useState } from "react";
+import { useAuth } from "../../store";
 import styles from "./styles";
 
 const lasema = require("../../assets/images/lasema.png");
+const police = require("../../assets/images/ng_police.jpg");
 
 const EmergencyPostCard = ({ post, emergencyDetailIsActive }) => {
   const navigation = useNavigation();
   const { aspectRatio } = useAspectRatio(1, post);
 
+  const { userData } = useAuth();
+
   const [isDrawerOpen, setDrawerOpen] = useState(false);
-  const [status, setStatus] = useState("pending");
+
+  const [status, setStatus] = useState(
+    post?.status?.toLowerCase() || "pending"
+  );
   const toggleDrawer = () => {
     setDrawerOpen((prevState) => !prevState);
   };
@@ -38,7 +47,10 @@ const EmergencyPostCard = ({ post, emergencyDetailIsActive }) => {
           {/* HEADER STARTS */}
           <View style={styles.header}>
             <View style={styles.userBox}>
-              <Image source={post.userImage} style={styles.userImage} />
+              <Image
+                source={post?.user?.image ? { uri: post?.user?.image } : police}
+                style={styles.userImage}
+              />
               <Text style={styles.username} numberOfLines={1}>
                 {post.username}
               </Text>
@@ -49,19 +61,20 @@ const EmergencyPostCard = ({ post, emergencyDetailIsActive }) => {
                 <Image source={lasema} style={styles.respondent} />
               </TouchableOpacity>
 
-              {emergencyDetailIsActive && (
-                <TouchableOpacity style={styles.followBtn}>
-                  <Text style={styles.followText}>Follow</Text>
+              <TouchableOpacity style={styles.followBtn}>
+                <Text style={styles.followText}>Follow</Text>
+              </TouchableOpacity>
+
+              {(userData?.id === post?.user?.id ||
+                userData?.id === post?.channel) && (
+                <TouchableOpacity onPress={toggleDrawer}>
+                  <Ionicons
+                    name="ellipsis-vertical-sharp"
+                    size={24}
+                    color={COLORS.primary}
+                  />
                 </TouchableOpacity>
               )}
-
-              <TouchableOpacity onPress={toggleDrawer}>
-                <Ionicons
-                  name="ellipsis-vertical-sharp"
-                  size={24}
-                  color={COLORS.primary}
-                />
-              </TouchableOpacity>
             </View>
           </View>
           {/* HEADER ENDS */}
@@ -72,7 +85,7 @@ const EmergencyPostCard = ({ post, emergencyDetailIsActive }) => {
               style={styles.postText}
               numberOfLines={emergencyDetailIsActive ? 0 : 3}
             >
-              {post.postText}
+              {post?.description}
             </Text>
 
             {emergencyDetailIsActive ? null : (
@@ -97,7 +110,7 @@ const EmergencyPostCard = ({ post, emergencyDetailIsActive }) => {
             }}
           >
             <Image
-              source={{ uri: post.postImage }}
+              source={{ uri: post?.file }}
               style={styles.postImage}
               resizeMode="contain"
             />
@@ -107,13 +120,14 @@ const EmergencyPostCard = ({ post, emergencyDetailIsActive }) => {
           {/* DATE AND STATUS STARTS */}
           <View style={styles.statusBox}>
             <Text style={styles.date}>
-              posted on {post.date} | {post.time}
+              posted on {formatDate(post?.user?.createdAt)} |{" "}
+              {formatTime(post?.user?.createdAt)}
             </Text>
 
             {status === "pending" && (
               <TouchableOpacity style={styles.awaiting}>
                 <Text style={[styles.statusText, { color: COLORS.aConText }]}>
-                  Pending
+                  {status}
                 </Text>
               </TouchableOpacity>
             )}
@@ -121,7 +135,7 @@ const EmergencyPostCard = ({ post, emergencyDetailIsActive }) => {
             {status === "confirmed" && (
               <TouchableOpacity style={styles.confirmed}>
                 <Text style={[styles.statusText, { color: COLORS.conText }]}>
-                  Confirmed
+                  {status}
                 </Text>
               </TouchableOpacity>
             )}
@@ -131,7 +145,7 @@ const EmergencyPostCard = ({ post, emergencyDetailIsActive }) => {
                 <Text
                   style={[styles.statusText, { color: COLORS.respondText }]}
                 >
-                  Responding
+                  {status}
                 </Text>
               </TouchableOpacity>
             )}
@@ -141,7 +155,7 @@ const EmergencyPostCard = ({ post, emergencyDetailIsActive }) => {
                 <Text
                   style={[styles.statusText, { color: COLORS.resolveText }]}
                 >
-                  Resolved
+                  {status}
                 </Text>
               </TouchableOpacity>
             )}
@@ -151,7 +165,7 @@ const EmergencyPostCard = ({ post, emergencyDetailIsActive }) => {
                 <Text
                   style={[styles.statusText, { color: COLORS.dismissText }]}
                 >
-                  Dismissed
+                  {status}
                 </Text>
               </TouchableOpacity>
             )}
@@ -164,11 +178,15 @@ const EmergencyPostCard = ({ post, emergencyDetailIsActive }) => {
               <TouchableOpacity>
                 <Entypo name="arrow-up" size={24} color={COLORS.primary} />
               </TouchableOpacity>
-              <Text style={styles.voteCount}>{post.upvoteCount}</Text>
+              <Text style={styles.voteCount}>
+                {abbreviateNumber(post?.upVotes, 2)}
+              </Text>
               <TouchableOpacity>
                 <Entypo name="arrow-down" size={24} color={COLORS.primary} />
               </TouchableOpacity>
-              <Text style={styles.voteCount}>{post.downvoteCount}</Text>
+              <Text style={styles.voteCount}>
+                {abbreviateNumber(post?.downVotes, 2)}
+              </Text>
             </View>
 
             <View style={styles.commentBox}>
@@ -180,7 +198,8 @@ const EmergencyPostCard = ({ post, emergencyDetailIsActive }) => {
                 />
               </TouchableOpacity>
               <Text style={styles.metricCount}>
-                {post.commentCount} Comments
+                {abbreviateNumber(post?.commentCount, 2)}{" "}
+                {post?.commentCount > 1 ? "Comments" : "Comment"}
               </Text>
             </View>
 
@@ -204,6 +223,8 @@ const EmergencyPostCard = ({ post, emergencyDetailIsActive }) => {
         handleDelete={handleDelete}
         toggleDrawer={toggleDrawer}
         forEmergency
+        posterId={post?.user?.id}
+        userData={userData}
       />
     </>
   );

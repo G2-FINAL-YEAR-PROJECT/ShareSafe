@@ -5,11 +5,19 @@ import { useNavigation } from "@react-navigation/native";
 import { useAspectRatio } from "../../hooks";
 import { useState } from "react";
 import PostActionModal from "../PostActionModal";
+import { formatDate } from "../../helpers";
+import { abbreviateNumber } from "js-abbreviation-number";
+
+import { useAuth } from "../../store";
 import styles from "./styles";
+
+const girlPic = require("../../assets/images/girl.jpg");
 
 const PostCard = ({ post, postDetailIsActive }) => {
   const { aspectRatio } = useAspectRatio(1, post);
   const navigation = useNavigation();
+
+  const { userData } = useAuth();
 
   const [isDrawerOpen, setDrawerOpen] = useState(false);
 
@@ -20,6 +28,7 @@ const PostCard = ({ post, postDetailIsActive }) => {
   const handleDelete = () => {
     toggleDrawer();
   };
+
   return (
     <>
       <TouchableOpacity
@@ -35,30 +44,48 @@ const PostCard = ({ post, postDetailIsActive }) => {
           {/* USERNAME AND DATE */}
           <View style={styles.header}>
             <View style={styles.userBox}>
-              <TouchableOpacity>
-                <Image source={post.userImage} style={styles.headerImage} />
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("ProfileTabStack", {
+                    screen: "Profile",
+                    params: { user: post?.user },
+                  })
+                }
+              >
+                <Image
+                  source={
+                    post?.user?.image ? { uri: post?.user?.image } : girlPic
+                  }
+                  style={styles.headerImage}
+                />
               </TouchableOpacity>
 
               <View>
-                <Text style={styles.username}>{post.username}</Text>
-                <Text style={styles.date}>{post.date}</Text>
+                <Text style={styles.username}>{post?.user?.fullName}</Text>
+                <Text style={styles.date}>{formatDate(post?.createdAt)}</Text>
               </View>
             </View>
 
             <View style={styles.actionBox}>
-              {postDetailIsActive && (
-                <TouchableOpacity style={styles.followBtn}>
-                  <Text style={styles.followText}>Follow</Text>
+              {userData?.id !== post?.user?.id &&
+                !post?.user?.followers?.includes(userData?.id) && (
+                  <TouchableOpacity style={styles.followBtn}>
+                    <Text style={styles.followText}>Follow</Text>
+                  </TouchableOpacity>
+                )}
+              <TouchableOpacity style={styles.followBtn}>
+                <Text style={styles.followText}>Follow</Text>
+              </TouchableOpacity>
+
+              {userData?.id === post?.user?.id && (
+                <TouchableOpacity onPress={toggleDrawer}>
+                  <Ionicons
+                    name="ellipsis-vertical-sharp"
+                    size={24}
+                    color={COLORS.primary}
+                  />
                 </TouchableOpacity>
               )}
-
-              <TouchableOpacity onPress={toggleDrawer}>
-                <Ionicons
-                  name="ellipsis-vertical-sharp"
-                  size={24}
-                  color={COLORS.primary}
-                />
-              </TouchableOpacity>
             </View>
           </View>
           {/* USERNAME AND DATE ends */}
@@ -72,7 +99,7 @@ const PostCard = ({ post, postDetailIsActive }) => {
             }}
           >
             <Image
-              source={{ uri: post.postImage }}
+              source={{ uri: post?.thumbnail }}
               style={styles.postImage}
               resizeMode="contain"
             />
@@ -84,7 +111,7 @@ const PostCard = ({ post, postDetailIsActive }) => {
               style={styles.postText}
               numberOfLines={postDetailIsActive ? 0 : 2}
             >
-              {post.postText}
+              {post?.text}
             </Text>
 
             {postDetailIsActive ? null : (
@@ -107,7 +134,9 @@ const PostCard = ({ post, postDetailIsActive }) => {
                   color={COLORS.primary}
                 />
               </TouchableOpacity>
-              <Text style={styles.metricCount}>{post.likesCount} Likes</Text>
+              <Text style={styles.metricCount}>
+                {abbreviateNumber(post?.likes, 2)} Likes
+              </Text>
             </View>
 
             <View style={styles.metricBox}>
@@ -119,7 +148,8 @@ const PostCard = ({ post, postDetailIsActive }) => {
                 />
               </TouchableOpacity>
               <Text style={styles.metricCount}>
-                {post.commentCount} Comments
+                {abbreviateNumber(post?.commentCount, 2)}{" "}
+                {post?.commentCount > 1 ? "Comments" : "Comment"}
               </Text>
             </View>
 

@@ -6,6 +6,14 @@
     "orientation": "portrait",
     "icon": "./assets/icon1.png",
     "userInterfaceStyle": "automatic",
+    "notification": {
+      "color": "#ffffff",
+      "iosDisplayInForeground": true,
+      "androidMode": "default",
+      "androidBehavior": "default",
+      "androidShowWhenInForeground": true
+    },
+    "permissions": ["ACCESS_BACKGROUND_LOCATION", "LOCATION_BACKGROUND"],
     "splash": {
       "image": "./assets/splash1.png",
       "resizeMode": "contain",
@@ -24,11 +32,8 @@
         "foregroundImage": "./assets/adaptive-icon1.png",
         "backgroundColor": "#ffffff"
       },
-      "permissions": [
-        "ACCESS_BACKGROUND_LOCATION",
-        "ACCESS_FINE_LOCATION",
-        "ACCESS_COARSE_LOCATION"
-      ]
+
+      "useNextNotificationsApi": true
     },
     "web": {
       "favicon": "./assets/favicon.png"

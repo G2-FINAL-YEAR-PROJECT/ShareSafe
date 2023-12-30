@@ -1,7 +1,7 @@
-import { View, ActivityIndicator } from "react-native";
+import { View, Text } from "react-native";
 import { COLORS } from "../../constants";
 
-const Loading = ({ color }) => {
+const ErrorScreen = ({ message }) => {
   return (
     <View
       style={{
@@ -11,12 +11,11 @@ const Loading = ({ color }) => {
         backgroundColor: COLORS.white,
       }}
     >
-      <ActivityIndicator
-        size={"large"}
-        color={color ? color : COLORS.primary}
-      />
+      <Text style={{ color: COLORS.red, fontFamily: "semibold", fontSize: 18 }}>
+        {message}
+      </Text>
     </View>
   );
 };
 
-export default Loading;
+export default ErrorScreen;

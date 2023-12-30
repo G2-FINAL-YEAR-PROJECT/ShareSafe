@@ -2,8 +2,19 @@ import { View, FlatList } from "react-native";
 import { postList } from "../../data";
 import { PostCard } from "../../ui";
 import { COLORS, SIZES } from "../../constants";
+import { useRoute } from "@react-navigation/native";
+import { useEffect } from "react";
+import { useAuth } from "../../store";
 
 const Profile = () => {
+  const { setUserProfile } = useAuth();
+  const route = useRoute();
+  const user = route?.params?.user;
+
+  useEffect(() => {
+    setUserProfile(user);
+  }, [user]);
+
   return (
     <View
       style={[

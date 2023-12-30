@@ -1,9 +1,8 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Text } from "react-native";
-import { Report, CreatePost, Messages, Profile } from "../screens";
+import { Report, CreatePost, Notifications } from "../screens";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import TopTabStack from "./TopTabStack";
-import ProfileTabStack from "./ProfileTabStack";
 import MessageTabStack from "./MessageTabStack";
 import { COLORS } from "../constants";
 import { Header } from "../ui";
@@ -52,7 +51,7 @@ const BottomTabStack = () => {
           },
 
           headerTitle: () => (
-            <Header showRecommended showSearchNotify showLogo />
+            <Header showRecommended showSearchProfile showLogo />
           ),
           headerStyle: {
             elevation: 0,
@@ -88,7 +87,7 @@ const BottomTabStack = () => {
             );
           },
 
-          headerTitle: () => <Header showBack showSearchNotify />,
+          headerTitle: () => <Header showBack showSearchProfile />,
           headerStyle: {
             elevation: 0,
           },
@@ -146,23 +145,21 @@ const BottomTabStack = () => {
               </Text>
             );
           },
-          headerTitle: () => <Header showBack showSearchNotify />,
+          headerTitle: () => <Header showBack showSearchProfile />,
           headerStyle: {
             elevation: 0,
           },
         }}
       />
+
       <Tab.Screen
-        name="ProfileTabStack"
-        component={ProfileTabStack}
+        name="Notifications"
+        component={Notifications}
         options={{
-          tabBarIcon: ({ focused }) => {
+          headerShown: false,
+          tabBarIcon: () => {
             return (
-              <Ionicons
-                name={focused ? "person" : "person-outline"}
-                size={24}
-                color={COLORS.white}
-              />
+              <Ionicons name="notifications" size={24} color={COLORS.white} />
             );
           },
 
@@ -174,14 +171,9 @@ const BottomTabStack = () => {
                   fontFamily: focused ? "semibold" : "regular",
                 }}
               >
-                Profile
+                Alerts
               </Text>
             );
-          },
-          headerTitle: () => <Header showBack showSearchNotify showProfile />,
-          headerStyle: {
-            elevation: 0,
-            height: 280,
           },
         }}
       />

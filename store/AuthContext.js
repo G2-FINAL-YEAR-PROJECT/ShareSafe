@@ -1,18 +1,23 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
+// import axios from "axios";
 import * as Location from "expo-location";
 import { createContext, useContext, useEffect, useState } from "react";
+
 import * as TaskManager from "expo-task-manager";
 import { API_KEY } from "@env";
+import { Alert, Linking, AppState } from "react-native";
+import { authFetch } from "../axios";
 
 const LOCATION_TASK_NAME = "background-location-task";
 
-const baseUrl = "https://share-safe-85lb.onrender.com/auth";
 const locationBaseUrl = "https://geocode.maps.co/reverse";
 
 const AuthContext = createContext();
 
+let locationWatcher;
+
 const AuthProvider = ({ children }) => {
+  const [userProfile, setUserProfile] = useState({});
   const [loadingAuth, setLoadingAuth] = useState(true);
   const [loadingLogin, setLoadingLogin] = useState(false);
   const [loadingRegister, setLoadingRegister] = useState(false);
@@ -25,68 +30,90 @@ const AuthProvider = ({ children }) => {
   const [currentLocation, setCurrentLocation] = useState({});
 
   useEffect(() => {
-    requestLocationPermission();
+    // requestLocationPermission();
+
     getAuthData();
   }, []);
 
-  const requestLocationPermission = async () => {
-    try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
+  // const requestLocationPermission = async () => {
+  //   try {
+  //     const { status } = await Location.requestForegroundPermissionsAsync();
 
-      if (status == "granted") {
-        const { status } = await Location.requestBackgroundPermissionsAsync();
-        if (status === "granted") {
-          setLocationGranted(true);
-        } else {
-          setLocationGranted(false);
-        }
-      } else {
-        setLocationGranted(false);
-      }
-    } catch (error) {
-      setLocationGranted(false);
-    }
-  };
+  //     if (status === "granted") {
+  //       const { status } = await Location.requestBackgroundPermissionsAsync();
+  //       if (status === "granted") {
+  //         setLocationGranted(true);
+  //       } else {
+  //         setLocationGranted(false);
+  //         showLocationPermissionAlert();
+  //       }
+  //     } else {
+  //       setLocationGranted(false);
+  //       showLocationPermissionAlert();
+  //     }
+  //   } catch (error) {
+  //     setLocationGranted(false);
+  //     showLocationPermissionAlert();
+  //   }
+  // };
 
-  TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
-    if (error) {
-      console.log("TaskManager error");
-      return;
-    }
+  // const showLocationPermissionAlert = () => {
+  //   Alert.alert(
+  //     "Location Permission Required",
+  //     'To receive emergency notifications, please choose "Allow all the time" for location access. Open app settings to update your preferences.',
+  //     [
+  //       {
+  //         text: "Cancel",
+  //         style: "cancel",
+  //       },
+  //       {
+  //         text: "Open Settings",
+  //         onPress: () => Linking.openSettings(),
+  //       },
+  //     ],
+  //     { cancelable: false }
+  //   );
+  // };
 
-    // Process location data
-    const { locations } = data;
-    const {
-      coords: { latitude, longitude },
-    } = locations[0];
-    setCurrentLocation({ longitude, latitude });
-    // console.log("Background location update:", locations);
-  });
+  // TaskManager.defineTask("backgroundLocationUpdates", ({ data, error }) => {
+  //   if (error) {
+  //     console.log("TaskManager error");
+  //     return;
+  //   }
 
-  useEffect(() => {
-    if (locationGranted) {
-      // Start background tracking when component mounts
-      startBackgroundTracking();
+  //   // Process location data
+  //   const { locations } = data;
+  //   const {
+  //     coords: { latitude, longitude },
+  //   } = locations[0];
+  //   console.log("Background location update:", locations);
+  //   setCurrentLocation({ longitude, latitude });
+  // });
 
-      // Cleanup function to stop background tracking when component unmounts
-      return () => {
-        stopBackgroundTracking();
-      };
-    }
-  }, [locationGranted]); // Empty dependency array ensures this effect runs only once when the component mounts
+  // useEffect(() => {
+  //   if (locationGranted) {
+  //     // Start background tracking when component mounts
+  //     startBackgroundTracking();
 
-  const startBackgroundTracking = async () => {
-    await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-      accuracy: Location.Accuracy.High,
-      timeInterval: 120000, // Update every 60 seconds
-      distanceInterval: 0,
-      showsBackgroundLocationIndicator: true, // Show location icon in status bar
-    });
-  };
+  //     // Cleanup function to stop background tracking when component unmounts
+  //     return () => {
+  //       stopBackgroundTracking();
+  //     };
+  //   }
+  // }, []);
 
-  const stopBackgroundTracking = async () => {
-    await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
-  };
+  // const startBackgroundTracking = async () => {
+  //   await Location.startLocationUpdatesAsync("backgroundLocationUpdates", {
+  //     accuracy: Location.Accuracy.High,
+  //     timeInterval: 2000, // Update every 60 seconds
+  //     distanceInterval: 0,
+  //     showsBackgroundLocationIndicator: true, // Show location icon in status bar
+  //   });
+  // };
+
+  // const stopBackgroundTracking = async () => {
+  //   await Location.stopLocationUpdatesAsync("backgroundLocationUpdates");
+  // };
 
   // const fetchAddress = async () => {
   //   const { longitude, latitude } = currentLocation;
@@ -136,7 +163,7 @@ const AuthProvider = ({ children }) => {
   const login = async ({ email, password }) => {
     try {
       setLoadingLogin(true);
-      const res = await axios.post(baseUrl + "/login", { email, password });
+      const res = await authFetch.post("/auth/login", { email, password });
       const token = res?.data?.data?.tokens?.access?.token;
       const userData = res?.data?.data?.user;
       setLoadingLogin(false);
@@ -163,10 +190,7 @@ const AuthProvider = ({ children }) => {
   const register = async (data) => {
     try {
       setLoadingRegister(true);
-      const res = await axios.post(baseUrl + "/register", {
-        ...data,
-        location: "New York",
-      });
+      const res = await authFetch.post("/auth/register", data);
       const token = res?.data?.data?.tokens?.access?.token;
       const userData = res?.data?.data?.signUpUserData;
       setLoadingRegister(false);
@@ -216,6 +240,8 @@ const AuthProvider = ({ children }) => {
         logout,
         viewedOnboarding,
         locationGranted,
+        userProfile,
+        setUserProfile,
       }}
     >
       {children}

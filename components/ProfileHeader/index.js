@@ -1,137 +1,167 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import { COLORS } from "../../constants";
 import { useAuth } from "../../store";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { useEffect, useState } from "react";
+import { authFetch } from "../../axios";
+import styles from "./styles";
 
 const ProfileHeader = () => {
-  const auth = useAuth();
+  const route = useRoute();
+  const user = route?.params?.params?.user;
+
+  const { userData, logout } = useAuth();
   const navigation = useNavigation();
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [currentUser, setCurrentUser] = useState(userData);
+
+  const fetchSingleUser = async (id) => {
+    setIsLoading(true);
+
+    try {
+      const res = await authFetch(`/users/${id}`);
+
+      if (res.data.status !== 200) {
+        throw new Error(res.data.message);
+      }
+
+      setCurrentUser(res.data.data);
+      setIsLoading(false);
+    } catch (err) {
+      setErrorMessage(err.message);
+      setIsLoading(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user?.id !== userData.id) {
+      fetchSingleUser(user?.id);
+    }
+  }, []);
+
   return (
-    <View style={{ marginVertical: 30 }}>
+    <View
+      style={{
+        marginBottom: 30,
+        marginTop: 20,
+        minWidth: "100%",
+        paddingRight: 34,
+      }}
+    >
+      <TouchableOpacity
+        style={{ marginBottom: 25 }}
+        onPress={() => navigation.goBack()}
+      >
+        <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
+      </TouchableOpacity>
       {/* PROFILE CARD STARTS */}
+
       <View style={[styles.cardBox]}>
-        <View style={styles.user}>
-          <Image
-            source={require("../../assets/images/girl.jpg")}
-            style={styles.image}
-          />
-          <View>
-            <Text
-              style={{ fontSize: 14, fontFamily: "bold", color: COLORS.white }}
-            >
-              Ikechukwu Macaulay
-            </Text>
-            <Text
-              style={{ fontSize: 11, fontFamily: "regular", color: "#D7D7D7" }}
-            >
-              @simplymiko
-            </Text>
-          </View>
-        </View>
+        {isLoading ? (
+          <ActivityIndicator size="small" color={COLORS.white} />
+        ) : (
+          <>
+            <View style={styles.user}>
+              <Image
+                source={
+                  currentUser?.profilePicture
+                    ? { uri: currentUser?.profilePicture }
+                    : girl
+                }
+                style={styles.image}
+              />
+              <View style={{ flexBasis: "40%" }}>
+                <Text
+                  numberOfLines={1}
+                  style={{
+                    fontSize: 14,
+                    fontFamily: "bold",
+                    color: COLORS.white,
+                  }}
+                >
+                  {currentUser?.fullName}
+                </Text>
+                <Text
+                  numberOfLines={1}
+                  style={{
+                    fontSize: 11,
+                    fontFamily: "regular",
+                    color: "#D7D7D7",
+                  }}
+                >
+                  {currentUser?.email}
+                </Text>
+              </View>
+            </View>
 
-        <View style={styles.profileAction}>
-          {/* <TouchableOpacity>
-            <Ionicons name="chatbubbles" size={24} color={COLORS.white} />
-          </TouchableOpacity>
+            <View style={styles.profileAction}>
+              {currentUser?.id !== userData?.id && (
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate("ChatDetails", {
+                      userId: currentUser?.id,
+                    })
+                  }
+                >
+                  <Ionicons name="chatbubbles" size={24} color={COLORS.white} />
+                </TouchableOpacity>
+              )}
 
-          <TouchableOpacity style={styles.followBtn}>
-            <Text style={styles.followText}>Follow</Text>
-          </TouchableOpacity> */}
+              {currentUser?.id !== userData?.id && (
+                <TouchableOpacity style={styles.followBtn}>
+                  <Text style={styles.followText}>Follow</Text>
+                </TouchableOpacity>
+              )}
 
-          <TouchableOpacity onPress={() => navigation.navigate("EditProfile")}>
-            <MaterialCommunityIcons
-              name="pencil-outline"
-              size={24}
-              color={COLORS.white}
-            />
-          </TouchableOpacity>
-        </View>
+              {currentUser?.id === userData?.id && (
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("EditProfile")}
+                >
+                  <MaterialCommunityIcons
+                    name="pencil-outline"
+                    size={24}
+                    color={COLORS.white}
+                  />
+                </TouchableOpacity>
+              )}
+            </View>
+          </>
+        )}
       </View>
       {/* PROFILE CARD ENDS */}
 
       {/* METRICS STARTS */}
-      <View style={styles.metric}>
-        <Text style={styles.following("regular")}>144 followers</Text>
-        <Text style={styles.following("regular")}>144 following</Text>
-        <TouchableOpacity style={styles.logout} onPress={() => auth.logout()}>
-          <Text style={[styles.following("medium"), { color: COLORS.white }]}>
-            Log Out
+      {isLoading ? (
+        <ActivityIndicator size="small" color={COLORS.primary} />
+      ) : (
+        <View style={styles.metric}>
+          <Text style={styles.following("regular")}>
+            {currentUser?.followers?.length} followers
           </Text>
-        </TouchableOpacity>
-      </View>
+          <Text style={styles.following("regular")}>
+            {currentUser?.following?.length} following
+          </Text>
+          <TouchableOpacity style={styles.logout} onPress={() => logout()}>
+            <Text style={[styles.following("medium"), { color: COLORS.white }]}>
+              Log Out
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 };
 
 export default ProfileHeader;
-
-const styles = StyleSheet.create({
-  cardBox: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 16,
-    backgroundColor: COLORS.primary,
-    borderRadius: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.5,
-    shadowRadius: 2,
-    elevation: 8,
-  },
-
-  user: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  image: {
-    width: 57,
-    height: 57,
-    borderWidth: 2,
-    borderColor: COLORS.white,
-    borderRadius: 50,
-    resizeMode: "contain",
-  },
-
-  profileAction: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  followBtn: {
-    backgroundColor: COLORS.white,
-    alignItems: "center",
-    paddingHorizontal: 15,
-    paddingVertical: 2.8,
-    borderRadius: 20,
-  },
-  followText: {
-    color: COLORS.black,
-    fontSize: 14,
-    fontFamily: "semibold",
-  },
-
-  metric: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 30,
-  },
-
-  following: (family) => {
-    return {
-      fontSize: 15,
-      fontFamily: family,
-    };
-  },
-
-  logout: {
-    backgroundColor: COLORS.primary,
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 3,
-  },
-});

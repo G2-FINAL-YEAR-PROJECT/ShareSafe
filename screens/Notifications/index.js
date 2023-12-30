@@ -40,7 +40,7 @@ const Notifications = () => {
     <ScrollView
       style={[
         SIZES.safeAreaView,
-        { backgroundColor: COLORS.white, paddingTop: 20 },
+        { backgroundColor: COLORS.white, paddingTop: 65 },
       ]}
       showsVerticalScrollIndicator={false}
     >

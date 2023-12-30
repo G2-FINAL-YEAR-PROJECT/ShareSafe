@@ -1,20 +1,18 @@
 import { View, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Recommended, ProfileHeader } from "../../components";
+import { Recommended } from "../../components";
 import { COLORS } from "../../constants";
 import { useNavigation } from "@react-navigation/native";
 
-const Header = ({
-  showBack,
-  showSearchNotify,
-  showLogo,
-  showProfile,
-  showRecommended,
-}) => {
+import { useAuth } from "../../store";
+
+const Header = ({ showBack, showSearchProfile, showLogo, showRecommended }) => {
   const navigation = useNavigation();
 
+  const { userData } = useAuth();
+
   return (
-    <View style={{ marginTop: (showRecommended || showProfile) && 30 }}>
+    <View style={{ marginTop: showRecommended && 30 }}>
       <View style={[styles.header, { width: "100%" }]}>
         <View style={styles.headerLeft}>
           {showLogo && (
@@ -36,7 +34,7 @@ const Header = ({
         </View>
 
         <View style={styles.headerRight}>
-          {showSearchNotify && (
+          {showSearchProfile && (
             <>
               <TouchableOpacity
                 style={{ alignItems: "center", marginRight: 18 }}
@@ -47,12 +45,21 @@ const Header = ({
 
               <TouchableOpacity
                 style={{ alignItems: "center" }}
-                onPressIn={() => navigation.navigate("Notifications")}
+                onPressIn={() =>
+                  navigation.navigate("ProfileTabStack", {
+                    screen: "Profile",
+                    params: { user: userData },
+                  })
+                }
               >
-                <Ionicons
-                  name="notifications"
-                  size={24}
-                  color={COLORS.primary}
+                <Image
+                  source={{ uri: userData?.profilePicture }}
+                  style={{
+                    width: 37,
+                    height: 37,
+                    borderRadius: 50,
+                    resizeMode: "contain",
+                  }}
                 />
               </TouchableOpacity>
             </>
@@ -60,7 +67,6 @@ const Header = ({
         </View>
       </View>
       {showRecommended && <Recommended />}
-      {showProfile && <ProfileHeader />}
     </View>
   );
 };

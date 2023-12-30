@@ -21,30 +21,30 @@ const Register = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const openAppSettings = () => {
-    Linking.openSettings();
-  };
+  // const openAppSettings = () => {
+  //   Linking.openSettings();
+  // };
   const handleRegister = async () => {
-    if (!locationGranted) {
-      Alert.alert(
-        "Confirm",
-        "Give location access",
-        [
-          {
-            text: "No",
-            style: "cancel",
-          },
-          {
-            text: "Yes",
-            onPress: () => {
-              openAppSettings();
-            },
-          },
-        ],
-        { cancelable: false }
-      );
-      return;
-    }
+    // if (!locationGranted) {
+    //   Alert.alert(
+    //     "Confirm",
+    //     "Give location access",
+    //     [
+    //       {
+    //         text: "No",
+    //         style: "cancel",
+    //       },
+    //       {
+    //         text: "Yes",
+    //         onPress: () => {
+    //           openAppSettings();
+    //         },
+    //       },
+    //     ],
+    //     { cancelable: false }
+    //   );
+    //   return;
+    // }
 
     if (!name.trim()) {
       alert("Name is required");
