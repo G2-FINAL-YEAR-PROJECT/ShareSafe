@@ -3,7 +3,7 @@ import axios from "axios";
 // Create a custom Axios instance
 const apiClient = axios.create({
   baseURL: "https://share-safe-85lb.onrender.com",
-  timeout: 1000,
+  timeout: 2000,
   headers: {
     "Content-Type": "application/json",
   },

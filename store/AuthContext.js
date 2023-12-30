@@ -6,7 +6,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import * as TaskManager from "expo-task-manager";
 import { API_KEY } from "@env";
 import { Alert, Linking, AppState } from "react-native";
-import { authFetch } from "../axios";
+import { apiClient } from "../config";
 
 const LOCATION_TASK_NAME = "background-location-task";
 
@@ -163,7 +163,7 @@ const AuthProvider = ({ children }) => {
   const login = async ({ email, password }) => {
     try {
       setLoadingLogin(true);
-      const res = await authFetch.post("/auth/login", { email, password });
+      const res = await apiClient.post("/auth/login", { email, password });
       const token = res?.data?.data?.tokens?.access?.token;
       const userData = res?.data?.data?.user;
       setLoadingLogin(false);
@@ -176,11 +176,10 @@ const AuthProvider = ({ children }) => {
       // Save token and user data
       setToken(token);
       setUserData(userData);
+      // Set the Bearer token in the headers
+      apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       // Persist data
-      await AsyncStorage.setItem(
-        "@AuthData",
-        JSON.stringify({ token, userData })
-      );
+      await AsyncStorage.setItem("@AuthData", JSON.stringify({ token, userData }));
     } catch (error) {
       console.log(error);
       handleErrorMessage();
@@ -190,7 +189,7 @@ const AuthProvider = ({ children }) => {
   const register = async (data) => {
     try {
       setLoadingRegister(true);
-      const res = await authFetch.post("/auth/register", data);
+      const res = await apiClient.post("/auth/register", data);
       const token = res?.data?.data?.tokens?.access?.token;
       const userData = res?.data?.data?.signUpUserData;
       setLoadingRegister(false);
@@ -202,11 +201,10 @@ const AuthProvider = ({ children }) => {
       }
 
       // Persist data
-      await AsyncStorage.setItem(
-        "@AuthData",
-        JSON.stringify({ token, userData })
-      );
+      await AsyncStorage.setItem("@AuthData", JSON.stringify({ token, userData }));
       await AsyncStorage.setItem("@showWelcomeScreen", "true");
+      // Set the Bearer token in the headers
+      apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
       // Save token and user data
       setToken(token);
@@ -221,6 +219,8 @@ const AuthProvider = ({ children }) => {
     await AsyncStorage.removeItem("@AuthData");
     setToken(null);
     setUserData(null);
+    // Remove the Bearer token in the headers
+    delete apiClient.defaults.headers.common["Authorization"];
   };
 
   const handleErrorMessage = (errorMessage) => {

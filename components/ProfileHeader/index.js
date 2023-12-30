@@ -1,18 +1,11 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  TouchableOpacity,
-  ActivityIndicator,
-} from "react-native";
+import { StyleSheet, Text, View, Image, TouchableOpacity, ActivityIndicator } from "react-native";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import { COLORS } from "../../constants";
 import { useAuth } from "../../store";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useEffect, useState } from "react";
-import { authFetch } from "../../axios";
 import styles from "./styles";
+import { apiClient } from "../../config";
 
 const ProfileHeader = () => {
   const route = useRoute();
@@ -29,7 +22,7 @@ const ProfileHeader = () => {
     setIsLoading(true);
 
     try {
-      const res = await authFetch(`/users/${id}`);
+      const res = await apiClient(`/users/${id}`);
 
       if (res.data.status !== 200) {
         throw new Error(res.data.message);
@@ -60,10 +53,7 @@ const ProfileHeader = () => {
         paddingRight: 34,
       }}
     >
-      <TouchableOpacity
-        style={{ marginBottom: 25 }}
-        onPress={() => navigation.goBack()}
-      >
+      <TouchableOpacity style={{ marginBottom: 25 }} onPress={() => navigation.goBack()}>
         <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
       </TouchableOpacity>
       {/* PROFILE CARD STARTS */}
@@ -75,11 +65,7 @@ const ProfileHeader = () => {
           <>
             <View style={styles.user}>
               <Image
-                source={
-                  currentUser?.profilePicture
-                    ? { uri: currentUser?.profilePicture }
-                    : girl
-                }
+                source={currentUser?.profilePicture ? { uri: currentUser?.profilePicture } : girl}
                 style={styles.image}
               />
               <View style={{ flexBasis: "40%" }}>
@@ -126,14 +112,8 @@ const ProfileHeader = () => {
               )}
 
               {currentUser?.id === userData?.id && (
-                <TouchableOpacity
-                  onPress={() => navigation.navigate("EditProfile")}
-                >
-                  <MaterialCommunityIcons
-                    name="pencil-outline"
-                    size={24}
-                    color={COLORS.white}
-                  />
+                <TouchableOpacity onPress={() => navigation.navigate("EditProfile")}>
+                  <MaterialCommunityIcons name="pencil-outline" size={24} color={COLORS.white} />
                 </TouchableOpacity>
               )}
             </View>
@@ -154,9 +134,7 @@ const ProfileHeader = () => {
             {currentUser?.following?.length} following
           </Text>
           <TouchableOpacity style={styles.logout} onPress={() => logout()}>
-            <Text style={[styles.following("medium"), { color: COLORS.white }]}>
-              Log Out
-            </Text>
+            <Text style={[styles.following("medium"), { color: COLORS.white }]}>Log Out</Text>
           </TouchableOpacity>
         </View>
       )}

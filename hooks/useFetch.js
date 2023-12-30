@@ -1,6 +1,6 @@
-import { authFetch } from "../axios";
 import { useEffect, useState } from "react";
 import { useAuth } from "../store";
+import { apiClient } from "../config";
 
 const useFetch = (url) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -13,11 +13,7 @@ const useFetch = (url) => {
     setIsLoading(true);
 
     try {
-      const res = await authFetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await apiClient(url);
 
       if (res.data.status !== 200) {
         throw new Error(res.data.message);
