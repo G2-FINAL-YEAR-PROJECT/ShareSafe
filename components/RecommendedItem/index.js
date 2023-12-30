@@ -3,13 +3,17 @@ import React from "react";
 import { COLORS } from "../../constants";
 
 const RecommendedItem = ({ item }) => {
+  const goToUserProfile = () => {
+    console.log(item.id);
+  };
+
   return (
-    <Pressable style={{ marginRight: 20 }}>
+    <Pressable style={{ marginRight: 20 }} onPress={goToUserProfile}>
       <View style={{ justifyContent: "center", alignItems: "center" }}>
         <View style={styles.imageContainer}>
-          <Image source={item.image} style={styles.image} />
+          <Image source={{ uri: item.profilePicture }} style={styles.image} />
         </View>
-        <Text style={styles.imageText}>{item.title}</Text>
+        <Text style={styles.imageText}>{item.fullName}</Text>
       </View>
     </Pressable>
   );
