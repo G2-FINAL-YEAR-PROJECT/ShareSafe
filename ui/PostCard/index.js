@@ -73,9 +73,6 @@ const PostCard = ({ post, postDetailIsActive }) => {
                     <Text style={styles.followText}>Follow</Text>
                   </TouchableOpacity>
                 )}
-              <TouchableOpacity style={styles.followBtn}>
-                <Text style={styles.followText}>Follow</Text>
-              </TouchableOpacity>
 
               {userData?.id === post?.user?.id && (
                 <TouchableOpacity onPress={toggleDrawer}>
