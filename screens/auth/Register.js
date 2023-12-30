@@ -121,6 +121,7 @@ const Register = ({ navigation }) => {
             placeholder="Your Phone Number"
             value={phoneNo}
             autoComplete="tel"
+            keyboardType="numeric"
             onChangeText={(text) => setPhoneNo(text)}
           />
         </View>

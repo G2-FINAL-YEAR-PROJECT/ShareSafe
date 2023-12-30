@@ -148,6 +148,8 @@ const AuthProvider = ({ children }) => {
       if (authData?.token && authData?.userData) {
         setToken(authData.token);
         setUserData(authData.userData);
+        // Set the Bearer token in the headers
+        apiClient.defaults.headers.common["Authorization"] = `Bearer ${authData.token}`;
       }
 
       if (viewedOnboarding) {

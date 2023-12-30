@@ -33,7 +33,7 @@ const Recommended = () => {
             data={recommendedData}
             horizontal
             showsHorizontalScrollIndicator={false}
-            renderItem={({ item }) => <RecommendedItem item={item} />}
+            renderItem={({ item }) => <RecommendedItem user={item} />}
             keyExtractor={(item) => item.id}
           />
         </>
