@@ -2,12 +2,41 @@ import { View, FlatList, Text } from "react-native";
 import { postList } from "../../data";
 import { PostCard } from "../../ui";
 import { COLORS, SIZES } from "../../constants";
-import { useFetch } from "../../hooks";
+import { useFetch, useDeletePost } from "../../hooks";
 import ErrorScreen from "../ErrorScreen";
 import Loading from "../Loading";
+import { apiClient } from "../../config";
 
 const Home = () => {
-  const { isLoading, errorMessage, data: allPosts } = useFetch("/post");
+  const {
+    isLoading,
+    errorMessage,
+    data: allPosts,
+    setData,
+  } = useFetch("/post");
+
+  const { handlePostDelete } = useDeletePost();
+
+  const deletePost = (page, postId) => {
+    // try {
+    //   const res = await apiClient.delete(`/post/${postId}`);
+
+    //   console.log(res.data.message);
+    //   if (res.data.status === 200) {
+    //     alert("post deleted successfully");
+    //     setData((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+    //   }
+
+    //   if (res.data.status !== 200) {
+    //     throw new Error(res.data.message);
+    //   }
+    // } catch (error) {
+    //   alert("Error deleting post");
+    //   console.log(error.message);
+    // }
+
+    handlePostDelete(page, "/post", postId, setData);
+  };
 
   return (
     <>
@@ -29,7 +58,12 @@ const Home = () => {
         >
           <FlatList
             data={allPosts}
-            renderItem={({ item }) => <PostCard post={item} />}
+            renderItem={({ item }) => (
+              <PostCard
+                post={item}
+                deletePost={deletePost.bind(null, "home")}
+              />
+            )}
             keyExtractor={(item) => item.id}
           />
         </View>

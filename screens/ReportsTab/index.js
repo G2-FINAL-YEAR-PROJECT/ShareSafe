@@ -4,17 +4,24 @@ import { EmergencyPostCard } from "../../ui";
 import { COLORS, SIZES } from "../../constants";
 import Loading from "../Loading";
 import ErrorScreen from "../ErrorScreen";
+import TemplateScreen from "../TemplateScreen";
 import { useAuth } from "../../store";
 import { useFetch } from "../../hooks";
 
 const ReportsTab = () => {
-  const { userProfile } = useAuth();
+  const { userProfile, userData } = useAuth();
 
   const {
     isLoading,
     errorMessage,
     data: userReports,
-  } = useFetch("/emergency/user");
+  } = useFetch(`/emergency/user?id=${userProfile.id}`);
+
+  const message = `${
+    userData?.id === userProfile?.id
+      ? "You have"
+      : userProfile?.fullName + " has"
+  } no report`;
 
   return (
     <>
@@ -22,6 +29,8 @@ const ReportsTab = () => {
         <Loading />
       ) : errorMessage ? (
         <ErrorScreen message={errorMessage} />
+      ) : userReports.length < 1 ? (
+        <TemplateScreen message={message} />
       ) : (
         <View
           style={[

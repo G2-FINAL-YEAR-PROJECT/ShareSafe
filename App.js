@@ -6,7 +6,6 @@ import { useCallback } from "react";
 import { useFonts } from "expo-font";
 import { HomeStack, AuthStack } from "./navigation";
 import * as SplashScreen from "expo-splash-screen";
-import { ActivityIndicator, View } from "react-native";
 import { Loading } from "./screens";
 
 export default function App() {

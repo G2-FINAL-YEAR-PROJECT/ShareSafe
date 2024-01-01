@@ -3,7 +3,7 @@ import { useAuth } from "../store";
 import { apiClient } from "../config";
 
 const useFetch = (url) => {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [data, setData] = useState([]);
 
@@ -39,6 +39,7 @@ const useFetch = (url) => {
     isLoading,
     errorMessage,
     data,
+    setData,
   };
 };
 

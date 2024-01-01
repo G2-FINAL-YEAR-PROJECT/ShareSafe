@@ -3,6 +3,8 @@ import React from "react";
 import { COLORS } from "../../constants";
 import { useNavigation } from "@react-navigation/native";
 
+const placeholder = require("../../assets/images/placeholder.jpg");
+
 const RecommendedItem = ({ user }) => {
   const navigator = useNavigation();
 
@@ -17,9 +19,14 @@ const RecommendedItem = ({ user }) => {
     <Pressable style={{ marginRight: 20 }} onPress={goToUserProfile}>
       <View style={{ justifyContent: "center", alignItems: "center" }}>
         <View style={styles.imageContainer}>
-          <Image source={{ uri: user.profilePicture }} style={styles.image} />
+          <Image
+            source={
+              user?.profilePicture ? { uri: user?.profilePicture } : placeholder
+            }
+            style={styles.image}
+          />
         </View>
-        <Text style={styles.imageText}>{user.fullName}</Text>
+        <Text style={styles.imageText}>{user?.fullName}</Text>
       </View>
     </Pressable>
   );

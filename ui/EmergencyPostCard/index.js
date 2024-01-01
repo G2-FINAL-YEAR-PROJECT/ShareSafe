@@ -2,7 +2,7 @@ import { View, Text, Image, TouchableOpacity } from "react-native";
 import { Entypo, Ionicons } from "@expo/vector-icons";
 import { COLORS } from "../../constants";
 import { useNavigation } from "@react-navigation/native";
-import { useAspectRatio } from "../../hooks";
+import { useAspectRatio, useFollow } from "../../hooks";
 import { abbreviateNumber } from "js-abbreviation-number";
 import { formatDate, formatTime } from "../../helpers";
 import PostActionModal from "../PostActionModal";
@@ -11,17 +11,20 @@ import { useAuth } from "../../store";
 import styles from "./styles";
 
 const lasema = require("../../assets/images/lasema.png");
-const police = require("../../assets/images/ng_police.jpg");
+const placeholder = require("../../assets/images/placeholder.jpg");
 
 const EmergencyPostCard = ({ post, emergencyDetailIsActive }) => {
-  const navigation = useNavigation();
-  const { aspectRatio } = useAspectRatio(1, post);
-
-  const { userData } = useAuth();
-
   const [isDrawerOpen, setDrawerOpen] = useState(false);
 
-  const [status, setStatus] = useState(post?.status?.toLowerCase() || "pending");
+  const navigation = useNavigation();
+  const { aspectRatio } = useAspectRatio(1, post);
+  const { userData } = useAuth();
+
+  const { isFollowing, handleFollowUser } = useFollow();
+
+  const [status, setStatus] = useState(
+    post?.status?.toLowerCase() || "pending"
+  );
   const toggleDrawer = () => {
     setDrawerOpen((prevState) => !prevState);
   };
@@ -45,30 +48,68 @@ const EmergencyPostCard = ({ post, emergencyDetailIsActive }) => {
           {/* HEADER STARTS */}
           <View style={styles.header}>
             <View style={styles.userBox}>
-              <Image
-                source={post?.user?.image ? { uri: post?.user?.image } : police}
-                style={styles.userImage}
-              />
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("ProfileTabStack", {
+                    screen: "Profile",
+                    params: { user: post?.user },
+                  })
+                }
+              >
+                <Image
+                  source={
+                    post?.user?.profilePicture
+                      ? { uri: post?.user?.profilePicture }
+                      : placeholder
+                  }
+                  style={styles.userImage}
+                />
+              </TouchableOpacity>
+
               <Text style={styles.username} numberOfLines={1}>
-                {post.username}
+                {post?.user?.fullName}
               </Text>
             </View>
 
             <View style={styles.actionBox}>
-              <TouchableOpacity>
-                <Image source={lasema} style={styles.respondent} />
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("ProfileTabStack", {
+                    screen: "Profile",
+                    params: { user: post?.channel },
+                  })
+                }
+              >
+                <Image
+                  source={
+                    post?.channel?.profilePicture
+                      ? { uri: post?.channel?.profilePicture }
+                      : lasema
+                  }
+                  style={styles.respondent}
+                />
               </TouchableOpacity>
 
-              {userData?.id !== post?.user?.id &&
-                !post?.user?.followers?.includes(userData?.id) && (
-                  <TouchableOpacity style={styles.followBtn}>
+              {emergencyDetailIsActive &&
+                userData?.id !== post?.user?.id &&
+                !post?.user?.followers?.includes(userData?.id) &&
+                !isFollowing && (
+                  <TouchableOpacity
+                    style={styles.followBtn}
+                    onPress={() => handleFollowUser(post?.user?.id)}
+                  >
                     <Text style={styles.followText}>Follow</Text>
                   </TouchableOpacity>
                 )}
 
-              {(userData?.id === post?.user?.id || userData?.id === post?.channel) && (
+              {(userData?.id === post?.user?.id ||
+                userData?.id === post?.channel?.id) && (
                 <TouchableOpacity onPress={toggleDrawer}>
-                  <Ionicons name="ellipsis-vertical-sharp" size={24} color={COLORS.primary} />
+                  <Ionicons
+                    name="ellipsis-vertical-sharp"
+                    size={24}
+                    color={COLORS.primary}
+                  />
                 </TouchableOpacity>
               )}
             </View>
@@ -77,12 +118,19 @@ const EmergencyPostCard = ({ post, emergencyDetailIsActive }) => {
 
           {/* DESCRIPTION STARTS */}
           <View style={{ marginTop: 20 }}>
-            <Text style={styles.postText} numberOfLines={emergencyDetailIsActive ? 0 : 3}>
+            <Text
+              style={styles.postText}
+              numberOfLines={emergencyDetailIsActive ? 0 : 3}
+            >
               {post?.description}
             </Text>
 
             {emergencyDetailIsActive ? null : (
-              <TouchableOpacity onPress={() => navigation.navigate("EmergencyDetails", { post })}>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("EmergencyDetails", { post })
+                }
+              >
                 <Text style={styles.showMore}>Show more</Text>
               </TouchableOpacity>
             )}
@@ -98,43 +146,64 @@ const EmergencyPostCard = ({ post, emergencyDetailIsActive }) => {
               aspectRatio: aspectRatio,
             }}
           >
-            <Image source={{ uri: post?.file }} style={styles.postImage} resizeMode="contain" />
+            <Image
+              source={{ uri: post?.file }}
+              style={styles.postImage}
+              resizeMode="contain"
+            />
           </View>
           {/* POST IMAGE ENDS */}
 
           {/* DATE AND STATUS STARTS */}
           <View style={styles.statusBox}>
             <Text style={styles.date}>
-              posted on {formatDate(post?.user?.createdAt)} | {formatTime(post?.user?.createdAt)}
+              posted on {formatDate(post?.user?.createdAt)} |{" "}
+              {formatTime(post?.user?.createdAt)}
             </Text>
 
             {status === "pending" && (
               <TouchableOpacity style={styles.awaiting}>
-                <Text style={[styles.statusText, { color: COLORS.aConText }]}>{status}</Text>
+                <Text style={[styles.statusText, { color: COLORS.aConText }]}>
+                  {status}
+                </Text>
               </TouchableOpacity>
             )}
 
             {status === "confirmed" && (
               <TouchableOpacity style={styles.confirmed}>
-                <Text style={[styles.statusText, { color: COLORS.conText }]}>{status}</Text>
+                <Text style={[styles.statusText, { color: COLORS.conText }]}>
+                  {status}
+                </Text>
               </TouchableOpacity>
             )}
 
             {status === "responding" && (
               <TouchableOpacity style={styles.responding}>
-                <Text style={[styles.statusText, { color: COLORS.respondText }]}>{status}</Text>
+                <Text
+                  style={[styles.statusText, { color: COLORS.respondText }]}
+                >
+                  {status}
+                </Text>
               </TouchableOpacity>
             )}
 
             {status === "resolved" && (
               <TouchableOpacity style={styles.resolved}>
-                <Text style={[styles.statusText, { color: COLORS.resolveText }]}>{status}</Text>
+                <Text
+                  style={[styles.statusText, { color: COLORS.resolveText }]}
+                >
+                  {status}
+                </Text>
               </TouchableOpacity>
             )}
 
             {status === "dismissed" && (
               <TouchableOpacity style={styles.dismiss}>
-                <Text style={[styles.statusText, { color: COLORS.dismissText }]}>{status}</Text>
+                <Text
+                  style={[styles.statusText, { color: COLORS.dismissText }]}
+                >
+                  {status}
+                </Text>
               </TouchableOpacity>
             )}
           </View>
@@ -146,16 +215,24 @@ const EmergencyPostCard = ({ post, emergencyDetailIsActive }) => {
               <TouchableOpacity>
                 <Entypo name="arrow-up" size={24} color={COLORS.primary} />
               </TouchableOpacity>
-              <Text style={styles.voteCount}>{abbreviateNumber(post?.upVotes, 2)}</Text>
+              <Text style={styles.voteCount}>
+                {abbreviateNumber(post?.upVotes, 2)}
+              </Text>
               <TouchableOpacity>
                 <Entypo name="arrow-down" size={24} color={COLORS.primary} />
               </TouchableOpacity>
-              <Text style={styles.voteCount}>{abbreviateNumber(post?.downVotes, 2)}</Text>
+              <Text style={styles.voteCount}>
+                {abbreviateNumber(post?.downVotes, 2)}
+              </Text>
             </View>
 
             <View style={styles.commentBox}>
               <TouchableOpacity>
-                <Ionicons name="ios-chatbox-outline" size={24} color={COLORS.primary} />
+                <Ionicons
+                  name="ios-chatbox-outline"
+                  size={24}
+                  color={COLORS.primary}
+                />
               </TouchableOpacity>
               <Text style={styles.metricCount}>
                 {abbreviateNumber(post?.commentCount, 2)}{" "}
@@ -165,7 +242,11 @@ const EmergencyPostCard = ({ post, emergencyDetailIsActive }) => {
 
             <View>
               <TouchableOpacity>
-                <Ionicons name="md-share-social-outline" size={24} color={COLORS.primary} />
+                <Ionicons
+                  name="md-share-social-outline"
+                  size={24}
+                  color={COLORS.primary}
+                />
               </TouchableOpacity>
             </View>
           </View>

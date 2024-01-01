@@ -29,17 +29,24 @@ const PostActionModal = ({
       <TouchableWithoutFeedback onPress={toggleDrawer}>
         <View style={styles.modalContainer}>
           <View style={styles.modal}>
-            <TouchableOpacity onPress={toggleDrawer} style={styles.drawerHandle}>
+            <TouchableOpacity
+              onPress={toggleDrawer}
+              style={styles.drawerHandle}
+            >
               <Ionicons name="chevron-down" size={24} color={COLORS.primary} />
             </TouchableOpacity>
 
-            {forEmergency && userData?.id === post?.channel && (
+            {forEmergency && userData?.id === post?.channel?.id && (
               <>
                 <TouchableOpacity
                   onPress={() => handlePostAction("confirmed")}
                   style={[styles.drawerOption, styles.confirmed]}
                 >
-                  <Text style={{ fontFamily: "semibold", color: COLORS.conText }}>Confirm</Text>
+                  <Text
+                    style={{ fontFamily: "semibold", color: COLORS.conText }}
+                  >
+                    Confirm
+                  </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -87,8 +94,13 @@ const PostActionModal = ({
             )}
 
             {userData?.id === posterId && (
-              <TouchableOpacity onPress={handleDelete} style={styles.drawerOption}>
-                <Text style={{ fontFamily: "semibold", color: COLORS.red }}>Delete</Text>
+              <TouchableOpacity
+                onPress={handleDelete}
+                style={styles.drawerOption}
+              >
+                <Text style={{ fontFamily: "semibold", color: COLORS.red }}>
+                  Delete
+                </Text>
               </TouchableOpacity>
             )}
           </View>
