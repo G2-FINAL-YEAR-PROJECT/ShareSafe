@@ -31,7 +31,7 @@ export default function App() {
   return (
     <AuthProvider>
       <AppNavigation />
-      <StatusBar style="auto" />
+      <StatusBar style="dark" />
     </AuthProvider>
   );
 }
