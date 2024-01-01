@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   View,
   TextInput,
+  Alert,
 } from "react-native";
 import { COLORS, SIZES, globalStyles } from "../../constants";
 import React, { useState } from "react";
@@ -14,14 +15,16 @@ import { PasswordField } from "../../ui";
 import { validateEmail } from "../../helpers";
 import { useAuth } from "../../store";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { apiClient } from "../../config";
 
 const EditProfile = () => {
-  const { userData } = useAuth();
+  const { userData, logout } = useAuth();
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [loadingProfile, setLoadingProfile] = useState(false);
   const [loadingPW, setLoadingPW] = useState(false);
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [inputData, setInputData] = useState(userData);
+  const [loadingDelete, setLoadingDelete] = useState(false);
 
+  const [inputData, setInputData] = useState(userData);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
@@ -64,6 +67,30 @@ const EditProfile = () => {
     // setLoadingPW(true);
 
     console.log(password);
+  };
+
+  const handleDeleteAccount = async () => {
+    Alert.alert("Delete account", "Are you sure you want to delete your account?", [
+      { text: "NO", style: "cancel" },
+      {
+        text: "YES",
+        onPress: async () => {
+          setLoadingDelete(true);
+          try {
+            const res = await apiClient.delete("/users/" + userData.id);
+            if (res.data.status !== 200) {
+              alert("An error occurred. Please try again");
+            }
+            await logout(); // Clear user credentials
+          } catch (error) {
+            console.log(error);
+            alert("An error occurred. Please try again");
+          } finally {
+            setLoadingDelete(false);
+          }
+        },
+      },
+    ]);
   };
 
   return (
@@ -140,7 +167,7 @@ const EditProfile = () => {
         Update
       </Button>
 
-      <View style={{ marginVertical: 40 }}>
+      <View style={{ marginTop: 40 }}>
         <Text style={[globalStyles.h3, { marginBottom: 25 }]}>Change Password</Text>
 
         <View style={styles.formGroup}>
@@ -164,6 +191,23 @@ const EditProfile = () => {
           buttonStyle={{ width: "70%", padding: 12, marginRight: 90 }}
         >
           Change Password
+        </Button>
+      </View>
+
+      <View style={{ marginVertical: 40 }}>
+        <Text style={[globalStyles.h3]}>Delete Account</Text>
+        <Text style={[globalStyles.p, { marginTop: 15, marginBottom: 24 }]}>
+          Deleting your account will remove all of your information from our database. This can not
+          be undone.
+        </Text>
+
+        <Button
+          onPress={handleDeleteAccount}
+          loading={loadingDelete}
+          textStyle={{ fontSize: 16 }}
+          buttonStyle={{ width: "70%", backgroundColor: "red", padding: 12, marginRight: 90 }}
+        >
+          Delete account
         </Button>
       </View>
     </ScrollView>
