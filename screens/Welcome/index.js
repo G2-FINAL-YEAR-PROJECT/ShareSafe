@@ -2,34 +2,31 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-nati
 import { COLORS, globalStyles } from "../../constants";
 import { useAuth } from "../../store";
 import { Button } from "../../ui";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { apiClient } from "../../config";
 
 const Welcome = () => {
   const navigator = useNavigation();
   const { userData } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [welcomeData, setWelcomeData] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
 
-  const welcomeData = [
-    { id: "40", name: "Lasu News" },
-    { id: "29", name: "Lasu Connect" },
-    { id: "79", name: "Punch" },
-    { id: "33", name: "Lasusu" },
-    { id: "85", name: "Nigeria Police" },
-    { id: "47", name: "The Nations" },
-    { id: "26", name: "LASEMA" },
-    { id: "36", name: "Tribune" },
-    { id: "72", name: "Lasu Connect" },
-    { id: "67", name: "The Punch" },
-    { id: "42", name: "TVC" },
-    { id: "61", name: "Lasu Health Center" },
-    // { id: "142", name: "TVC" },
-    // { id: "185", name: "Nigeria Police" },
-    // { id: "140", name: "Lasu News" },
-    // { id: "167", name: "Lasusu" },
-    // { id: "136", name: "Tribune" },
-  ];
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const res = await apiClient.get("/users/recommended");
+      const data = res.data.data;
+      setWelcomeData(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const onItemClick = (id) => {
     let updatedSelection;
@@ -42,22 +39,33 @@ const Welcome = () => {
   };
 
   const handleSubmit = async () => {
-    // console.log("selectedItems: ", selectedItems);
-    if (selectedItems.length < 3) {
+    if (selectedItems.length < 3 && userData?.role == "USER") {
       alert("Select at least 3 accounts to follow!");
       return;
     }
-
-    // TODO: API call
-    await AsyncStorage.removeItem("@showWelcomeScreen");
-    navigator.navigate("BottomTabStack");
+    setLoading(true);
+    try {
+      const res = await apiClient.put("/users/follow", { users: selectedItems });
+      if (res.data.status !== 200) {
+        alert("An error occurred. Please try again");
+        return;
+      }
+      // Go to home screen
+      await AsyncStorage.removeItem("@showWelcomeScreen");
+      navigator.navigate("BottomTabStack");
+    } catch (error) {
+      console.log("showWelcomeScreen: ", error);
+      alert("An error occurred. Please try again");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <ScrollView>
       <View style={styles.container}>
-        <Text style={[globalStyles.h2, { textAlign: "center" }]}>
-          Hi {userData?.fullName}, Welcome
+        <Text style={[globalStyles.h2, { textAlign: "center", textTransform: "capitalize" }]}>
+          Welcome, {userData?.fullName}
         </Text>
 
         <Text style={styles.heading}>Select who to follow</Text>
@@ -72,13 +80,13 @@ const Welcome = () => {
               onPress={() => onItemClick(item.id)}
             >
               <Text style={[styles.gridItem, selectedItems.includes(item.id) && styles.selected]}>
-                {item.name}
+                {item.fullName}
               </Text>
             </TouchableOpacity>
           ))}
         </View>
 
-        <Button onPress={handleSubmit} buttonStyle={{ marginTop: 45 }}>
+        <Button onPress={handleSubmit} loading={loading} buttonStyle={{ marginTop: 45 }}>
           Continue
         </Button>
       </View>
@@ -91,13 +99,13 @@ export default Welcome;
 const styles = StyleSheet.create({
   container: {
     ...globalStyles.container,
-    paddingTop: 35,
+    paddingTop: 40,
   },
   heading: {
     fontSize: 26,
     fontFamily: "medium",
     textAlign: "center",
-    marginTop: 40,
+    marginTop: 35,
   },
   sub: {
     ...globalStyles.p,

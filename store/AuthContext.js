@@ -1,8 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-// import axios from "axios";
 import * as Location from "expo-location";
 import { createContext, useContext, useEffect, useState } from "react";
-
+import * as Notifications from "expo-notifications";
 import * as TaskManager from "expo-task-manager";
 import { API_KEY } from "@env";
 import { Alert, Linking, AppState } from "react-native";
@@ -17,6 +16,7 @@ const AuthContext = createContext();
 let locationWatcher;
 
 const AuthProvider = ({ children }) => {
+  const [deviceToken, setDeviceToken] = useState("");
   const [userProfile, setUserProfile] = useState({});
   const [loadingAuth, setLoadingAuth] = useState(true);
   const [loadingLogin, setLoadingLogin] = useState(false);
@@ -29,10 +29,23 @@ const AuthProvider = ({ children }) => {
 
   const [currentLocation, setCurrentLocation] = useState({});
 
+  const getDeviceToken = async () => {
+    try {
+      const token = (await Notifications.getDevicePushTokenAsync()).data;
+      setDeviceToken(token);
+      if (!token) {
+        throw new Error("device push token not found");
+      }
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
   useEffect(() => {
     // requestLocationPermission();
 
     getAuthData();
+    getDeviceToken();
   }, []);
 
   // const requestLocationPermission = async () => {
@@ -149,7 +162,9 @@ const AuthProvider = ({ children }) => {
         setToken(authData.token);
         setUserData(authData.userData);
         // Set the Bearer token in the headers
-        apiClient.defaults.headers.common["Authorization"] = `Bearer ${authData.token}`;
+        apiClient.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${authData.token}`;
       }
 
       if (viewedOnboarding) {
@@ -181,19 +196,27 @@ const AuthProvider = ({ children }) => {
       // Set the Bearer token in the headers
       apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       // Persist data
-      await AsyncStorage.setItem("@AuthData", JSON.stringify({ token, userData }));
+      await AsyncStorage.setItem(
+        "@AuthData",
+        JSON.stringify({ token, userData })
+      );
     } catch (error) {
       console.log(error);
       handleErrorMessage();
+    } finally {
+      setLoadingLogin(false);
     }
   };
 
   const register = async (data) => {
     try {
       setLoadingRegister(true);
-      const res = await apiClient.post("/auth/register", data);
+      const res = await apiClient.post("/auth/register", {
+        ...data,
+        fcmToken: deviceToken,
+      });
       const token = res?.data?.data?.tokens?.access?.token;
-      const userData = res?.data?.data?.signUpUserData;
+      const userData = res?.data?.data?.user;
       setLoadingRegister(false);
 
       // Error handling
@@ -203,7 +226,10 @@ const AuthProvider = ({ children }) => {
       }
 
       // Persist data
-      await AsyncStorage.setItem("@AuthData", JSON.stringify({ token, userData }));
+      await AsyncStorage.setItem(
+        "@AuthData",
+        JSON.stringify({ token, userData })
+      );
       await AsyncStorage.setItem("@showWelcomeScreen", "true");
       // Set the Bearer token in the headers
       apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
@@ -212,8 +238,11 @@ const AuthProvider = ({ children }) => {
       setToken(token);
       setUserData(userData);
     } catch (error) {
+      setLoadingRegister(false);
       console.log(error);
       handleErrorMessage();
+    } finally {
+      setLoadingRegister(false);
     }
   };
 

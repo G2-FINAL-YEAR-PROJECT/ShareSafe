@@ -6,7 +6,6 @@ import { useCallback } from "react";
 import { useFonts } from "expo-font";
 import { HomeStack, AuthStack } from "./navigation";
 import * as SplashScreen from "expo-splash-screen";
-import { ActivityIndicator, View } from "react-native";
 import { Loading } from "./screens";
 
 export default function App() {
@@ -31,7 +30,7 @@ export default function App() {
   return (
     <AuthProvider>
       <AppNavigation />
-      <StatusBar style="auto" />
+      <StatusBar style="dark" />
     </AuthProvider>
   );
 }

@@ -2,22 +2,28 @@ import { View, Text, TouchableOpacity, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "../../constants";
 import { useNavigation } from "@react-navigation/native";
-import { useAspectRatio } from "../../hooks";
+import { useAspectRatio, useFollow } from "../../hooks";
 import { useState } from "react";
 import PostActionModal from "../PostActionModal";
 import { formatDate } from "../../helpers";
 import { abbreviateNumber } from "js-abbreviation-number";
-
 import { useAuth } from "../../store";
+import { apiClient } from "../../config";
 import styles from "./styles";
 
-const PostCard = ({ post, postDetailIsActive }) => {
+const PostCard = ({ post, postDetailIsActive, deletePost }) => {
   const { aspectRatio } = useAspectRatio(1, post);
   const navigation = useNavigation();
 
-  const { userData } = useAuth();
+  const { token, userData } = useAuth();
+
+  const { isFollowing, handleFollowUser } = useFollow();
 
   const [isDrawerOpen, setDrawerOpen] = useState(false);
+  const [likedByUser, setLikedByUser] = useState(
+    post?.likedBy?.includes(userData?.id)
+  );
+  const [errorMessage, setErrorMessage] = useState("");
 
   const toggleDrawer = () => {
     setDrawerOpen((prevState) => !prevState);
@@ -25,6 +31,31 @@ const PostCard = ({ post, postDetailIsActive }) => {
 
   const handleDelete = () => {
     toggleDrawer();
+    deletePost(post?.id);
+  };
+
+  const handlePostInteraction = async (postId) => {
+    let res;
+    try {
+      if (likedByUser) {
+        console.log("unlike", likedByUser);
+        res = await apiClient.put(`/post/unLike/${postId}`);
+        setLikedByUser((prev) => !prev);
+      } else {
+        console.log("like", likedByUser);
+        res = await apiClient.put(`/post/like/${postId}`);
+        setLikedByUser(res.data.data?.likedBy?.includes(userData?.id));
+      }
+
+      console.log(res.data);
+
+      if (res.data.status !== 200) {
+        throw new Error(res.data.message);
+      }
+    } catch (error) {
+      console.log("error", error.message);
+      setErrorMessage;
+    }
   };
 
   return (
@@ -63,9 +94,14 @@ const PostCard = ({ post, postDetailIsActive }) => {
             </View>
 
             <View style={styles.actionBox}>
-              {userData?.id !== post?.user?.id &&
-                !post?.user?.followers?.includes(userData?.id) && (
-                  <TouchableOpacity style={styles.followBtn}>
+              {postDetailIsActive &&
+                userData?.id !== post?.user?.id &&
+                !post?.user?.followers?.includes(userData?.id) &&
+                !isFollowing && (
+                  <TouchableOpacity
+                    style={styles.followBtn}
+                    onPress={() => handleFollowUser(post?.user?.id)}
+                  >
                     <Text style={styles.followText}>Follow</Text>
                   </TouchableOpacity>
                 )}
@@ -120,9 +156,9 @@ const PostCard = ({ post, postDetailIsActive }) => {
           {/* POST INTERACTION */}
           <View style={styles.intBox}>
             <View style={styles.metricBox}>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => handlePostInteraction(post?.id)}>
                 <Ionicons
-                  name="heart-outline"
+                  name={likedByUser ? "heart" : "heart-outline"}
                   size={24}
                   color={COLORS.primary}
                 />

@@ -6,11 +6,13 @@ import {
   Keyboard,
 } from "react-native";
 import { EmergencyPostCard, TextAreaInput } from "../../ui";
-import { useHideKeyBoard } from "../../hooks";
+import { useHideKeyBoard, useSinglePost } from "../../hooks";
 import { useRoute } from "@react-navigation/native";
 import { COLORS, SIZES } from "../../constants";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
+import Loading from "../Loading";
+import ErrorScreen from "../ErrorScreen";
 import styles from "./styles";
 
 const EmergencyDetails = () => {
@@ -20,9 +22,14 @@ const EmergencyDetails = () => {
   const route = useRoute();
   const { post } = route.params;
 
-  const commentIsValid = comment.trim().length > 0;
+  const { isLoading, errorMessage, singlePost } = useSinglePost(
+    "/emergency",
+    post?.id
+  );
 
   useHideKeyBoard(setCommentIsFocused);
+
+  const commentIsValid = comment.trim().length > 0;
 
   const handleReply = () => {
     if (!commentIsValid) return;
@@ -40,7 +47,15 @@ const EmergencyDetails = () => {
           { paddingTop: 8, backgroundColor: COLORS.white },
         ]}
       >
-        <EmergencyPostCard post={post} emergencyDetailIsActive />
+        {isLoading ? (
+          <Loading />
+        ) : errorMessage ? (
+          <ErrorScreen message={errorMessage} />
+        ) : (
+          singlePost && (
+            <EmergencyPostCard post={singlePost} emergencyDetailIsActive />
+          )
+        )}
       </ScrollView>
 
       <View

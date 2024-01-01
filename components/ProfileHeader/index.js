@@ -1,4 +1,11 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, ActivityIndicator } from "react-native";
+import {
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  ActivityIndicator,
+  Alert,
+} from "react-native";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import { COLORS } from "../../constants";
 import { useAuth } from "../../store";
@@ -6,6 +13,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import styles from "./styles";
 import { apiClient } from "../../config";
+import { useFollow } from "../../hooks";
 import placeHolderImg from "../../assets/images/placeholder.jpg";
 
 const ProfileHeader = () => {
@@ -14,6 +22,7 @@ const ProfileHeader = () => {
 
   const { userData, logout } = useAuth();
   const navigation = useNavigation();
+  const { isFollowing, handleFollowUser, setIsFollowing } = useFollow();
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -28,8 +37,9 @@ const ProfileHeader = () => {
       if (res.data.status !== 200) {
         throw new Error(res.data.message);
       }
-
-      setCurrentUser(res.data.data);
+      const { data } = res.data;
+      setCurrentUser(data);
+      setIsFollowing(data?.followers?.includes(userData?.id));
       setIsLoading(false);
     } catch (err) {
       setErrorMessage(err.message);
@@ -39,10 +49,48 @@ const ProfileHeader = () => {
     }
   };
 
-  useEffect(() => {
-    if (user?.id !== userData.id) {
-      fetchSingleUser(user?.id);
+  const handleUnfollow = async () => {
+    try {
+      const res = await apiClient.put(`users/follow`, {
+        users: [currentUser?.id],
+      });
+
+      // console.log(res.data);
+
+      if (res.data.status === 200) {
+        setIsFollowing((prev) => !prev);
+      }
+
+      if (res.data.status !== 200) {
+        throw new Error(res.data.message);
+      }
+    } catch (error) {
+      console.log("error", error.message);
     }
+  };
+
+  const triggerUnfollowAlert = () => {
+    Alert.alert(
+      `Unfollow ${currentUser?.fullName} `,
+      "Are you sure about this",
+      [
+        {
+          text: "No",
+          style: "cancel",
+        },
+        {
+          text: "Yes",
+          onPress: () => {
+            handleUnfollow();
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+
+  useEffect(() => {
+    fetchSingleUser(user?.id);
   }, []);
 
   return (
@@ -54,7 +102,10 @@ const ProfileHeader = () => {
         paddingRight: 34,
       }}
     >
-      <TouchableOpacity style={{ marginBottom: 25 }} onPress={() => navigation.goBack()}>
+      <TouchableOpacity
+        style={{ marginBottom: 25 }}
+        onPress={() => navigation.goBack()}
+      >
         <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
       </TouchableOpacity>
       {/* PROFILE CARD STARTS */}
@@ -110,15 +161,33 @@ const ProfileHeader = () => {
                 </TouchableOpacity>
               )}
 
-              {currentUser?.id !== userData?.id && (
-                <TouchableOpacity style={styles.followBtn}>
+              {currentUser?.id !== userData?.id && !isFollowing && (
+                <TouchableOpacity
+                  style={styles.followBtn}
+                  onPress={() => handleFollowUser(currentUser?.id)}
+                >
                   <Text style={styles.followText}>Follow</Text>
                 </TouchableOpacity>
               )}
 
+              {isFollowing && (
+                <TouchableOpacity
+                  style={styles.followBtn}
+                  onPress={triggerUnfollowAlert}
+                >
+                  <Text style={styles.followText}>Following</Text>
+                </TouchableOpacity>
+              )}
+
               {currentUser?.id === userData?.id && (
-                <TouchableOpacity onPress={() => navigation.navigate("EditProfile")}>
-                  <MaterialCommunityIcons name="pencil-outline" size={24} color={COLORS.white} />
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("EditProfile")}
+                >
+                  <MaterialCommunityIcons
+                    name="pencil-outline"
+                    size={24}
+                    color={COLORS.white}
+                  />
                 </TouchableOpacity>
               )}
             </View>
@@ -139,7 +208,9 @@ const ProfileHeader = () => {
             {currentUser?.following?.length} following
           </Text>
           <TouchableOpacity style={styles.logout} onPress={() => logout()}>
-            <Text style={[styles.following("medium"), { color: COLORS.white }]}>Log Out</Text>
+            <Text style={[styles.following("medium"), { color: COLORS.white }]}>
+              Log Out
+            </Text>
           </TouchableOpacity>
         </View>
       )}

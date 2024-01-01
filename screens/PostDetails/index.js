@@ -3,23 +3,29 @@ import {
   TouchableOpacity,
   View,
   ScrollView,
-  StyleSheet,
   Keyboard,
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { COLORS, SIZES } from "../../constants";
 import { PostCard, TextAreaInput } from "../../ui";
-import { useHideKeyBoard } from "../../hooks";
+import { useHideKeyBoard, useSinglePost } from "../../hooks";
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./styles";
+import { apiClient } from "../../config";
+import ErrorScreen from "../ErrorScreen";
+import Loading from "../Loading";
 
 const PostDetails = () => {
+  const route = useRoute();
+
   const [comment, setComment] = useState("");
   const [commentIsFocused, setCommentIsFocused] = useState(false);
 
-  const route = useRoute();
-  const { post } = route.params;
+  const { isLoading, errorMessage, singlePost } = useSinglePost(
+    "/post",
+    route?.params?.post?.id
+  );
 
   const commentIsValid = comment.trim().length > 0;
 
@@ -41,7 +47,13 @@ const PostDetails = () => {
           { paddingTop: 8, backgroundColor: COLORS.white },
         ]}
       >
-        <PostCard post={post} postDetailIsActive />
+        {isLoading ? (
+          <Loading />
+        ) : errorMessage ? (
+          <ErrorScreen message={errorMessage} />
+        ) : (
+          singlePost && <PostCard post={singlePost} postDetailIsActive />
+        )}
       </ScrollView>
 
       <View
