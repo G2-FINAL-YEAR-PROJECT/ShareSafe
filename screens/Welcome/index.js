@@ -39,7 +39,7 @@ const Welcome = () => {
   };
 
   const handleSubmit = async () => {
-    if (selectedItems.length < 3) {
+    if (selectedItems.length < 3 && userData?.role == "USER") {
       alert("Select at least 3 accounts to follow!");
       return;
     }

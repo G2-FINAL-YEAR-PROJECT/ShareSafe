@@ -96,7 +96,7 @@ const EditProfile = () => {
   return (
     <ScrollView style={[SIZES.safeAreaView, { paddingTop: 5, backgroundColor: COLORS.white }]}>
       <TouchableOpacity style={styles.photoWrapper}>
-        <Image style={styles.pic} source={require("../../assets/images/man.jpg")} />
+        <Image style={styles.pic} source={require("../../assets/images/placeholder.jpg")} />
       </TouchableOpacity>
 
       <Text style={[globalStyles.h5, { fontSize: 16, textAlign: "center", marginBottom: 30 }]}>
