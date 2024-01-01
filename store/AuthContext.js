@@ -216,7 +216,7 @@ const AuthProvider = ({ children }) => {
         fcmToken: deviceToken,
       });
       const token = res?.data?.data?.tokens?.access?.token;
-      const userData = res?.data?.data?.signUpUserData;
+      const userData = res?.data?.data?.user;
       setLoadingRegister(false);
 
       // Error handling

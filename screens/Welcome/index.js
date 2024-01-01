@@ -64,7 +64,7 @@ const Welcome = () => {
   return (
     <ScrollView>
       <View style={styles.container}>
-        <Text style={[globalStyles.h2, { textAlign: "center" }]}>
+        <Text style={[globalStyles.h2, { textAlign: "center", textTransform: "capitalize" }]}>
           Welcome, {userData?.fullName}
         </Text>
 

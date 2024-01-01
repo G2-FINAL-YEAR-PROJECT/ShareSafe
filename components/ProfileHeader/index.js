@@ -90,9 +90,7 @@ const ProfileHeader = () => {
   };
 
   useEffect(() => {
-    if (user?.id !== userData.id) {
-      fetchSingleUser(user?.id);
-    }
+    fetchSingleUser(user?.id);
   }, []);
 
   return (
