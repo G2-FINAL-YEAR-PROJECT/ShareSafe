@@ -8,10 +8,10 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { COLORS, SIZES } from "../../constants";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { TextAreaInput } from "../../ui";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import styles from "./styles";
 
 const userImage = require("../../assets/images/girl.jpg");
@@ -28,7 +28,7 @@ const CreatePost = () => {
     }
     Alert.alert(
       "Close",
-      "Are you sure you sure?",
+      "Are you sure you want stop this process?",
       [
         {
           text: "No",
