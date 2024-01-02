@@ -25,7 +25,7 @@ const AuthProvider = ({ children }) => {
   const [userProfile, setUserProfile] = useState({});
 
   const [deviceExpoPushToken, setDeviceExpoPushToken] = useState("");
-  const [notification, setNotification] = useState(false);
+  const [notification, setNotification] = useState();
   const notificationListener = useRef();
   const responseListener = useRef();
 
@@ -52,20 +52,21 @@ const AuthProvider = ({ children }) => {
     // Handle notifications when the app is in the foreground
     notificationListener.current =
       Notifications.addNotificationReceivedListener((notification) => {
-        setNotification(notification);
-        console.log("NotificationReceivedForeground:", notification);
+        // const notificationData = notification.request.content.data;
+        // console.log("ForegroundListener:", notificationData, notification);
       });
 
     // Sets up a listener for notification responses (e.g., when a user taps on a notification)
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
-        console.log("responseListener:", response);
+        const notificationData = response.notification.request.content.data;
+        setNotification(notificationData);
+        // console.log("responseListener:", notificationData, response);
       });
   };
 
   const getAuthData = async () => {
     // await AsyncStorage.clear();
-
     try {
       let authData = await AsyncStorage.getItem("@AuthData");
       const viewedOnboarding = await AsyncStorage.getItem("@viewedOnboarding");
@@ -186,6 +187,8 @@ const AuthProvider = ({ children }) => {
         locationGranted,
         userProfile,
         setUserProfile,
+        notification,
+        setNotification,
       }}
     >
       {children}

@@ -4,16 +4,16 @@ import * as Device from "expo-device";
 import Constants from "expo-constants";
 
 export const registerForPushNotificationsAsync = async () => {
-  // Determines how to handles notifications when the app is in the foreground
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowAlert: true,
-      shouldPlaySound: true,
-      shouldSetBadge: false,
-    }),
-  });
-
   try {
+    // Determines how to handles notifications when the app is in the foreground
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: false,
+      }),
+    });
+
     if (Platform.OS === "android") {
       Notifications.setNotificationChannelAsync("default", {
         name: "default",
@@ -59,4 +59,35 @@ export const registerForPushNotificationsAsync = async () => {
   } catch (error) {
     console.log(error);
   }
+};
+
+export const schedulePushNotification = async (expoPushToken) => {
+  const message = {
+    to: [expoPushToken],
+    sound: "default",
+    title: "Emergency alert near you! 🔔",
+    body: "Fire accident happening at Lasu Lab",
+    data: { id: "65942b9d2fb5ad3e3c219edc", type: "EMERGENCY" },
+  };
+
+  try {
+    const url = "https://exp.host/--/api/v2/push/send";
+    await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(message),
+    });
+  } catch (error) {
+    console.log(error);
+  }
+
+  // // Alternative method
+  // await Notifications.scheduleNotificationAsync({
+  //   content: {
+  //     title: "Emergency alert near you! 🔔",
+  //     body: "Fire accident happening at Lasu Lab",
+  //     data: { id: "65942b9d2fb5ad3e3c219edc", type: "EMERGENCY" },
+  //   },
+  //   trigger: { seconds: 2 },
+  // });
 };
