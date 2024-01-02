@@ -11,15 +11,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { reportType } from "../../data";
 import { apiClient } from "../../config";
 import { useState, useEffect } from "react";
-
 import SelectDropdown from "react-native-select-dropdown";
 import styles from "./styles";
-import { apiClient } from "../../config";
 
 const Report = ({ navigation }) => {
   const [reportTypeId, setReportTypeId] = useState("");
   const [inputIsFocused, setInputIsFocused] = useState(false);
-  const [locationIsFocused, setLocationIsFocused] = useState(false);
 
   const [reportText, setReportText] = useState("");
   const [channelValue, setChannelValue] = useState("");
@@ -57,7 +54,6 @@ const Report = ({ navigation }) => {
     navigation.addListener("focus", () => {
       setReportTypeId("");
       setInputIsFocused(false);
-      setLocationIsFocused(false);
       setReportText("");
       setLocationText("");
       setChannelValue("");
