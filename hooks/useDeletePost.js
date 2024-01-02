@@ -15,9 +15,11 @@ const useDeletePost = () => {
           return;
         }
 
-        updateData((prevPosts) =>
-          prevPosts.filter((post) => post.id !== postId)
-        );
+        if (updateData) {
+          updateData((prevPosts) =>
+            prevPosts.filter((post) => post.id !== postId)
+          );
+        }
       }
 
       if (res.data.status !== 200) {

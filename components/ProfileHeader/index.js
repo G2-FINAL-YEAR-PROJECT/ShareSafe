@@ -51,11 +51,9 @@ const ProfileHeader = () => {
 
   const handleUnfollow = async () => {
     try {
-      const res = await apiClient.put(`users/follow`, {
+      const res = await apiClient.put(`users/unfollow`, {
         users: [currentUser?.id],
       });
-
-      // console.log(res.data);
 
       if (res.data.status === 200) {
         setIsFollowing((prev) => !prev);
@@ -207,11 +205,16 @@ const ProfileHeader = () => {
           <Text style={styles.following("regular")}>
             {currentUser?.following?.length} following
           </Text>
-          <TouchableOpacity style={styles.logout} onPress={() => logout()}>
-            <Text style={[styles.following("medium"), { color: COLORS.white }]}>
-              Log Out
-            </Text>
-          </TouchableOpacity>
+
+          {currentUser?.id === userData?.id && (
+            <TouchableOpacity style={styles.logout} onPress={() => logout()}>
+              <Text
+                style={[styles.following("medium"), { color: COLORS.white }]}
+              >
+                Log Out
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       )}
     </View>

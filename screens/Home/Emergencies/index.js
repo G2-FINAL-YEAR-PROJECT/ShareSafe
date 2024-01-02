@@ -3,7 +3,7 @@ import { useState } from "react";
 // import { emergencyList } from "../../../data";
 import { EmergencyPostCard, SearchInput } from "../../../ui";
 import { COLORS, SIZES } from "../../../constants";
-import { useFetch } from "../../../hooks";
+import { useFetch, useDeletePost } from "../../../hooks";
 import Loading from "../../Loading";
 import ErrorScreen from "../../ErrorScreen";
 
@@ -15,7 +15,14 @@ const Emergencies = () => {
     data: allEmergencies,
     isLoading,
     errorMessage,
+    setData,
   } = useFetch("/emergency");
+
+  const { handlePostDelete } = useDeletePost();
+
+  const deletePost = (page, postId) => {
+    handlePostDelete(page, "/emergency", postId, setData);
+  };
 
   return (
     <>
@@ -47,7 +54,12 @@ const Emergencies = () => {
 
           <FlatList
             data={allEmergencies}
-            renderItem={({ item }) => <EmergencyPostCard post={item} />}
+            renderItem={({ item }) => (
+              <EmergencyPostCard
+                post={item}
+                deletePost={deletePost.bind(null, "emergencies")}
+              />
+            )}
             keyExtractor={(item) => item.id}
           />
         </View>

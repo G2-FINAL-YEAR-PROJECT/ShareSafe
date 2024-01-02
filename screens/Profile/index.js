@@ -1,5 +1,4 @@
 import { View, FlatList } from "react-native";
-
 import { PostCard } from "../../ui";
 import { COLORS, SIZES } from "../../constants";
 import { useRoute } from "@react-navigation/native";

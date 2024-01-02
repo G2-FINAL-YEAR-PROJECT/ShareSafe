@@ -6,7 +6,7 @@ import Loading from "../Loading";
 import ErrorScreen from "../ErrorScreen";
 import TemplateScreen from "../TemplateScreen";
 import { useAuth } from "../../store";
-import { useFetch } from "../../hooks";
+import { useFetch, useDeletePost } from "../../hooks";
 
 const ReportsTab = () => {
   const { userProfile, userData } = useAuth();
@@ -15,7 +15,14 @@ const ReportsTab = () => {
     isLoading,
     errorMessage,
     data: userReports,
+    setData,
   } = useFetch(`/emergency/user?id=${userProfile.id}`);
+
+  const { handlePostDelete } = useDeletePost();
+
+  const deletePost = (page, postId) => {
+    handlePostDelete(page, "/emergency", postId, setData);
+  };
 
   const message = `${
     userData?.id === userProfile?.id
@@ -38,13 +45,17 @@ const ReportsTab = () => {
             {
               backgroundColor: COLORS.white,
               paddingTop: 28,
-              paddingBottom: 90,
             },
           ]}
         >
           <FlatList
             data={userReports}
-            renderItem={({ item }) => <EmergencyPostCard post={item} />}
+            renderItem={({ item }) => (
+              <EmergencyPostCard
+                post={item}
+                deletePost={deletePost.bind(null, "profileReport")}
+              />
+            )}
             keyExtractor={(item) => item.id}
           />
         </View>
