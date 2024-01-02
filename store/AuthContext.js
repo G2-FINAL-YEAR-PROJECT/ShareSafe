@@ -183,7 +183,6 @@ const AuthProvider = ({ children }) => {
       const res = await apiClient.post("/auth/login", { email, password });
       const token = res?.data?.data?.tokens?.access?.token;
       const userData = res?.data?.data?.user;
-      setLoadingLogin(false);
 
       // Error handling
       if (!token) {
@@ -217,7 +216,7 @@ const AuthProvider = ({ children }) => {
       });
       const token = res?.data?.data?.tokens?.access?.token;
       const userData = res?.data?.data?.user;
-      setLoadingRegister(false);
+      // console.log(res?.data);
 
       // Error handling
       if (!token) {

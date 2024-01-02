@@ -1,35 +1,35 @@
 export const reportType = [
   {
-    id: "t1",
+    id: "MEDICAL",
     type: "Medical",
   },
 
   {
-    id: "t2",
+    id: "NATURA_DISASTER",
     type: "Natural Disaster",
   },
   {
-    id: "t3",
+    id: "FIRE",
     type: "Fire",
   },
   {
-    id: "t4",
+    id: "ENVIRONMENTAL",
     type: "Environmental",
   },
   {
-    id: "t5",
+    id: "SECURITY",
     type: "Security",
   },
   {
-    id: "t6",
+    id: "TECHNOLOGICAL",
     type: "Technological",
   },
   {
-    id: "t7",
+    id: "SEARCH_AND_RESCUE",
     type: "Search and Rescue",
   },
   {
-    id: "t8",
+    id: "OTHERS",
     type: "Other",
   },
 ];

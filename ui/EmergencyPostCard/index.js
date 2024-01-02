@@ -13,7 +13,7 @@ import styles from "./styles";
 const lasema = require("../../assets/images/lasema.png");
 const placeholder = require("../../assets/images/placeholder.jpg");
 
-const EmergencyPostCard = ({ post, emergencyDetailIsActive }) => {
+const EmergencyPostCard = ({ post, deletePost, emergencyDetailIsActive }) => {
   const [isDrawerOpen, setDrawerOpen] = useState(false);
 
   const navigation = useNavigation();
@@ -36,6 +36,7 @@ const EmergencyPostCard = ({ post, emergencyDetailIsActive }) => {
 
   const handleDelete = () => {
     toggleDrawer();
+    deletePost(post?.id);
   };
 
   return (
