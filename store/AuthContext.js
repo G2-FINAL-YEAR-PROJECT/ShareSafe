@@ -1,19 +1,18 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import * as Notifications from "expo-notifications";
 import * as TaskManager from "expo-task-manager";
 import { API_KEY } from "@env";
 import { Alert, Linking, AppState } from "react-native";
 import { apiClient } from "../config";
-import { registerForPushNotificationsAsync } from "../services";
+import { registerForPushNotificationsAsync } from "../services/notification";
 
 const LOCATION_TASK_NAME = "background-location-task";
 const locationBaseUrl = "https://geocode.maps.co/reverse";
+let locationWatcher;
 
 const AuthContext = createContext();
-
-let locationWatcher;
 
 const AuthProvider = ({ children }) => {
   const [loadingAuth, setLoadingAuth] = useState(true);
@@ -26,6 +25,10 @@ const AuthProvider = ({ children }) => {
   const [userProfile, setUserProfile] = useState({});
 
   const [deviceExpoPushToken, setDeviceExpoPushToken] = useState("");
+  const [notification, setNotification] = useState(false);
+  const notificationListener = useRef();
+  const responseListener = useRef();
+
   const [currentLocation, setCurrentLocation] = useState({});
   const [locationGranted, setLocationGranted] = useState(false);
 
@@ -33,20 +36,31 @@ const AuthProvider = ({ children }) => {
     // requestLocationPermission();
     getAuthData();
     setupNotifications();
+
+    return () => {
+      Notifications.removeNotificationSubscription(
+        notificationListener.current
+      );
+      Notifications.removeNotificationSubscription(responseListener.current);
+    };
   }, []);
 
   const setupNotifications = async () => {
     const expoPushToken = await registerForPushNotificationsAsync();
-
-    if (!expoPushToken) {
-      alert("Device push token not found");
-      return;
-    }
-    // Handle the Expo Push Token (e.g., send it to your server)
     setDeviceExpoPushToken(expoPushToken);
 
     // Handle notifications when the app is in the foreground
-    // addNotificationListener(handleNotification);
+    notificationListener.current =
+      Notifications.addNotificationReceivedListener((notification) => {
+        setNotification(notification);
+        console.log("NotificationReceivedForeground:", notification);
+      });
+
+    // Sets up a listener for notification responses (e.g., when a user taps on a notification)
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        console.log("responseListener:", response);
+      });
   };
 
   const getAuthData = async () => {
