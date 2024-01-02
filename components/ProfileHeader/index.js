@@ -24,13 +24,11 @@ const ProfileHeader = () => {
   const navigation = useNavigation();
   const { isFollowing, handleFollowUser, setIsFollowing } = useFollow();
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [currentUser, setCurrentUser] = useState(userData);
 
   const fetchSingleUser = async (id) => {
-    setIsLoading(true);
-
     try {
       const res = await apiClient(`/users/${id}`);
 
@@ -110,7 +108,11 @@ const ProfileHeader = () => {
 
       <View style={[styles.cardBox]}>
         {isLoading ? (
-          <ActivityIndicator size="small" color={COLORS.white} />
+          <ActivityIndicator
+            size={25}
+            color={COLORS.white}
+            style={{ paddingVertical: 10, marginHorizontal: "50%" }}
+          />
         ) : (
           <>
             <View style={styles.user}>
@@ -195,9 +197,7 @@ const ProfileHeader = () => {
       {/* PROFILE CARD ENDS */}
 
       {/* METRICS STARTS */}
-      {isLoading ? (
-        <ActivityIndicator size="small" color={COLORS.primary} />
-      ) : (
+      {!isLoading && (
         <View style={styles.metric}>
           <Text style={styles.following("regular")}>
             {currentUser?.followers?.length} followers
