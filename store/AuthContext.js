@@ -6,9 +6,9 @@ import * as TaskManager from "expo-task-manager";
 import { API_KEY } from "@env";
 import { Alert, Linking, AppState } from "react-native";
 import { apiClient } from "../config";
+import { registerForPushNotificationsAsync } from "../services";
 
 const LOCATION_TASK_NAME = "background-location-task";
-
 const locationBaseUrl = "https://geocode.maps.co/reverse";
 
 const AuthContext = createContext();
@@ -16,8 +16,6 @@ const AuthContext = createContext();
 let locationWatcher;
 
 const AuthProvider = ({ children }) => {
-  const [deviceToken, setDeviceToken] = useState("");
-  const [userProfile, setUserProfile] = useState({});
   const [loadingAuth, setLoadingAuth] = useState(true);
   const [loadingLogin, setLoadingLogin] = useState(false);
   const [loadingRegister, setLoadingRegister] = useState(false);
@@ -25,129 +23,31 @@ const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [userData, setUserData] = useState(null);
   const [viewedOnboarding, setViewedOnboarding] = useState(false);
-  const [locationGranted, setLocationGranted] = useState(false);
+  const [userProfile, setUserProfile] = useState({});
 
+  const [deviceExpoPushToken, setDeviceExpoPushToken] = useState("");
   const [currentLocation, setCurrentLocation] = useState({});
-
-  const getDeviceToken = async () => {
-    try {
-      const token = (await Notifications.getDevicePushTokenAsync()).data;
-      setDeviceToken(token);
-      if (!token) {
-        throw new Error("device push token not found");
-      }
-    } catch (error) {
-      alert(error.message);
-    }
-  };
+  const [locationGranted, setLocationGranted] = useState(false);
 
   useEffect(() => {
     // requestLocationPermission();
-
     getAuthData();
-    getDeviceToken();
+    setupNotifications();
   }, []);
 
-  // const requestLocationPermission = async () => {
-  //   try {
-  //     const { status } = await Location.requestForegroundPermissionsAsync();
+  const setupNotifications = async () => {
+    const expoPushToken = await registerForPushNotificationsAsync();
 
-  //     if (status === "granted") {
-  //       const { status } = await Location.requestBackgroundPermissionsAsync();
-  //       if (status === "granted") {
-  //         setLocationGranted(true);
-  //       } else {
-  //         setLocationGranted(false);
-  //         showLocationPermissionAlert();
-  //       }
-  //     } else {
-  //       setLocationGranted(false);
-  //       showLocationPermissionAlert();
-  //     }
-  //   } catch (error) {
-  //     setLocationGranted(false);
-  //     showLocationPermissionAlert();
-  //   }
-  // };
+    if (!expoPushToken) {
+      alert("Device push token not found");
+      return;
+    }
+    // Handle the Expo Push Token (e.g., send it to your server)
+    setDeviceExpoPushToken(expoPushToken);
 
-  // const showLocationPermissionAlert = () => {
-  //   Alert.alert(
-  //     "Location Permission Required",
-  //     'To receive emergency notifications, please choose "Allow all the time" for location access. Open app settings to update your preferences.',
-  //     [
-  //       {
-  //         text: "Cancel",
-  //         style: "cancel",
-  //       },
-  //       {
-  //         text: "Open Settings",
-  //         onPress: () => Linking.openSettings(),
-  //       },
-  //     ],
-  //     { cancelable: false }
-  //   );
-  // };
-
-  // TaskManager.defineTask("backgroundLocationUpdates", ({ data, error }) => {
-  //   if (error) {
-  //     console.log("TaskManager error");
-  //     return;
-  //   }
-
-  //   // Process location data
-  //   const { locations } = data;
-  //   const {
-  //     coords: { latitude, longitude },
-  //   } = locations[0];
-  //   console.log("Background location update:", locations);
-  //   setCurrentLocation({ longitude, latitude });
-  // });
-
-  // useEffect(() => {
-  //   if (locationGranted) {
-  //     // Start background tracking when component mounts
-  //     startBackgroundTracking();
-
-  //     // Cleanup function to stop background tracking when component unmounts
-  //     return () => {
-  //       stopBackgroundTracking();
-  //     };
-  //   }
-  // }, []);
-
-  // const startBackgroundTracking = async () => {
-  //   await Location.startLocationUpdatesAsync("backgroundLocationUpdates", {
-  //     accuracy: Location.Accuracy.High,
-  //     timeInterval: 2000, // Update every 60 seconds
-  //     distanceInterval: 0,
-  //     showsBackgroundLocationIndicator: true, // Show location icon in status bar
-  //   });
-  // };
-
-  // const stopBackgroundTracking = async () => {
-  //   await Location.stopLocationUpdatesAsync("backgroundLocationUpdates");
-  // };
-
-  // const fetchAddress = async () => {
-  //   const { longitude, latitude } = currentLocation;
-
-  //   try {
-
-  //     const { data } = await axios.get(
-  //       `${locationBaseUrl}?lat=${latitude}&lon=${longitude}&api_key=${API_KEY}`
-  //     );
-
-  //     console.log("address", data);
-  //   } catch (error) {
-  //     console.log("error", error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   if (currentLocation) {
-  //     // update backend with users current coordinates
-  //   }
-  // }, [currentLocation]);
+    // Handle notifications when the app is in the foreground
+    // addNotificationListener(handleNotification);
+  };
 
   const getAuthData = async () => {
     // await AsyncStorage.clear();
@@ -212,7 +112,7 @@ const AuthProvider = ({ children }) => {
       setLoadingRegister(true);
       const res = await apiClient.post("/auth/register", {
         ...data,
-        fcmToken: deviceToken,
+        fcmToken: deviceExpoPushToken,
       });
       const token = res?.data?.data?.tokens?.access?.token;
       const userData = res?.data?.data?.user;
