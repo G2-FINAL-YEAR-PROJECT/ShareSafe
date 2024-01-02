@@ -7,6 +7,7 @@ import { useState } from "react";
 import PostActionModal from "../PostActionModal";
 import { formatDate } from "../../helpers";
 import { abbreviateNumber } from "js-abbreviation-number";
+import { PanGestureHandler, State } from "react-native-gesture-handler";
 import { useAuth } from "../../store";
 import { apiClient } from "../../config";
 import styles from "./styles";
@@ -23,7 +24,7 @@ const PostCard = ({ post, postDetailIsActive, deletePost }) => {
   const [likedByUser, setLikedByUser] = useState(
     post?.likedBy?.includes(userData?.id)
   );
-  const [errorMessage, setErrorMessage] = useState("");
+  const [likeCount, setLikeCount] = useState(post?.likes);
 
   const toggleDrawer = () => {
     setDrawerOpen((prevState) => !prevState);
@@ -35,26 +36,16 @@ const PostCard = ({ post, postDetailIsActive, deletePost }) => {
   };
 
   const handlePostInteraction = async (postId) => {
-    let res;
     try {
-      if (likedByUser) {
-        console.log("unlike", likedByUser);
-        res = await apiClient.put(`/post/unLike/${postId}`);
-        setLikedByUser((prev) => !prev);
-      } else {
-        console.log("like", likedByUser);
-        res = await apiClient.put(`/post/like/${postId}`);
-        setLikedByUser(res.data.data?.likedBy?.includes(userData?.id));
-      }
-
-      console.log(res.data);
-
+      res = await apiClient.put(`/post/like/${postId}`);
       if (res.data.status !== 200) {
         throw new Error(res.data.message);
       }
+
+      setLikedByUser(res.data.data?.likedBy?.includes(userData?.id));
+      setLikeCount(res.data.data?.likes);
     } catch (error) {
       console.log("error", error.message);
-      setErrorMessage;
     }
   };
 
@@ -163,8 +154,9 @@ const PostCard = ({ post, postDetailIsActive, deletePost }) => {
                   color={COLORS.primary}
                 />
               </TouchableOpacity>
+
               <Text style={styles.metricCount}>
-                {abbreviateNumber(post?.likes, 2)} Likes
+                {abbreviateNumber(likeCount, 2)} Likes
               </Text>
             </View>
 

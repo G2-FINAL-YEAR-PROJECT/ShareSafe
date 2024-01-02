@@ -8,7 +8,8 @@ import {
 import { Button, SearchInput, TextAreaInput } from "../../ui";
 import { COLORS, SIZES } from "../../constants";
 import { Ionicons } from "@expo/vector-icons";
-import { reportType, channels } from "../../data";
+import { reportType } from "../../data";
+import { apiClient } from "../../config";
 import { useState, useEffect } from "react";
 
 import SelectDropdown from "react-native-select-dropdown";
@@ -28,12 +29,29 @@ const Report = ({ navigation }) => {
   const [locationOptions, setLocationOptions] = useState([]);
   const [locationPosition, setLocationPosition] = useState("");
 
-  const filteredChannel = channels[reportTypeId];
+  const [filteredChannel, setFilteredChannel] = useState([]);
 
   const handleChooseReportType = (id) => {
     setReportTypeId((prevId) => (prevId === id ? "" : id));
-    setChannelValue("");
   };
+
+  useEffect(() => {
+    const getChannels = async () => {
+      try {
+        const res = await apiClient(`/users?category=${reportTypeId}`);
+        if (res.data.status !== 200) {
+          throw new Error(res.data.message);
+        }
+        setFilteredChannel(res.data.data.results);
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
+
+    if (reportTypeId !== "") {
+      getChannels();
+    }
+  }, [reportTypeId]);
 
   useEffect(() => {
     navigation.addListener("focus", () => {
@@ -159,24 +177,28 @@ const Report = ({ navigation }) => {
           <View style={{ marginTop: 14 }}>
             <SelectDropdown
               data={
-                reportTypeId
+                reportTypeId && filteredChannel.length > 0
                   ? filteredChannel
-                  : ["Please choose report type first"]
+                  : filteredChannel.length < 1 &&
+                    reportTypeId.trim().length !== 0
+                  ? ["No respondent for this category"]
+                  : ["Choose report type first"]
               }
               onSelect={(selectedItem) => {
-                if (!selectedItem.name) {
+                if (!selectedItem?.fullName) {
                   alert("Please choose report type first");
                   return;
                 }
-                setChannelValue(selectedItem.name);
-                setChannelContact(selectedItem.contact);
-                console.log(selectedItem.name);
+                setChannelValue(selectedItem?.fullName);
+                setChannelContact(selectedItem?.phoneNumber);
               }}
               buttonTextAfterSelection={(selectedItem) => {
-                return selectedItem.name ? selectedItem.name : selectedItem;
+                return selectedItem?.fullName
+                  ? selectedItem?.fullName
+                  : selectedItem;
               }}
               rowTextForSelection={(item) => {
-                return item.name ? item.name : item;
+                return item?.fullName ? item?.fullName : item;
               }}
               renderDropdownIcon={() => (
                 <Ionicons

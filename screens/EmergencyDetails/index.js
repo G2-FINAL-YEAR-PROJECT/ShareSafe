@@ -6,7 +6,7 @@ import {
   Keyboard,
 } from "react-native";
 import { EmergencyPostCard, TextAreaInput } from "../../ui";
-import { useHideKeyBoard, useSinglePost } from "../../hooks";
+import { useHideKeyBoard, useSinglePost, useDeletePost } from "../../hooks";
 import { useRoute } from "@react-navigation/native";
 import { COLORS, SIZES } from "../../constants";
 import { Ionicons } from "@expo/vector-icons";
@@ -26,6 +26,12 @@ const EmergencyDetails = () => {
     "/emergency",
     post?.id
   );
+
+  const { handlePostDelete } = useDeletePost();
+
+  const deletePost = (page, postId) => {
+    handlePostDelete(page, "/emergency", postId);
+  };
 
   useHideKeyBoard(setCommentIsFocused);
 
@@ -53,7 +59,11 @@ const EmergencyDetails = () => {
           <ErrorScreen message={errorMessage} />
         ) : (
           singlePost && (
-            <EmergencyPostCard post={singlePost} emergencyDetailIsActive />
+            <EmergencyPostCard
+              post={singlePost}
+              deletePost={deletePost.bind(null, "EmergencyDetails")}
+              emergencyDetailIsActive
+            />
           )
         )}
       </ScrollView>

@@ -10,8 +10,6 @@ const useFollow = () => {
         users: [id],
       });
 
-      console.log(res.data, id);
-
       if (res.data.status === 200) {
         setIsFollowing(true);
       }

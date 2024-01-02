@@ -38,7 +38,6 @@ const LikesTab = () => {
               backgroundColor: COLORS.white,
               paddingTop: 28,
               paddingHorizontal: 10,
-              paddingBottom: 90,
             },
           ]}
         >

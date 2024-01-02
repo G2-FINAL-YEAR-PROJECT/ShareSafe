@@ -8,11 +8,10 @@ import {
 import { useRoute } from "@react-navigation/native";
 import { COLORS, SIZES } from "../../constants";
 import { PostCard, TextAreaInput } from "../../ui";
-import { useHideKeyBoard, useSinglePost } from "../../hooks";
+import { useHideKeyBoard, useSinglePost, useDeletePost } from "../../hooks";
 import { Ionicons } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import styles from "./styles";
-import { apiClient } from "../../config";
 import ErrorScreen from "../ErrorScreen";
 import Loading from "../Loading";
 
@@ -26,6 +25,12 @@ const PostDetails = () => {
     "/post",
     route?.params?.post?.id
   );
+
+  const { handlePostDelete } = useDeletePost();
+
+  const deletePost = (page, postId) => {
+    handlePostDelete(page, "/post", postId);
+  };
 
   const commentIsValid = comment.trim().length > 0;
 
@@ -52,7 +57,13 @@ const PostDetails = () => {
         ) : errorMessage ? (
           <ErrorScreen message={errorMessage} />
         ) : (
-          singlePost && <PostCard post={singlePost} postDetailIsActive />
+          singlePost && (
+            <PostCard
+              post={singlePost}
+              postDetailIsActive
+              deletePost={deletePost.bind(null, "PostDetails")}
+            />
+          )
         )}
       </ScrollView>
 

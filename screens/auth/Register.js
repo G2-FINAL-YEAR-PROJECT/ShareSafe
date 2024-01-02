@@ -89,14 +89,15 @@ const Register = ({ navigation }) => {
       return;
     }
 
-    const data = {
+    let data = {
       fullName: name.trim(),
       email: email.trim(),
       role: role.toUpperCase(),
       password,
       phoneNumber: phoneNo.toString(),
-      category: accountCategory,
     };
+    if (role === "Respondent") data.category = accountCategory;
+
     await register(data);
   };
 
