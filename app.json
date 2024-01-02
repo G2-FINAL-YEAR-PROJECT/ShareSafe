@@ -32,11 +32,15 @@
         "foregroundImage": "./assets/adaptive-icon1.png",
         "backgroundColor": "#ffffff"
       },
-
       "useNextNotificationsApi": true
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "27c34b57-0531-43a7-9651-f6724f507d47"
+      }
     }
   }
 }
