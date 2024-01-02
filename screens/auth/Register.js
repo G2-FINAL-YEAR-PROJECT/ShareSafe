@@ -1,4 +1,12 @@
-import { ScrollView, Text, TextInput, TouchableOpacity, View, Linking, Alert } from "react-native";
+import {
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  Linking,
+  Alert,
+} from "react-native";
 
 import { useState, useEffect } from "react";
 import { COLORS, globalStyles } from "../../constants";
@@ -15,7 +23,7 @@ const Register = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [phoneNo, setPhoneNo] = useState("");
   const [role, setRole] = useState("");
-  const [accountCategory, setAccountCategory] = useState("");
+  const [accountCategory, setAccountCategory] = useState(" ");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
@@ -156,7 +164,7 @@ const Register = ({ navigation }) => {
               data={reportType}
               defaultButtonText="Select an option"
               onSelect={(selectedItem, index) => {
-                setAccountCategory(selectedItem.type);
+                setAccountCategory(selectedItem.id);
               }}
               buttonTextAfterSelection={(selectedItem) => {
                 return selectedItem.type ? selectedItem.type : selectedItem;
@@ -177,7 +185,10 @@ const Register = ({ navigation }) => {
 
         <View style={styles.formGroup}>
           <Text style={globalStyles.label}>Confirm Password</Text>
-          <PasswordField password={confirmPassword} setPassword={setConfirmPassword} />
+          <PasswordField
+            password={confirmPassword}
+            setPassword={setConfirmPassword}
+          />
         </View>
 
         <Button onPress={handleRegister} loading={loadingRegister}>
@@ -187,7 +198,10 @@ const Register = ({ navigation }) => {
         <View style={{ marginTop: 26, alignItems: "center" }}>
           <Text style={[globalStyles.h5]}>Have an account?</Text>
 
-          <TouchableOpacity onPress={() => navigation.navigate("Login")} disabled={loadingRegister}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Login")}
+            disabled={loadingRegister}
+          >
             <Text style={[globalStyles.link]}>Login</Text>
           </TouchableOpacity>
         </View>
