@@ -54,6 +54,7 @@ const ReportsTab = () => {
               <EmergencyPostCard
                 post={item}
                 deletePost={deletePost.bind(null, "profileReport")}
+                forEmergency={true}
               />
             )}
             keyExtractor={(item) => item.id}

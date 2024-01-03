@@ -11,7 +11,7 @@ import { COLORS } from "../../constants";
 
 const PostActionModal = ({
   toggleDrawer,
-  handlePostAction,
+  handleStatusUpdate,
   isDrawerOpen,
   handleDelete,
   forEmergency,
@@ -39,7 +39,7 @@ const PostActionModal = ({
             {forEmergency && userData?.id === post?.channel?.id && (
               <>
                 <TouchableOpacity
-                  onPress={() => handlePostAction("confirmed")}
+                  onPress={() => handleStatusUpdate("CONFIRMED")}
                   style={[styles.drawerOption, styles.confirmed]}
                 >
                   <Text
@@ -50,7 +50,7 @@ const PostActionModal = ({
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  onPress={() => handlePostAction("responding")}
+                  onPress={() => handleStatusUpdate("RESPONDING")}
                   style={[styles.drawerOption, styles.responding]}
                 >
                   <Text
@@ -64,7 +64,7 @@ const PostActionModal = ({
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  onPress={() => handlePostAction("resolved")}
+                  onPress={() => handleStatusUpdate("RESOLVED")}
                   style={[styles.drawerOption, styles.resolved]}
                 >
                   <Text
@@ -78,7 +78,7 @@ const PostActionModal = ({
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  onPress={() => handlePostAction("dismissed")}
+                  onPress={() => handleStatusUpdate("DISMISSED")}
                   style={[styles.drawerOption, styles.dismiss]}
                 >
                   <Text
@@ -87,7 +87,7 @@ const PostActionModal = ({
                       color: COLORS.dismissText,
                     }}
                   >
-                    Dismissed
+                    Dismiss
                   </Text>
                 </TouchableOpacity>
               </>

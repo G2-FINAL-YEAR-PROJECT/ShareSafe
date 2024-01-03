@@ -2,6 +2,24 @@ import { StyleSheet } from "react-native";
 import { COLORS } from "../../constants";
 
 const styles = StyleSheet.create({
+  imageContainer: {
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderBottomWidth: 1,
+    borderRadius: 10,
+    borderColor: COLORS.primary,
+    marginBottom: 200,
+    marginTop: 50,
+    paddingHorizontal: 10,
+    paddingBottom: 10,
+    paddingTop: 20,
+  },
+
+  closeImage: {
+    position: "absolute",
+    right: -2,
+    top: -15,
+  },
   userBox: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -57,14 +75,14 @@ const styles = StyleSheet.create({
     right: 15,
   },
 
-  postBtn: (commentIsValid) => {
+  postBtn: (postIsValid, isLoading) => {
     return {
       alignItems: "center",
       paddingVertical: 5,
       paddingHorizontal: 20,
       borderRadius: 20,
       backgroundColor: COLORS.primary,
-      opacity: commentIsValid ? 1 : 0.5,
+      opacity: postIsValid && !isLoading ? 1 : 0.5,
     };
   },
   postText: {
