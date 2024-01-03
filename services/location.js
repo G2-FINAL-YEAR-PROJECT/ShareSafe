@@ -1,42 +1,51 @@
-// const requestLocationPermission = async () => {
-//   try {
-//     const { status } = await Location.requestForegroundPermissionsAsync();
+import * as Location from "expo-location";
+import * as TaskManager from "expo-task-manager";
+import { API_KEY } from "@env";
+import { Alert, Linking, AppState } from "react-native";
 
-//     if (status === "granted") {
-//       const { status } = await Location.requestBackgroundPermissionsAsync();
-//       if (status === "granted") {
-//         setLocationGranted(true);
-//       } else {
-//         setLocationGranted(false);
-//         showLocationPermissionAlert();
-//       }
-//     } else {
-//       setLocationGranted(false);
-//       showLocationPermissionAlert();
-//     }
-//   } catch (error) {
-//     setLocationGranted(false);
-//     showLocationPermissionAlert();
-//   }
-// };
+const LOCATION_TASK_NAME = "background-location-task";
+const locationBaseUrl = "https://geocode.maps.co/reverse";
+let locationWatcher;
 
-// const showLocationPermissionAlert = () => {
-//   Alert.alert(
-//     "Location Permission Required",
-//     'To receive emergency notifications, please choose "Allow all the time" for location access. Open app settings to update your preferences.',
-//     [
-//       {
-//         text: "Cancel",
-//         style: "cancel",
-//       },
-//       {
-//         text: "Open Settings",
-//         onPress: () => Linking.openSettings(),
-//       },
-//     ],
-//     { cancelable: false }
-//   );
-// };
+export const requestLocationPermission = async () => {
+  try {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+
+    if (status === "granted") {
+      const { status } = await Location.requestBackgroundPermissionsAsync();
+      if (status === "granted") {
+        setLocationGranted(true);
+      } else {
+        setLocationGranted(false);
+        showLocationPermissionAlert();
+      }
+    } else {
+      setLocationGranted(false);
+      showLocationPermissionAlert();
+    }
+  } catch (error) {
+    setLocationGranted(false);
+    showLocationPermissionAlert();
+  }
+};
+
+export const showLocationPermissionAlert = () => {
+  Alert.alert(
+    "Location Permission Required",
+    'To receive emergency notifications, please choose "Allow all the time" for location access. Open app settings to update your preferences.',
+    [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Open Settings",
+        onPress: () => Linking.openSettings(),
+      },
+    ],
+    { cancelable: false }
+  );
+};
 
 // TaskManager.defineTask("backgroundLocationUpdates", ({ data, error }) => {
 //   if (error) {
@@ -65,33 +74,32 @@
 //   }
 // }, []);
 
-// const startBackgroundTracking = async () => {
-//   await Location.startLocationUpdatesAsync("backgroundLocationUpdates", {
-//     accuracy: Location.Accuracy.High,
-//     timeInterval: 2000, // Update every 60 seconds
-//     distanceInterval: 0,
-//     showsBackgroundLocationIndicator: true, // Show location icon in status bar
-//   });
-// };
+export const startBackgroundTracking = async () => {
+  await Location.startLocationUpdatesAsync("backgroundLocationUpdates", {
+    accuracy: Location.Accuracy.High,
+    timeInterval: 2000, // Update every 60 seconds
+    distanceInterval: 0,
+    showsBackgroundLocationIndicator: true, // Show location icon in status bar
+  });
+};
 
-// const stopBackgroundTracking = async () => {
-//   await Location.stopLocationUpdatesAsync("backgroundLocationUpdates");
-// };
+export const stopBackgroundTracking = async () => {
+  await Location.stopLocationUpdatesAsync("backgroundLocationUpdates");
+};
 
-// const fetchAddress = async () => {
-//   const { longitude, latitude } = currentLocation;
+export const fetchAddress = async () => {
+  const { longitude, latitude } = currentLocation;
 
-//   try {
+  try {
+    const { data } = await axios.get(
+      `${locationBaseUrl}?lat=${latitude}&lon=${longitude}&api_key=${API_KEY}`
+    );
 
-//     const { data } = await axios.get(
-//       `${locationBaseUrl}?lat=${latitude}&lon=${longitude}&api_key=${API_KEY}`
-//     );
-
-//     console.log("address", data);
-//   } catch (error) {
-//     console.log("error", error);
-//   }
-// };
+    console.log("address", data);
+  } catch (error) {
+    console.log("error", error);
+  }
+};
 
 // useEffect(() => {
 //   if (currentLocation) {

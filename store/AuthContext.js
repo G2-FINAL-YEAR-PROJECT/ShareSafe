@@ -1,16 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as Location from "expo-location";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import * as Notifications from "expo-notifications";
-import * as TaskManager from "expo-task-manager";
-import { API_KEY } from "@env";
-import { Alert, Linking, AppState } from "react-native";
 import { apiClient } from "../config";
 import { registerForPushNotificationsAsync } from "../services/notification";
-
-const LOCATION_TASK_NAME = "background-location-task";
-const locationBaseUrl = "https://geocode.maps.co/reverse";
-let locationWatcher;
 
 const AuthContext = createContext();
 
