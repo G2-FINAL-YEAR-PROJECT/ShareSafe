@@ -88,22 +88,38 @@ const styles = StyleSheet.create({
     textAlign: "left",
   },
 
-  upload: {
-    flexDirection: "row",
+  media: {
     alignItems: "center",
-
-    gap: 4,
+    justifyContent: "center",
     backgroundColor: COLORS.primary,
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-    borderRadius: 10,
+    width: 50,
+    height: 50,
+    borderRadius: 50,
   },
 
-  uploadText: {
-    fontSize: 15,
-    fontFamily: "semibold",
-    letterSpacing: 0.5,
-    color: COLORS.white,
+  mediaBtn: {
+    marginTop: 6,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+
+  imageContainer: {
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderBottomWidth: 1,
+    borderRadius: 10,
+    borderColor: COLORS.primary,
+    marginTop: 20,
+    paddingHorizontal: 10,
+    paddingBottom: 10,
+    paddingTop: 20,
+  },
+
+  closeImage: {
+    position: "absolute",
+    right: -2,
+    top: -15,
   },
 });
 

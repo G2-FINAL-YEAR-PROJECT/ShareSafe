@@ -1,11 +1,5 @@
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-} from "react-native";
-import { Button, SearchInput, TextAreaInput } from "../../ui";
+import { View, Text, ScrollView, TouchableOpacity, Image } from "react-native";
+import { Button, TextAreaInput } from "../../ui";
 import { COLORS, SIZES } from "../../constants";
 import { Ionicons } from "@expo/vector-icons";
 import { reportType } from "../../data";
@@ -13,8 +7,9 @@ import { apiClient } from "../../config";
 import { useState, useEffect } from "react";
 import SelectDropdown from "react-native-select-dropdown";
 import styles from "./styles";
+import { usePickImage } from "../../hooks";
 
-const Report = ({ navigation }) => {
+const Report = ({ navigation, route }) => {
   const [reportTypeId, setReportTypeId] = useState("");
   const [inputIsFocused, setInputIsFocused] = useState(false);
 
@@ -24,13 +19,20 @@ const Report = ({ navigation }) => {
 
   const [locationText, setLocationText] = useState("");
   const [locationOptions, setLocationOptions] = useState([]);
-  const [locationPosition, setLocationPosition] = useState("");
+  const [locationPosition, setLocationPosition] = useState({});
 
   const [filteredChannel, setFilteredChannel] = useState([]);
+  const [previewImage, setPreviewImage] = useState(null);
 
   const handleChooseReportType = (id) => {
     setReportTypeId((prevId) => (prevId === id ? "" : id));
   };
+
+  useEffect(() => {
+    setPreviewImage(route?.params?.imageUri);
+  }, [route?.params?.imageUri]);
+
+  const { pickImage } = usePickImage(setPreviewImage);
 
   useEffect(() => {
     const getChannels = async () => {
@@ -50,20 +52,24 @@ const Report = ({ navigation }) => {
     }
   }, [reportTypeId]);
 
-  useEffect(() => {
-    navigation.addListener("focus", () => {
-      setReportTypeId("");
-      setInputIsFocused(false);
-      setReportText("");
-      setLocationText("");
-      setChannelValue("");
-      setChannelContact("");
-    });
+  // useEffect(() => {
+  //   navigation.addListener("focus", () => {
+  //     setReportTypeId("");
+  //     setInputIsFocused(false);
+  //     setReportText("");
+  //     setLocationText("");
+  //     setChannelValue("");
+  //     setChannelContact("");
+  //     setFilteredChannel([]);
+  //     setLocationPosition({});
+  //     setLocationText("");
+  //     // setPreviewImage(null);
+  //   });
 
-    return () => {
-      navigation.removeListener("focus");
-    };
-  }, [navigation]);
+  //   return () => {
+  //     navigation.removeListener("focus");
+  //   };
+  // }, [navigation]);
 
   const handleSubmit = () => {
     navigation.navigate("ReportSuccess", { channelValue, channelContact });
@@ -228,19 +234,19 @@ const Report = ({ navigation }) => {
           <View style={{ marginTop: 15 }}>
             <SelectDropdown
               data={locationOptions}
-              onSelect={(selectedItem, index) => {
-                // console.log(selectedItem, index);
-                setLocationText(selectedItem);
+              onSelect={(selectedItem) => {
+                const location = `${selectedItem?.name} - ${selectedItem?.address}`;
+                setLocationText(location);
+
                 setLocationPosition(selectedItem.position); // {"lat": 6.484363, "lon": 3.199292}
               }}
               defaultButtonText={"Search Location"}
               onChangeSearchInputText={(text) => {
-                // console.log(text);
                 if (text.length > 3) {
                   fetchLocationSuggestions(text);
                 }
               }}
-              buttonTextAfterSelection={(selectedItem, index) => {
+              buttonTextAfterSelection={(selectedItem) => {
                 if (selectedItem.type == "POI") {
                   return (
                     <>
@@ -255,7 +261,6 @@ const Report = ({ navigation }) => {
                 }
               }}
               rowTextForSelection={(item, index) => {
-                // console.log("rowTextForSelection:", item);
                 if (item.type == "POI") {
                   return (
                     <>
@@ -292,27 +297,55 @@ const Report = ({ navigation }) => {
         </View>
 
         {/* SHARE FILE */}
-        <View style={{ marginTop: 17 }}>
+        <View style={{ marginTop: 25 }}>
           <Text
             style={[
               styles.titleText(18, "semibold", 0.5),
               { color: COLORS.black },
             ]}
           >
-            Share file (Video, Audio, Image)
+            Share file (Image)
           </Text>
 
-          <TouchableOpacity style={{ maxWidth: "36%", marginTop: 17 }}>
-            <View style={styles.upload}>
-              <Text style={styles.uploadText}>Choose file</Text>
-              <Ionicons
-                name="attach-sharp"
-                size={22}
-                color={COLORS.white}
-                style={{ transform: [{ rotate: "45deg" }] }}
+          <View style={styles.mediaBtn}>
+            <TouchableOpacity
+              style={[styles.media, styles.camera]}
+              onPress={() =>
+                navigation.navigate("CameraScreen", { from: "Report" })
+              }
+            >
+              <Ionicons name="camera" size={24} color={COLORS.white} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.media, styles.gallery]}
+              onPress={pickImage}
+            >
+              <Ionicons name="images-outline" size={24} color={COLORS.white} />
+            </TouchableOpacity>
+          </View>
+
+          {/* IMAGE PREVIEW GOES HERE */}
+
+          {previewImage && (
+            <View style={styles.imageContainer}>
+              <Image
+                source={{ uri: previewImage }}
+                style={{ width: "100%", height: 500, borderRadius: 10 }}
               />
+
+              <TouchableOpacity
+                style={styles.closeImage}
+                onPress={() => setPreviewImage(null)}
+              >
+                <Ionicons
+                  name="close-circle-outline"
+                  size={35}
+                  color={COLORS.primary}
+                />
+              </TouchableOpacity>
             </View>
-          </TouchableOpacity>
+          )}
         </View>
 
         {/* SUBMIT REPORT */}

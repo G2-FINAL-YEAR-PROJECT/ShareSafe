@@ -13,6 +13,7 @@ import {
   EmergencyDetails,
   EditProfile,
   ChatDetails,
+  CameraScreen,
 } from "../screens";
 
 import { ProfileHeader } from "../components";
@@ -109,6 +110,14 @@ const HomeStack = () => {
               <Ionicons name="notifications" size={24} color={COLORS.primary} />
             </TouchableOpacity>
           ),
+        }}
+      />
+
+      <Stack.Screen
+        name="CameraScreen"
+        component={CameraScreen}
+        options={{
+          headerShown: false,
         }}
       />
 

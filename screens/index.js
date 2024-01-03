@@ -24,3 +24,4 @@ export { default as UnreadTab } from "./UnreadTab";
 export { default as Welcome } from "./Welcome";
 export { default as EditProfile } from "./EditProfile";
 export { default as ChatDetails } from "./ChatDetails";
+export { default as CameraScreen } from "./CameraScreen";

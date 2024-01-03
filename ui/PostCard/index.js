@@ -7,7 +7,6 @@ import { useState } from "react";
 import PostActionModal from "../PostActionModal";
 import { formatDate } from "../../helpers";
 import { abbreviateNumber } from "js-abbreviation-number";
-import { PanGestureHandler, State } from "react-native-gesture-handler";
 import { useAuth } from "../../store";
 import { apiClient } from "../../config";
 import styles from "./styles";
@@ -161,7 +160,9 @@ const PostCard = ({ post, postDetailIsActive, deletePost }) => {
             </View>
 
             <View style={styles.metricBox}>
-              <TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("PostDetails", { post })}
+              >
                 <Ionicons
                   name="ios-chatbox-outline"
                   size={24}

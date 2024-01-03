@@ -1,5 +1,5 @@
 import { View, Text, Image, TouchableOpacity } from "react-native";
-import { Entypo, Ionicons } from "@expo/vector-icons";
+import { Entypo, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { COLORS } from "../../constants";
 import { useNavigation } from "@react-navigation/native";
 import { useAspectRatio, useFollow } from "../../hooks";
@@ -8,35 +8,81 @@ import { formatDate, formatTime } from "../../helpers";
 import PostActionModal from "../PostActionModal";
 import { useState } from "react";
 import { useAuth } from "../../store";
+import { apiClient } from "../../config";
+import { capitalize } from "../../helpers";
 import styles from "./styles";
 
-const lasema = require("../../assets/images/lasema.png");
 const placeholder = require("../../assets/images/placeholder.jpg");
 
-const EmergencyPostCard = ({ post, deletePost, emergencyDetailIsActive }) => {
+const EmergencyPostCard = ({
+  post,
+  deletePost,
+  emergencyDetailIsActive,
+  forEmergency,
+}) => {
+  const { userData } = useAuth();
+
   const [isDrawerOpen, setDrawerOpen] = useState(false);
+  const [status, setStatus] = useState(post?.status);
+  const [upVoted, setUpVoted] = useState(
+    post?.upVotedBy?.includes(userData?.id)
+  );
+  const [downVoted, setDownVoted] = useState(
+    post?.downVotedBy?.includes(userData?.id)
+  );
+  const [upVoteCount, setUpVoteCount] = useState(post?.upVotes);
+  const [downVoteCount, setDownVoteCount] = useState(post?.downVotes);
 
   const navigation = useNavigation();
   const { aspectRatio } = useAspectRatio(1, post);
-  const { userData } = useAuth();
 
   const { isFollowing, handleFollowUser } = useFollow();
 
-  const [status, setStatus] = useState(
-    post?.status?.toLowerCase() || "pending"
-  );
   const toggleDrawer = () => {
     setDrawerOpen((prevState) => !prevState);
   };
 
-  const handlePostAction = (type) => {
-    setStatus(type);
+  const handleStatusUpdate = async (type) => {
     toggleDrawer();
+    try {
+      const res = await apiClient.put(`/emergency/${post?.id}`, {
+        status: type,
+      });
+      if (res.data.status !== 200) {
+        throw new Error("STATUS UPDATE FAILED!!!");
+      }
+
+      setStatus(res.data?.data?.status);
+
+      alert("STATUS UPDATE SUCCESSFUL");
+    } catch (error) {
+      toggleDrawer();
+      alert(error?.message);
+    }
   };
 
   const handleDelete = () => {
     toggleDrawer();
     deletePost(post?.id);
+  };
+
+  const handleVote = async (type) => {
+    try {
+      const res = await apiClient.put(`/emergency/${type}/${post.id}`);
+
+      if (res.data.status !== 200) {
+        throw new Error(res.data.message);
+      }
+
+      const { data } = res.data;
+      setUpVoted(data?.upVotedBy?.includes(userData?.id));
+      setDownVoted(data?.downVotedBy?.includes(userData?.id));
+      setUpVoteCount(data?.upVotes);
+      setDownVoteCount(data?.downVotes);
+    } catch (error) {
+      alert(error?.message);
+      console.log(error?.message);
+    }
   };
 
   return (
@@ -85,7 +131,7 @@ const EmergencyPostCard = ({ post, deletePost, emergencyDetailIsActive }) => {
                   source={
                     post?.channel?.profilePicture
                       ? { uri: post?.channel?.profilePicture }
-                      : lasema
+                      : placeholder
                   }
                   style={styles.respondent}
                 />
@@ -162,48 +208,48 @@ const EmergencyPostCard = ({ post, deletePost, emergencyDetailIsActive }) => {
               {formatTime(post?.user?.createdAt)}
             </Text>
 
-            {status === "pending" && (
+            {status === "PENDING" && (
               <TouchableOpacity style={styles.awaiting}>
                 <Text style={[styles.statusText, { color: COLORS.aConText }]}>
-                  {status}
+                  {capitalize(status)}
                 </Text>
               </TouchableOpacity>
             )}
 
-            {status === "confirmed" && (
+            {status === "CONFIRMED" && (
               <TouchableOpacity style={styles.confirmed}>
                 <Text style={[styles.statusText, { color: COLORS.conText }]}>
-                  {status}
+                  {capitalize(status)}
                 </Text>
               </TouchableOpacity>
             )}
 
-            {status === "responding" && (
+            {status === "RESPONDING" && (
               <TouchableOpacity style={styles.responding}>
                 <Text
                   style={[styles.statusText, { color: COLORS.respondText }]}
                 >
-                  {status}
+                  {capitalize(status)}
                 </Text>
               </TouchableOpacity>
             )}
 
-            {status === "resolved" && (
+            {status === "RESOLVED" && (
               <TouchableOpacity style={styles.resolved}>
                 <Text
                   style={[styles.statusText, { color: COLORS.resolveText }]}
                 >
-                  {status}
+                  {capitalize(status)}
                 </Text>
               </TouchableOpacity>
             )}
 
-            {status === "dismissed" && (
+            {status === "DISMISSED" && (
               <TouchableOpacity style={styles.dismiss}>
                 <Text
                   style={[styles.statusText, { color: COLORS.dismissText }]}
                 >
-                  {status}
+                  {capitalize(status)}
                 </Text>
               </TouchableOpacity>
             )}
@@ -213,22 +259,37 @@ const EmergencyPostCard = ({ post, deletePost, emergencyDetailIsActive }) => {
           {/* POST INTERACTION STARTS */}
           <View style={styles.intBox}>
             <View style={styles.metricBox}>
-              <TouchableOpacity>
-                <Entypo name="arrow-up" size={24} color={COLORS.primary} />
+              <TouchableOpacity onPress={() => handleVote("upvote")}>
+                <MaterialCommunityIcons
+                  name={upVoted ? "arrow-up-bold" : "arrow-up-bold-outline"}
+                  size={24}
+                  color={COLORS.primary}
+                />
               </TouchableOpacity>
               <Text style={styles.voteCount}>
-                {abbreviateNumber(post?.upVotes, 2)}
+                {abbreviateNumber(upVoteCount, 2)}
               </Text>
-              <TouchableOpacity>
-                <Entypo name="arrow-down" size={24} color={COLORS.primary} />
+
+              <TouchableOpacity onPress={() => handleVote("downVote")}>
+                <MaterialCommunityIcons
+                  name={
+                    downVoted ? "arrow-down-bold" : "arrow-down-bold-outline"
+                  }
+                  size={24}
+                  color={COLORS.primary}
+                />
               </TouchableOpacity>
               <Text style={styles.voteCount}>
-                {abbreviateNumber(post?.downVotes, 2)}
+                {abbreviateNumber(downVoteCount, 2)}
               </Text>
             </View>
 
             <View style={styles.commentBox}>
-              <TouchableOpacity>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("EmergencyDetails", { post })
+                }
+              >
                 <Ionicons
                   name="ios-chatbox-outline"
                   size={24}
@@ -257,10 +318,10 @@ const EmergencyPostCard = ({ post, deletePost, emergencyDetailIsActive }) => {
 
       <PostActionModal
         isDrawerOpen={isDrawerOpen}
-        handlePostAction={(type) => handlePostAction(type)}
+        handleStatusUpdate={(type) => handleStatusUpdate(type)}
         handleDelete={handleDelete}
         toggleDrawer={toggleDrawer}
-        forEmergency
+        forEmergency={forEmergency}
         posterId={post?.user?.id}
         userData={userData}
         post={post}
