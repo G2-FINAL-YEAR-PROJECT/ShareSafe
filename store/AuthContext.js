@@ -30,9 +30,6 @@ const AuthProvider = ({ children }) => {
     setupNotifications();
 
     return () => {
-      Notifications.removeNotificationSubscription(
-        notificationListener.current
-      );
       Notifications.removeNotificationSubscription(responseListener.current);
     };
   }, []);
@@ -40,13 +37,6 @@ const AuthProvider = ({ children }) => {
   const setupNotifications = async () => {
     const expoPushToken = await registerForPushNotificationsAsync();
     setDeviceExpoPushToken(expoPushToken);
-
-    // Handle notifications when the app is in the foreground
-    notificationListener.current =
-      Notifications.addNotificationReceivedListener((notification) => {
-        // const notificationData = notification.request.content.data;
-        // console.log("ForegroundListener:", notificationData, notification);
-      });
 
     // Sets up a listener for notification responses (e.g., when a user taps on a notification)
     responseListener.current =
