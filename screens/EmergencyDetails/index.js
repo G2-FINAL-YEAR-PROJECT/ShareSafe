@@ -63,6 +63,7 @@ const EmergencyDetails = () => {
               post={singlePost}
               deletePost={deletePost.bind(null, "EmergencyDetails")}
               emergencyDetailIsActive
+              forEmergency={true}
             />
           )
         )}

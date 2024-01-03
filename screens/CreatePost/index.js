@@ -6,23 +6,66 @@ import {
   View,
   Image,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { COLORS, SIZES } from "../../constants";
-import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { TextAreaInput } from "../../ui";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
+import { uploadToCloudinary, formatDate } from "../../helpers";
+import { useAuth } from "../../store";
 import styles from "./styles";
+import { apiClient } from "../../config";
+import { usePickImage } from "../../hooks";
 
-const userImage = require("../../assets/images/girl.jpg");
-const CreatePost = () => {
+const placeholder = require("../../assets/images/placeholder.jpg");
+
+const CreatePost = ({ route }) => {
   const navigation = useNavigation();
   const [comment, setComment] = useState("");
+  const [previewImage, setPreviewImage] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const commentIsValid = comment.trim().length > 0;
+  const { userData } = useAuth();
+
+  const postIsValid = comment.trim().length > 0 && previewImage?.length > 0;
+
+  useEffect(() => {
+    setPreviewImage(route?.params?.imageUri);
+  }, [route?.params?.imageUri]);
+
+  const { pickImage } = usePickImage(setPreviewImage);
+
+  const handlePost = async () => {
+    setIsLoading(true);
+    try {
+      const imageUrl = await uploadToCloudinary(previewImage);
+
+      const res = await apiClient.post("/post", {
+        text: comment,
+        thumbnail: imageUrl,
+      });
+
+      if (res.data.status !== 200) {
+        throw new Error(res.data.message);
+      }
+
+      alert("upload success");
+      setComment("");
+      setPreviewImage(null);
+      setIsLoading(false);
+      navigation.navigate("Home");
+    } catch (error) {
+      alert(`"ERRRROR", ${error?.message}`);
+      setIsLoading(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleBackPress = () => {
-    if (!commentIsValid) {
+    if (!postIsValid) {
       navigation.goBack();
       return;
     }
@@ -38,6 +81,7 @@ const CreatePost = () => {
           text: "Yes",
           onPress: () => {
             setComment("");
+            setPreviewImage(null);
             navigation.goBack();
           },
         },
@@ -56,25 +100,46 @@ const CreatePost = () => {
     return () => {
       backHandler.remove();
     };
-  }, [navigation, commentIsValid]);
+  }, [navigation, postIsValid]);
 
   return (
     <>
       <TouchableOpacity onPress={handleBackPress} style={[styles.cancel]}>
         <Ionicons name="close-circle-outline" size={24} color="black" />
       </TouchableOpacity>
+
       <ScrollView
         style={[
           SIZES.safeAreaView,
-          { backgroundColor: COLORS.white, paddingTop: 115 },
+          {
+            backgroundColor: COLORS.white,
+            paddingTop: 115,
+            paddingBottom: 300,
+          },
         ]}
       >
         <View style={styles.userBox}>
           <View style={styles.user}>
-            <Image style={styles.image} source={userImage} />
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("ProfileTabStack", {
+                  screen: "Profile",
+                  params: { user: userData },
+                })
+              }
+            >
+              <Image
+                style={styles.image}
+                source={
+                  userData?.profilePicture
+                    ? { uri: userData?.profilePicture }
+                    : placeholder
+                }
+              />
+            </TouchableOpacity>
             <View>
               <Text style={styles.textStyle(16, COLORS.black2, "semibold")}>
-                Miko
+                {userData?.fullName}
               </Text>
               <Text
                 style={[
@@ -82,16 +147,21 @@ const CreatePost = () => {
                   { marginTop: -5 },
                 ]}
               >
-                24th September 2023
+                {formatDate(new Date())}
               </Text>
             </View>
           </View>
 
           <TouchableOpacity
-            style={styles.postBtn(commentIsValid)}
-            disabled={!commentIsValid}
+            style={styles.postBtn(postIsValid, isLoading)}
+            disabled={!postIsValid || isLoading}
+            onPress={handlePost}
           >
-            <Text style={styles.postText}>Post</Text>
+            {isLoading ? (
+              <ActivityIndicator size="small" color={COLORS.white} />
+            ) : (
+              <Text style={styles.postText}>Post</Text>
+            )}
           </TouchableOpacity>
         </View>
 
@@ -101,17 +171,46 @@ const CreatePost = () => {
             placeholder="What do you want to talk about?"
             hideBorder
             numberOfLines={40}
-            height={320}
+            height={200}
             padding={0}
             handleChange={(text) => setComment(text)}
           />
         </View>
+
+        {previewImage && (
+          <View style={styles.imageContainer}>
+            <Image
+              source={{ uri: previewImage }}
+              style={{ width: "100%", height: 500, borderRadius: 10 }}
+            />
+
+            <TouchableOpacity
+              style={styles.closeImage}
+              onPress={() => setPreviewImage(null)}
+            >
+              <Ionicons
+                name="close-circle-outline"
+                size={35}
+                color={COLORS.primary}
+              />
+            </TouchableOpacity>
+          </View>
+        )}
       </ScrollView>
-      <TouchableOpacity style={[styles.media, styles.camera]}>
+
+      <TouchableOpacity
+        style={[styles.media, styles.camera]}
+        onPress={() =>
+          navigation.navigate("CameraScreen", { from: "CreatePost" })
+        }
+      >
         <Ionicons name="camera" size={24} color={COLORS.white} />
       </TouchableOpacity>
 
-      <TouchableOpacity style={[styles.media, styles.gallery]}>
+      <TouchableOpacity
+        style={[styles.media, styles.gallery]}
+        onPress={pickImage}
+      >
         <Ionicons name="images-outline" size={24} color={COLORS.white} />
       </TouchableOpacity>
     </>

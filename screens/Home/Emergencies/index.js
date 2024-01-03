@@ -1,6 +1,5 @@
 import { View, FlatList } from "react-native";
 import { useState } from "react";
-// import { emergencyList } from "../../../data";
 import { EmergencyPostCard, SearchInput } from "../../../ui";
 import { COLORS, SIZES } from "../../../constants";
 import { useFetch, useDeletePost } from "../../../hooks";
@@ -58,6 +57,7 @@ const Emergencies = () => {
               <EmergencyPostCard
                 post={item}
                 deletePost={deletePost.bind(null, "emergencies")}
+                forEmergency={true}
               />
             )}
             keyExtractor={(item) => item.id}
