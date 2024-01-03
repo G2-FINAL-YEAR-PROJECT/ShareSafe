@@ -12,13 +12,15 @@ import { COLORS, SIZES, globalStyles } from "../../constants";
 import React, { useState } from "react";
 import Button from "../../ui/Button";
 import { PasswordField } from "../../ui";
-import { validateEmail } from "../../helpers";
+import { Ionicons } from "@expo/vector-icons";
+import { uploadToCloudinary, validateEmail } from "../../helpers";
 import { useAuth } from "../../store";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { apiClient } from "../../config";
+import { usePickImage } from "../../hooks";
 
 const EditProfile = () => {
-  const { userData, logout } = useAuth();
+  const { userData, setUserData, logout } = useAuth();
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [loadingProfile, setLoadingProfile] = useState(false);
   const [loadingPW, setLoadingPW] = useState(false);
@@ -28,28 +30,44 @@ const EditProfile = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleProfileUpdate = () => {
+  const [previewImage, setPreviewImage] = useState(null);
+
+  const { pickImage } = usePickImage(setPreviewImage);
+
+  const handleProfileUpdate = async () => {
     // Validate input fields
     if (!inputData?.fullName) {
       alert("Name is required");
       return;
     }
-
-    if (!validateEmail(inputData?.email || "")) {
-      alert("Please enter a valid email address");
+    if (!inputData?.phoneNumber) {
+      alert("Phone number is required");
       return;
     }
 
-    // setLoadingProfile(true);
-
+    setLoadingProfile(true);
     const data = {
       fullName: inputData.fullName.trim(),
-      email: inputData.email.trim(),
-      location: inputData.location,
+      phoneNumber: inputData.phoneNumber,
       dob: inputData.dob,
     };
-    console.log(inputData);
-    console.log(data);
+
+    try {
+      if (previewImage) {
+        const imageUrl = await uploadToCloudinary(previewImage);
+        data.profilePicture = imageUrl;
+      }
+      const res = await apiClient.put("/users/update", data);
+      const userData = res?.data?.data;
+      setUserData(userData);
+      setLoadingProfile(false);
+      alert("Profile updated successfully!");
+    } catch (error) {
+      console.log(error);
+      alert("Error updating profile!");
+    } finally {
+      setLoadingProfile(false);
+    }
   };
 
   const handleChangePassword = () => {
@@ -97,6 +115,10 @@ const EditProfile = () => {
     );
   };
 
+  const ProfilePhoto = userData.profilePicture
+    ? { uri: userData?.profilePicture }
+    : require("../../assets/images/placeholder.jpg");
+
   return (
     <ScrollView
       style={[
@@ -104,11 +126,20 @@ const EditProfile = () => {
         { paddingTop: 5, backgroundColor: COLORS.white },
       ]}
     >
-      <TouchableOpacity style={styles.photoWrapper}>
+      <TouchableOpacity style={styles.photoWrapper} onPress={pickImage}>
         <Image
           style={styles.pic}
-          source={require("../../assets/images/placeholder.jpg")}
+          source={previewImage ? { uri: previewImage } : ProfilePhoto}
         />
+
+        {previewImage && (
+          <TouchableOpacity
+            style={styles.cancelIconOverlay}
+            onPress={() => setPreviewImage(null)}
+          >
+            <Ionicons name="close-circle" style={{}} size={35} color="red" />
+          </TouchableOpacity>
+        )}
       </TouchableOpacity>
 
       <Text
@@ -136,23 +167,24 @@ const EditProfile = () => {
       <View style={styles.formGroup}>
         <Text style={globalStyles.label}>Email Address</Text>
         <TextInput
-          style={globalStyles.input}
-          placeholder="hello@example.com"
+          style={[globalStyles.input, { color: "#777" }]}
           value={inputData?.email || ""}
-          autoComplete="email"
-          onChangeText={(text) => setInputData({ ...inputData, email: text })}
+          editable={false}
         />
       </View>
 
-      {/* <View style={styles.formGroup}>
-        <Text style={globalStyles.label}>Location</Text>
+      <View style={styles.formGroup}>
+        <Text style={globalStyles.label}>Phone Number</Text>
         <TextInput
           style={globalStyles.input}
-          value={inputData?.location || ""}
-          autoComplete="address-line1"
-          onChangeText={(text) => setInputData({ ...inputData, location: text })}
+          value={inputData?.phoneNumber || ""}
+          autoComplete="tel"
+          keyboardType="numeric"
+          onChangeText={(text) =>
+            setInputData({ ...inputData, phoneNumber: text })
+          }
         />
-      </View> */}
+      </View>
 
       <View style={styles.formGroup}>
         <Text style={globalStyles.label}>Date of Birth</Text>
@@ -250,6 +282,18 @@ const styles = StyleSheet.create({
     display: "flex",
     alignItems: "center",
     marginBottom: 12,
+    position: "relative",
+  },
+  cancelIconOverlay: {
+    position: "absolute",
+    top: 0,
+    width: 90,
+    height: 90,
+    borderRadius: 50,
+    backgroundColor: "#00000085",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
   pic: {
     width: 90,

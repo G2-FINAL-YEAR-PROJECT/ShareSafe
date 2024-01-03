@@ -159,6 +159,7 @@ const AuthProvider = ({ children }) => {
       value={{
         token,
         userData,
+        setUserData,
         loadingAuth,
         loadingLogin,
         loadingRegister,
