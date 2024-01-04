@@ -18,7 +18,6 @@ const AuthProvider = ({ children }) => {
 
   const [deviceExpoPushToken, setDeviceExpoPushToken] = useState("");
   const [notification, setNotification] = useState();
-  const notificationListener = useRef();
   const responseListener = useRef();
 
   const [currentLocation, setCurrentLocation] = useState({});
@@ -37,8 +36,7 @@ const AuthProvider = ({ children }) => {
   const setupNotifications = async () => {
     const expoPushToken = await registerForPushNotificationsAsync();
     setDeviceExpoPushToken(expoPushToken);
-
-    // Sets up a listener for notification responses (e.g., when a user taps on a notification)
+    // Sets up listener for notification response
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
         const notificationData = response.notification.request.content.data;
@@ -109,7 +107,7 @@ const AuthProvider = ({ children }) => {
       setLoadingRegister(true);
       const res = await apiClient.post("/auth/register", {
         ...data,
-        fcmToken: deviceExpoPushToken,
+        pushToken: deviceExpoPushToken,
       });
       const token = res?.data?.data?.tokens?.access?.token;
       const userData = res?.data?.data?.user;
