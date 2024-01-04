@@ -6,3 +6,4 @@ export { default as useFollow } from "./useFollow";
 export { default as useSinglePost } from "./useSinglePost";
 export { default as useDeletePost } from "./useDeletePost";
 export { default as usePickImage } from "./usePickImage";
+export { default as useComments } from "./useComments";

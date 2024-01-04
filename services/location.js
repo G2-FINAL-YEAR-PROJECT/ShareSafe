@@ -1,18 +1,12 @@
 import * as Location from "expo-location";
-import * as TaskManager from "expo-task-manager";
 import { API_KEY } from "@env";
-import { Alert, Linking, AppState } from "react-native";
+import { Alert, Linking } from "react-native";
+import axios from "axios";
 
 // const LOCATION_TASK_NAME = "background-location-task";
 const locationBaseUrl = "https://geocode.maps.co/reverse";
 
-export const requestLocationPermission = async (
-  setLocationGranted,
-  setCurrentLocation
-) => {
-  // Define the background location task
-  defineLocationTask(setCurrentLocation);
-
+export const requestLocationPermission = async (setLocationGranted) => {
   try {
     const { status: foregroundStatus } =
       await Location.requestForegroundPermissionsAsync();
@@ -20,18 +14,17 @@ export const requestLocationPermission = async (
 
     if (foregroundStatus === "granted") {
       const { status: backgroundStatus } =
-        // await Location.requestBackgroundPermissionsAsync();
-        await Location.getBackgroundPermissionsAsync();
+        await Location.requestBackgroundPermissionsAsync();
+      // await Location.getBackgroundPermissionsAsync();
       // console.log("backgroundStatus", backgroundStatus, foregroundStatus);
 
       if (backgroundStatus !== "granted") {
-        showBackgroundPermissionAlert();
         setLocationGranted(false);
+        showBackgroundPermissionAlert();
         return;
       }
-
+      // startBackgroundTracking();
       setLocationGranted(true);
-      startBackgroundTracking();
     } else {
       setLocationGranted(false);
       showLocationRequiredAlert();
@@ -39,7 +32,6 @@ export const requestLocationPermission = async (
   } catch (error) {
     console.log("requestLocationPermission", error);
     setLocationGranted(false);
-    // showLocationPermissionAlert();
   }
 };
 
@@ -82,41 +74,30 @@ export const showLocationRequiredAlert = () => {
 export const startBackgroundTracking = async () => {
   await Location.startLocationUpdatesAsync("backgroundLocationUpdates", {
     accuracy: Location.Accuracy.High,
-    timeInterval: 600000, // Update every 10 minutes - 600000
+    timeInterval: 120000, // Update every 10 minutes - 600000
     distanceInterval: 0,
     showsBackgroundLocationIndicator: true, // Show location icon in status bar
   });
 };
 
 export const stopBackgroundTracking = async () => {
-  await Location.stopLocationUpdatesAsync("backgroundLocationUpdates");
+  try {
+    await Location.stopLocationUpdatesAsync("backgroundLocationUpdates");
+  } catch (error) {
+    console.log(error);
+  }
 };
 
-const defineLocationTask = (setCurrentLocation) => {
-  TaskManager.defineTask("backgroundLocationUpdates", ({ data, error }) => {
-    if (error) {
-      console.log("TaskManager error");
-      return;
-    }
-    // Process location data
-    const { locations } = data;
-    const {
-      coords: { latitude, longitude },
-    } = locations[0];
-    console.log("++++ Background location update:", { latitude, longitude });
-    setCurrentLocation({ longitude, latitude });
-  });
-};
-
-export const fetchAddress = async (location) => {
-  const { longitude, latitude } = location;
+export const fetchAddress = async (currentPosition) => {
+  const { lat, lon } = currentPosition;
   try {
     const { data } = await axios.get(
-      `${locationBaseUrl}?lat=${latitude}&lon=${longitude}&api_key=${API_KEY}`
+      `${locationBaseUrl}?lat=${lat}&lon=${lon}&api_key=${API_KEY}`
     );
 
-    console.log("address", data);
+    // console.log("address", data);
+    return data;
   } catch (error) {
-    console.log("error", error);
+    throw new Error(error);
   }
 };

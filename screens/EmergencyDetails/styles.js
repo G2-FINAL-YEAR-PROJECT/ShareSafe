@@ -12,14 +12,14 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     paddingVertical: 10,
   },
-  replyBtn: (commentIsValid) => {
+  replyBtn: (commentIsValid, uploadingComment) => {
     return {
       backgroundColor: COLORS.primary,
       alignItems: "center",
       paddingHorizontal: 20,
       paddingVertical: 7,
       borderRadius: 20,
-      opacity: commentIsValid ? 1 : 0.5,
+      opacity: commentIsValid && !uploadingComment ? 1 : 0.5,
     };
   },
 
