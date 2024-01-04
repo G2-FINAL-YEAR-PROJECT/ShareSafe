@@ -4,11 +4,9 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  Linking,
-  Alert,
 } from "react-native";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { COLORS, globalStyles } from "../../constants";
 import styles from "./styles";
 import { Button, PasswordField } from "../../ui";
@@ -18,7 +16,7 @@ import SelectDropdown from "react-native-select-dropdown";
 import { reportType } from "../../data";
 
 const Register = ({ navigation }) => {
-  const { register, loadingRegister, locationGranted } = useAuth();
+  const { register, loadingRegister } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNo, setPhoneNo] = useState("");
@@ -27,32 +25,7 @@ const Register = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const openAppSettings = () => {
-    Linking.openSettings();
-  };
-
   const handleRegister = async () => {
-    // if (!locationGranted) {
-    //   Alert.alert(
-    //     "Confirm",
-    //     "Give location access",
-    //     [
-    //       {
-    //         text: "No",
-    //         style: "cancel",
-    //       },
-    //       {
-    //         text: "Yes",
-    //         onPress: () => {
-    //           openAppSettings();
-    //         },
-    //       },
-    //     ],
-    //     { cancelable: false }
-    //   );
-    //   return;
-    // }
-
     // Validations
     if (!name.trim()) {
       alert("Name is required");
