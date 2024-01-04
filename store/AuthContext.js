@@ -3,6 +3,10 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 import * as Notifications from "expo-notifications";
 import { apiClient } from "../config";
 import { registerForPushNotificationsAsync } from "../services/notification";
+import {
+  requestLocationPermission,
+  stopBackgroundTracking,
+} from "../services/location";
 
 const AuthContext = createContext();
 
@@ -18,37 +22,45 @@ const AuthProvider = ({ children }) => {
 
   const [deviceExpoPushToken, setDeviceExpoPushToken] = useState("");
   const [notification, setNotification] = useState();
-  const notificationListener = useRef();
   const responseListener = useRef();
 
   const [currentLocation, setCurrentLocation] = useState({});
   const [locationGranted, setLocationGranted] = useState(false);
 
   useEffect(() => {
-    // requestLocationPermission();
     getAuthData();
+    // Notifications permission
     setupNotifications();
+    // Location permission
+    requestLocationPermission(setLocationGranted, setCurrentLocation);
 
     return () => {
-      Notifications.removeNotificationSubscription(
-        notificationListener.current
-      );
       Notifications.removeNotificationSubscription(responseListener.current);
+      stopBackgroundTracking();
     };
   }, []);
+
+  useEffect(() => {
+    const updateLocation = async () => {
+      const data = {
+        latitude: currentLocation.latitude.toString(),
+        longitude: currentLocation.longitude.toString(),
+      };
+      await apiClient.put("/users/update", data);
+      console.log("Location updated!");
+    };
+
+    if (currentLocation?.latitude && currentLocation?.longitude) {
+      console.log("currentLocation", currentLocation);
+      updateLocation();
+    }
+  }, [currentLocation]);
 
   const setupNotifications = async () => {
     const expoPushToken = await registerForPushNotificationsAsync();
     setDeviceExpoPushToken(expoPushToken);
 
-    // Handle notifications when the app is in the foreground
-    notificationListener.current =
-      Notifications.addNotificationReceivedListener((notification) => {
-        // const notificationData = notification.request.content.data;
-        // console.log("ForegroundListener:", notificationData, notification);
-      });
-
-    // Sets up a listener for notification responses (e.g., when a user taps on a notification)
+    // Sets up listener for notification response
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
         const notificationData = response.notification.request.content.data;
@@ -119,7 +131,7 @@ const AuthProvider = ({ children }) => {
       setLoadingRegister(true);
       const res = await apiClient.post("/auth/register", {
         ...data,
-        fcmToken: deviceExpoPushToken,
+        pushToken: deviceExpoPushToken,
       });
       const token = res?.data?.data?.tokens?.access?.token;
       const userData = res?.data?.data?.user;
@@ -169,6 +181,7 @@ const AuthProvider = ({ children }) => {
       value={{
         token,
         userData,
+        setUserData,
         loadingAuth,
         loadingLogin,
         loadingRegister,
@@ -176,7 +189,7 @@ const AuthProvider = ({ children }) => {
         register,
         logout,
         viewedOnboarding,
-        locationGranted,
+        // locationGranted,
         userProfile,
         setUserProfile,
         notification,
