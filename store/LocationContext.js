@@ -1,11 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import * as TaskManager from "expo-task-manager";
-import {
-  requestLocationPermission,
-  fetchAddress,
-  stopBackgroundTracking,
-} from "../services";
-
+import { requestLocationPermission, fetchAddress } from "../services";
 import { apiClient } from "../config";
 
 const LocationContext = createContext();
@@ -14,27 +8,8 @@ const LocationProvider = ({ children }) => {
   const [currentPosition, setCurrentPosition] = useState({});
   const [currentLocation, setCurrentLocation] = useState([]);
 
-  TaskManager.defineTask("backgroundLocationUpdates", ({ data, error }) => {
-    if (error) {
-      console.log("TaskManager error");
-      return;
-    }
-
-    // Process location data
-    const { locations } = data;
-    const {
-      coords: { latitude, longitude },
-    } = locations[0];
-    // console.log("++++ Background location update:", { latitude, longitude });
-    setCurrentPosition({ lat: latitude, lon: longitude });
-  });
-
   useEffect(() => {
-    requestLocationPermission();
-
-    return () => {
-      stopBackgroundTracking();
-    };
+    requestLocationPermission(setCurrentPosition);
   }, []);
 
   useEffect(() => {
