@@ -3,10 +3,7 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 import * as Notifications from "expo-notifications";
 import { apiClient } from "../config";
 import { registerForPushNotificationsAsync } from "../services/notification";
-import {
-  requestLocationPermission,
-  stopBackgroundTracking,
-} from "../services/location";
+import {} from "../services/location";
 
 const AuthContext = createContext();
 
@@ -24,37 +21,15 @@ const AuthProvider = ({ children }) => {
   const [notification, setNotification] = useState();
   const responseListener = useRef();
 
-  const [currentLocation, setCurrentLocation] = useState({});
-  const [locationGranted, setLocationGranted] = useState(false);
-
   useEffect(() => {
     getAuthData();
     // Notifications permission
     setupNotifications();
-    // Location permission
-    requestLocationPermission(setLocationGranted, setCurrentLocation);
 
     return () => {
       Notifications.removeNotificationSubscription(responseListener.current);
-      stopBackgroundTracking();
     };
   }, []);
-
-  useEffect(() => {
-    const updateLocation = async () => {
-      const data = {
-        latitude: currentLocation.latitude.toString(),
-        longitude: currentLocation.longitude.toString(),
-      };
-      await apiClient.put("/users/update", data);
-      console.log("Location updated!");
-    };
-
-    if (currentLocation?.latitude && currentLocation?.longitude) {
-      console.log("currentLocation", currentLocation);
-      updateLocation();
-    }
-  }, [currentLocation]);
 
   const setupNotifications = async () => {
     const expoPushToken = await registerForPushNotificationsAsync();

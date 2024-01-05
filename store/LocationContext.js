@@ -13,8 +13,6 @@ const LocationContext = createContext();
 const LocationProvider = ({ children }) => {
   const [currentPosition, setCurrentPosition] = useState({});
   const [currentLocation, setCurrentLocation] = useState([]);
-  const [locationGranted, setLocationGranted] = useState(false);
-  const [taskInitialized, setTaskInitialized] = useState(false);
 
   TaskManager.defineTask("backgroundLocationUpdates", ({ data, error }) => {
     if (error) {
@@ -22,9 +20,6 @@ const LocationProvider = ({ children }) => {
       return;
     }
 
-    if (data) {
-      setTaskInitialized(true);
-    }
     // Process location data
     const { locations } = data;
     const {
@@ -35,18 +30,12 @@ const LocationProvider = ({ children }) => {
   });
 
   useEffect(() => {
-    if (taskInitialized) {
-      requestLocationPermission(setLocationGranted);
-    }
-  }, [taskInitialized]);
+    requestLocationPermission();
 
-  useEffect(() => {
-    if (locationGranted) {
-      return () => {
-        stopBackgroundTracking();
-      };
-    }
-  }, [locationGranted]);
+    return () => {
+      stopBackgroundTracking();
+    };
+  }, []);
 
   useEffect(() => {
     if (currentPosition) {
@@ -76,7 +65,7 @@ const LocationProvider = ({ children }) => {
           if (res.data?.status !== 200) {
             throw new Error(res.data?.message);
           }
-          console.log(res.data);
+          // console.log(res.data);
         } catch (error) {
           console.log(error?.message);
         }

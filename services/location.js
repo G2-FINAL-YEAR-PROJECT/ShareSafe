@@ -6,7 +6,7 @@ import axios from "axios";
 // const LOCATION_TASK_NAME = "background-location-task";
 const locationBaseUrl = "https://geocode.maps.co/reverse";
 
-export const requestLocationPermission = async (setLocationGranted) => {
+export const requestLocationPermission = async () => {
   try {
     const { status: foregroundStatus } =
       await Location.requestForegroundPermissionsAsync();
@@ -19,19 +19,15 @@ export const requestLocationPermission = async (setLocationGranted) => {
       // console.log("backgroundStatus", backgroundStatus, foregroundStatus);
 
       if (backgroundStatus !== "granted") {
-        setLocationGranted(false);
         showBackgroundPermissionAlert();
         return;
       }
       // startBackgroundTracking();
-      setLocationGranted(true);
     } else {
-      setLocationGranted(false);
       showLocationRequiredAlert();
     }
   } catch (error) {
     console.log("requestLocationPermission", error);
-    setLocationGranted(false);
   }
 };
 
@@ -74,7 +70,7 @@ export const showLocationRequiredAlert = () => {
 export const startBackgroundTracking = async () => {
   await Location.startLocationUpdatesAsync("backgroundLocationUpdates", {
     accuracy: Location.Accuracy.High,
-    timeInterval: 120000, // Update every 10 minutes - 600000
+    timeInterval: 2000, // Update every 10 minutes - 600000
     distanceInterval: 0,
     showsBackgroundLocationIndicator: true, // Show location icon in status bar
   });
