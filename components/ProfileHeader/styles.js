@@ -28,6 +28,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.white,
     borderRadius: 50,
     resizeMode: "contain",
+    backgroundColor: COLORS.gray,
   },
 
   profileAction: {
