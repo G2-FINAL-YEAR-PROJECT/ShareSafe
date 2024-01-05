@@ -10,6 +10,8 @@ import { abbreviateNumber } from "js-abbreviation-number";
 import { useAuth } from "../../store";
 import { apiClient } from "../../config";
 import styles from "./styles";
+import placeHolderImg from "../../assets/images/placeholder.jpg";
+const oops = require("../../assets/images/oops.jpg");
 
 const PostCard = ({ post, postDetailIsActive, deletePost }) => {
   const { aspectRatio } = useAspectRatio(1, post);
@@ -72,7 +74,11 @@ const PostCard = ({ post, postDetailIsActive, deletePost }) => {
                 }
               >
                 <Image
-                  source={{ uri: post?.user?.profilePicture }}
+                  source={
+                    post?.user?.profilePicture
+                      ? { uri: post?.user?.profilePicture }
+                      : placeHolderImg
+                  }
                   style={styles.headerImage}
                 />
               </TouchableOpacity>
@@ -118,7 +124,7 @@ const PostCard = ({ post, postDetailIsActive, deletePost }) => {
             }}
           >
             <Image
-              source={{ uri: post?.thumbnail }}
+              source={post?.thumbnail ? { uri: post?.thumbnail } : oops}
               style={styles.postImage}
               resizeMode="contain"
             />

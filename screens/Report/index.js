@@ -8,14 +8,17 @@ import { useState, useEffect } from "react";
 import SelectDropdown from "react-native-select-dropdown";
 import styles from "./styles";
 import { usePickImage } from "../../hooks";
+import { fetchAddress } from "../../services";
+import { useLocationContext } from "../../store";
+import { uploadToCloudinary } from "../../helpers";
 
 const Report = ({ navigation, route }) => {
   const [reportTypeId, setReportTypeId] = useState("");
   const [inputIsFocused, setInputIsFocused] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [reportText, setReportText] = useState("");
-  const [channelValue, setChannelValue] = useState("");
-  const [channelContact, setChannelContact] = useState("");
+  const [channelValue, setChannelValue] = useState({});
 
   const [locationText, setLocationText] = useState("");
   const [locationOptions, setLocationOptions] = useState([]);
@@ -23,6 +26,11 @@ const Report = ({ navigation, route }) => {
 
   const [filteredChannel, setFilteredChannel] = useState([]);
   const [previewImage, setPreviewImage] = useState(null);
+
+  const { currentLocation } = useLocationContext();
+
+  // console.log(currentLocation);
+  // console.log(locationPosition);
 
   const handleChooseReportType = (id) => {
     setReportTypeId((prevId) => (prevId === id ? "" : id));
@@ -52,27 +60,60 @@ const Report = ({ navigation, route }) => {
     }
   }, [reportTypeId]);
 
-  // useEffect(() => {
-  //   navigation.addListener("focus", () => {
-  //     setReportTypeId("");
-  //     setInputIsFocused(false);
-  //     setReportText("");
-  //     setLocationText("");
-  //     setChannelValue("");
-  //     setChannelContact("");
-  //     setFilteredChannel([]);
-  //     setLocationPosition({});
-  //     setLocationText("");
-  //     // setPreviewImage(null);
-  //   });
+  const postIsValid =
+    reportText.trim().length > 0 && locationText.trim().length && channelValue;
 
-  //   return () => {
-  //     navigation.removeListener("focus");
-  //   };
-  // }, [navigation]);
+  const clearInput = () => {
+    setReportTypeId("");
+    setInputIsFocused(false);
+    setReportText("");
+    setLocationText("");
+    setChannelValue({});
+    setFilteredChannel([]);
+    setLocationPosition({});
+    setLocationOptions([]);
+    setLocationText("");
+    setPreviewImage(null);
+  };
 
-  const handleSubmit = () => {
-    navigation.navigate("ReportSuccess", { channelValue, channelContact });
+  const handleSubmit = async () => {
+    if (!postIsValid) {
+      alert("Please fill all required fields");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const imageUrl = await uploadToCloudinary(previewImage);
+      const address = await fetchAddress(locationPosition);
+      let payload = {
+        location: locationText,
+        status: "PENDING",
+        channel: channelValue?.id,
+        description: reportText,
+        boundaryPoint: address?.boundingbox,
+      };
+
+      if (previewImage?.trim().length > 0) {
+        payload.file = imageUrl;
+      }
+      const res = await apiClient.post("/emergency", payload);
+      if (res.data?.status !== 200) {
+        throw new Error(res.data?.message);
+      }
+      clearInput();
+      setIsLoading(false);
+      navigation.navigate("ReportSuccess", {
+        channelName: channelValue?.fullName,
+        channelContact: channelValue?.phoneNumber,
+      });
+    } catch (error) {
+      alert(error.message);
+      console.log("this error", error.message);
+      setIsLoading(false);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const fetchLocationSuggestions = async (text) => {
@@ -191,8 +232,12 @@ const Report = ({ navigation, route }) => {
                   alert("Please choose report type first");
                   return;
                 }
-                setChannelValue(selectedItem?.fullName);
-                setChannelContact(selectedItem?.phoneNumber);
+                const data = {
+                  fullName: selectedItem?.fullName,
+                  phoneNumber: selectedItem?.phoneNumber,
+                  id: selectedItem?.id,
+                };
+                setChannelValue(data);
               }}
               buttonTextAfterSelection={(selectedItem) => {
                 return selectedItem?.fullName
@@ -233,11 +278,18 @@ const Report = ({ navigation, route }) => {
 
           <View style={{ marginTop: 15 }}>
             <SelectDropdown
-              data={locationOptions}
+              data={
+                locationOptions?.length > 0 ? locationOptions : currentLocation
+              }
               onSelect={(selectedItem) => {
-                const location = `${selectedItem?.name} - ${selectedItem?.address}`;
-                setLocationText(location);
+                let location;
+                if (selectedItem?.address) {
+                  location = `${selectedItem?.name} - ${selectedItem?.address}`;
+                } else {
+                  location = selectedItem?.name;
+                }
 
+                setLocationText(location);
                 setLocationPosition(selectedItem.position); // {"lat": 6.484363, "lon": 3.199292}
               }}
               defaultButtonText={"Search Location"}
@@ -349,7 +401,11 @@ const Report = ({ navigation, route }) => {
         </View>
 
         {/* SUBMIT REPORT */}
-        <Button buttonStyle={{ marginTop: 43 }} onPress={handleSubmit}>
+        <Button
+          buttonStyle={{ marginTop: 43 }}
+          loading={isLoading}
+          onPress={handleSubmit}
+        >
           Submit
         </Button>
       </ScrollView>

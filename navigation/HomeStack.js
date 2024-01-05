@@ -6,7 +6,6 @@ import { COLORS, SIZES } from "../constants";
 import {
   Welcome,
   ReportSuccess,
-  Notifications,
   Search,
   Loading,
   PostDetails,

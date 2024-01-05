@@ -42,6 +42,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: COLORS.primary,
     borderRadius: 50,
+    backgroundColor: COLORS.gray,
   },
   imageContainer: {
     borderRadius: 50,

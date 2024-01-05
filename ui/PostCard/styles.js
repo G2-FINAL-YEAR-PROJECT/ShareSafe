@@ -30,6 +30,7 @@ const styles = StyleSheet.create({
     height: 35,
     borderRadius: 20,
     resizeMode: "contain",
+    backgroundColor: COLORS.gray,
   },
 
   username: {
