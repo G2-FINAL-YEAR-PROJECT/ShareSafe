@@ -28,14 +28,16 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon1.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.shareSafe.www",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "extra": {
       "eas": {
-        "projectId": "22e1513a-478b-43d2-953e-aca91a916efa"
+        "projectId": "27c34b57-0531-43a7-9651-f6724f507d47"
       }
     }
   }
