@@ -6,23 +6,12 @@ import axios from "axios";
 // const LOCATION_TASK_NAME = "background-location-task";
 const locationBaseUrl = "https://geocode.maps.co/reverse";
 
-export const requestLocationPermission = async () => {
+export const requestLocationPermission = async (setCurrentPosition) => {
   try {
     const { status: foregroundStatus } =
       await Location.requestForegroundPermissionsAsync();
-    // console.log("foregroundStatus", foregroundStatus);
-
     if (foregroundStatus === "granted") {
-      const { status: backgroundStatus } =
-        await Location.requestBackgroundPermissionsAsync();
-      // await Location.getBackgroundPermissionsAsync();
-      // console.log("backgroundStatus", backgroundStatus, foregroundStatus);
-
-      if (backgroundStatus !== "granted") {
-        showBackgroundPermissionAlert();
-        return;
-      }
-      // startBackgroundTracking();
+      startForegroundTracking(setCurrentPosition);
     } else {
       showLocationRequiredAlert();
     }
@@ -31,10 +20,10 @@ export const requestLocationPermission = async () => {
   }
 };
 
-export const showBackgroundPermissionAlert = () => {
+export const showGoToSettingsAlert = () => {
   Alert.alert(
-    "Enable background location",
-    'To receive emergency notifications, please choose "Allow all the time" for location access. Open app settings to update your preferences.',
+    "Go to settings",
+    'To receive emergency notifications, please choose "Allow while using the app" for location access. Open app settings to update your preferences.',
     [
       {
         text: "Cancel",
@@ -60,28 +49,27 @@ export const showLocationRequiredAlert = () => {
       },
       {
         text: "OK",
-        onPress: () => showBackgroundPermissionAlert(),
+        onPress: () => showGoToSettingsAlert(),
       },
     ],
     { cancelable: false }
   );
 };
 
-export const startBackgroundTracking = async () => {
-  await Location.startLocationUpdatesAsync("backgroundLocationUpdates", {
-    accuracy: Location.Accuracy.High,
-    timeInterval: 2000, // Update every 10 minutes - 600000
-    distanceInterval: 0,
-    showsBackgroundLocationIndicator: true, // Show location icon in status bar
-  });
-};
-
-export const stopBackgroundTracking = async () => {
-  try {
-    await Location.stopLocationUpdatesAsync("backgroundLocationUpdates");
-  } catch (error) {
-    console.log(error);
-  }
+export const startForegroundTracking = async (setCurrentPosition) => {
+  await Location.watchPositionAsync(
+    {
+      accuracy: Location.Accuracy.High,
+      timeInterval: 35000,
+      distanceInterval: 0,
+      mayShowUserSettingsDialog: false,
+    },
+    (location) => {
+      // console.log("update location!", location.coords);
+      const { latitude, longitude } = location?.coords;
+      setCurrentPosition({ lat: latitude, lon: longitude });
+    }
+  );
 };
 
 export const fetchAddress = async (currentPosition) => {
