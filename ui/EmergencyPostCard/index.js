@@ -13,6 +13,7 @@ import { capitalize } from "../../helpers";
 import styles from "./styles";
 
 const placeholder = require("../../assets/images/placeholder.jpg");
+const oops = require("../../assets/images/oops.jpg");
 
 const EmergencyPostCard = ({
   post,
@@ -194,7 +195,7 @@ const EmergencyPostCard = ({
             }}
           >
             <Image
-              source={{ uri: post?.file }}
+              source={post?.file ? { uri: post?.file } : oops}
               style={styles.postImage}
               resizeMode="contain"
             />

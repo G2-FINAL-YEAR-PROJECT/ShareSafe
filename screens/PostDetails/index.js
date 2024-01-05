@@ -4,27 +4,40 @@ import {
   View,
   ScrollView,
   Keyboard,
+  ActivityIndicator,
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { COLORS, SIZES } from "../../constants";
-import { PostCard, TextAreaInput } from "../../ui";
-import { useHideKeyBoard, useSinglePost, useDeletePost } from "../../hooks";
+import { PostCard, TextAreaInput, CommentCard } from "../../ui";
+import {
+  useHideKeyBoard,
+  useSinglePost,
+  useDeletePost,
+  useComments,
+} from "../../hooks";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import styles from "./styles";
 import ErrorScreen from "../ErrorScreen";
 import Loading from "../Loading";
-
+import { apiClient } from "../../config";
+import { useAuth } from "../../store";
 const PostDetails = () => {
   const route = useRoute();
 
   const [comment, setComment] = useState("");
   const [commentIsFocused, setCommentIsFocused] = useState(false);
+  const [uploadingComment, setUploadingComment] = useState(false);
+
+  const { userData } = useAuth();
 
   const { isLoading, errorMessage, singlePost } = useSinglePost(
     "/post",
     route?.params?.post?.id
   );
+
+  const { loadingComment, setCommentList, commentList, commentError } =
+    useComments("/post/comment", route?.params?.post?.id, singlePost);
 
   const { handlePostDelete } = useDeletePost();
 
@@ -36,12 +49,45 @@ const PostDetails = () => {
 
   useHideKeyBoard(setCommentIsFocused);
 
-  const handleReply = () => {
-    if (!commentIsValid) return;
-    console.log(comment);
+  const handleReply = async () => {
+    setUploadingComment(true);
+    try {
+      const payload = {
+        text: comment,
+      };
+      const res = await apiClient.post(
+        `/post/comment/${route?.params?.post?.id}`,
+        payload
+      );
 
-    setComment("");
-    Keyboard.dismiss();
+      if (res.data?.status !== 200) {
+        throw new Error(res.data?.message);
+      }
+
+      const { data } = res.data;
+
+      const newComment = {
+        entityType: data?.entityType,
+        id: data?.id,
+        postId: data?.postId,
+        text: data?.text,
+        user: {
+          fullName: userData?.fullName,
+          id: userData?.id,
+          profilePicture: userData?.profilePicture,
+        },
+      };
+      setUploadingComment(false);
+      alert("commented successfully");
+      setComment("");
+      setCommentList((prev) => [...prev, newComment]);
+      Keyboard.dismiss();
+    } catch (error) {
+      alert(error?.data?.message);
+      setUploadingComment(false);
+    } finally {
+      setUploadingComment(false);
+    }
   };
 
   return (
@@ -63,6 +109,20 @@ const PostDetails = () => {
               postDetailIsActive
               deletePost={deletePost.bind(null, "PostDetails")}
             />
+          )
+        )}
+
+        {!isLoading && loadingComment ? (
+          <Loading />
+        ) : commentError ? (
+          <ErrorScreen message={commentError} />
+        ) : (
+          commentList && (
+            <View style={{ rowGap: 8, paddingBottom: 200 }}>
+              {commentList?.map((item) => (
+                <CommentCard key={item?.id} comment={item} />
+              ))}
+            </View>
           )
         )}
       </ScrollView>
@@ -101,11 +161,15 @@ const PostDetails = () => {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.replyBtn(commentIsValid)}
+              style={styles.replyBtn(commentIsValid, uploadingComment)}
               onPress={handleReply}
-              disabled={!commentIsValid}
+              disabled={!commentIsValid || uploadingComment}
             >
-              <Text style={styles.replyText}>Reply</Text>
+              {uploadingComment ? (
+                <ActivityIndicator size="small" color={COLORS.white} />
+              ) : (
+                <Text style={styles.replyText}>Reply</Text>
+              )}
             </TouchableOpacity>
           </View>
         )}

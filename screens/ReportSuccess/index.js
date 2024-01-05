@@ -40,7 +40,7 @@ const ReportSuccess = ({ navigation }) => {
       </Text>
       <View style={{ width: "100%", marginTop: 17 }}>
         <Button icon={phone} textStyle={{ fontSize: 14 }} onPress={handleCall}>
-          {params.channelValue}
+          {params.channelName}
         </Button>
         <Button onPress={() => navigation.navigate("Home")}>Go Home</Button>
       </View>
