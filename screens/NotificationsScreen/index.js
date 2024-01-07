@@ -18,7 +18,7 @@ import Loading from "../Loading";
 import ErrorScreen from "../ErrorScreen";
 
 const NotificationsScreen = ({ navigation }) => {
-  const { notificationCount, setNotificationCount } = useAuth();
+  const { setNotificationCount } = useAuth();
 
   const [showEmergency, setShowEmergency] = useState(true);
   const [showPost, setShowPost] = useState(true);
