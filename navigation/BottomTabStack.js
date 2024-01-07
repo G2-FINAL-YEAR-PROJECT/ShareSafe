@@ -1,11 +1,12 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Text } from "react-native";
-import { Report, CreatePost, Notifications } from "../screens";
+import { Text, View } from "react-native";
+import { Report, CreatePost, NotificationsScreen } from "../screens";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import TopTabStack from "./TopTabStack";
 import MessageTabStack from "./MessageTabStack";
 import { COLORS } from "../constants";
 import { Header } from "../ui";
+import { useAuth } from "../store";
 import { LocationProvider } from "../store";
 
 const Tab = createBottomTabNavigator();
@@ -22,6 +23,9 @@ const BottomTabStack = () => {
       backgroundColor: COLORS.primary,
     },
   };
+
+  const { notificationCount, setNotificationCount } = useAuth();
+
   return (
     <LocationProvider>
       <Tab.Navigator screenOptions={screenOptions}>
@@ -160,12 +164,44 @@ const BottomTabStack = () => {
 
         <Tab.Screen
           name="Notifications"
-          component={Notifications}
+          component={NotificationsScreen}
           options={{
             headerShown: false,
             tabBarIcon: () => {
               return (
-                <Ionicons name="notifications" size={24} color={COLORS.white} />
+                <View>
+                  <Ionicons
+                    name="notifications"
+                    size={notificationCount > 0 ? 30 : 24}
+                    color={COLORS.white}
+                  />
+                  {notificationCount > 0 && (
+                    <View
+                      style={{
+                        justifyContent: "center",
+                        alignItems: "center",
+                        backgroundColor: COLORS.red,
+                        width: 18,
+                        height: 18,
+
+                        borderRadius: 10,
+                        position: "absolute",
+                        right: 0,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          color: COLORS.white,
+                          fontFamily: "semibold",
+                          textAlign: "center",
+                          fontSize: 14,
+                        }}
+                      >
+                        {notificationCount}
+                      </Text>
+                    </View>
+                  )}
+                </View>
               );
             },
 

@@ -27,7 +27,8 @@ const EditProfile = () => {
   const [loadingDelete, setLoadingDelete] = useState(false);
 
   const [inputData, setInputData] = useState(userData);
-  const [password, setPassword] = useState("");
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [previewImage, setPreviewImage] = useState(null);
@@ -70,21 +71,37 @@ const EditProfile = () => {
     }
   };
 
-  const handleChangePassword = () => {
+  const handleChangePassword = async () => {
     // Validate password
-    if (password.length < 8) {
+    if (newPassword.length < 8 || oldPassword.length < 8) {
       alert("Password must be at least 8 characters");
       return;
     }
 
-    if (password !== confirmPassword) {
+    if (newPassword !== confirmPassword) {
       alert("Password does not match!");
       return;
     }
 
-    // setLoadingPW(true);
+    setLoadingPW(true);
+    try {
+      const res = await apiClient.put("/users/update/password", {
+        oldPassword,
+        newPassword,
+      });
 
-    console.log(password);
+      if (res.data?.status !== 200) {
+        throw new Error(res.data?.message);
+      }
+      alert("Password updated successfully");
+      setLoadingPW(false);
+    } catch (error) {
+      alert(error?.message);
+      console.log(error?.message);
+      setLoadingPW(false);
+    } finally {
+      setLoadingPW(false);
+    }
   };
 
   const handleDeleteAccount = async () => {
@@ -225,14 +242,21 @@ const EditProfile = () => {
 
         <View style={styles.formGroup}>
           <View style={globalStyles.flex}>
-            <Text style={globalStyles.label}>Password</Text>
+            <Text style={globalStyles.label}>Old Password</Text>
           </View>
-          <PasswordField password={password} setPassword={setPassword} />
+          <PasswordField password={oldPassword} setPassword={setOldPassword} />
         </View>
 
         <View style={styles.formGroup}>
           <View style={globalStyles.flex}>
-            <Text style={globalStyles.label}>Password</Text>
+            <Text style={globalStyles.label}>New Password</Text>
+          </View>
+          <PasswordField password={newPassword} setPassword={setNewPassword} />
+        </View>
+
+        <View style={styles.formGroup}>
+          <View style={globalStyles.flex}>
+            <Text style={globalStyles.label}>Confirm New Password</Text>
           </View>
           <PasswordField
             password={confirmPassword}

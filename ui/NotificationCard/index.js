@@ -1,20 +1,36 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { formatTime } from "../../helpers";
+const placeholder = require("../../assets/images/placeholder.jpg");
 
 const NotificationCard = ({ item, forPosts }) => {
+  const navigation = useNavigation();
+  const profilePicture = item?.user?.profilePicture
+    ? { uri: item?.user?.profilePicture }
+    : placeholder;
+  const title = `${item?.user?.fullName} reported an emergency`;
   return (
-    <TouchableOpacity>
+    <TouchableOpacity
+      onPress={() =>
+        navigation.navigate("EmergencyDetails", {
+          post: { id: item?.emergency },
+        })
+      }
+    >
       <View style={styles.card}>
         <View style={styles.imageBox}>
-          <Image style={styles.image(forPosts)} source={item.image} />
+          <Image style={styles.image(forPosts)} source={profilePicture} />
           <View style={{ flexBasis: "65%" }}>
-            <Text style={styles.title}>{item.title}</Text>
+            <Text style={styles.title} numberOfLines={1}>
+              {title}
+            </Text>
             <Text style={styles.message} numberOfLines={2}>
-              {item.message}
+              {item?.body}
             </Text>
           </View>
         </View>
 
-        <Text style={styles.time}>{item.time}</Text>
+        <Text style={styles.time}>{formatTime(item?.createdAt)}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -27,9 +43,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    // paddingLeft: 8,
-    // paddingRight: 8,
-    // paddingVertical: 6,
   },
 
   imageBox: {
