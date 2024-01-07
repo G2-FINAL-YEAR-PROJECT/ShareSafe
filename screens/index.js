@@ -11,7 +11,7 @@ export { default as Home } from "./Home";
 export { default as InboxTab } from "./InboxTab";
 export { default as LikesTab } from "./LikesTab";
 export { default as Loading } from "./Loading";
-export { default as Notifications } from "./Notifications";
+export { default as NotificationsScreen } from "./NotificationsScreen";
 export { default as Onboarding } from "./Onboarding";
 export { default as PostDetails } from "./PostDetails";
 export { default as Profile } from "./Profile";

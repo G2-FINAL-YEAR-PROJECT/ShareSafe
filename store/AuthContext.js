@@ -19,6 +19,8 @@ const AuthProvider = ({ children }) => {
 
   const [deviceExpoPushToken, setDeviceExpoPushToken] = useState("");
   const [notification, setNotification] = useState();
+  const [notificationCount, setNotificationCount] = useState(0);
+  const notificationListener = useRef();
   const responseListener = useRef();
 
   useEffect(() => {
@@ -27,6 +29,9 @@ const AuthProvider = ({ children }) => {
     setupNotifications();
 
     return () => {
+      Notifications.removeNotificationSubscription(
+        notificationListener.current
+      );
       Notifications.removeNotificationSubscription(responseListener.current);
     };
   }, []);
@@ -34,6 +39,12 @@ const AuthProvider = ({ children }) => {
   const setupNotifications = async () => {
     const expoPushToken = await registerForPushNotificationsAsync();
     setDeviceExpoPushToken(expoPushToken);
+
+    notificationListener.current =
+      Notifications.addNotificationReceivedListener((notification) => {
+        // update notification(Count)
+        setNotificationCount((prevCount) => prevCount + 1);
+      });
 
     // Sets up listener for notification response
     responseListener.current =
@@ -164,11 +175,12 @@ const AuthProvider = ({ children }) => {
         register,
         logout,
         viewedOnboarding,
-        // locationGranted,
         userProfile,
         setUserProfile,
         notification,
         setNotification,
+        notificationCount,
+        setNotificationCount,
       }}
     >
       {children}
