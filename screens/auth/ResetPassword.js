@@ -3,10 +3,10 @@ import { globalStyles } from "../../constants";
 import styles from "./styles";
 import { Button, PasswordField } from "../../ui";
 import { useState } from "react";
-import axios from "axios";
+import { apiClient } from "../../config";
 
 const ResetPassword = ({ route, navigation }) => {
-  const { token } = route.params?.token;
+  const { email, otp } = route.params;
   const [loading, setLoading] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -25,12 +25,11 @@ const ResetPassword = ({ route, navigation }) => {
 
     try {
       setLoading(true);
-      const baseUrl = "https://share-safe-kn9v.onrender.com/auth";
-      const res = await axios.post(baseUrl + "/reset_password?token=" + token, {
+      const res = await apiClient.post("/auth/reset_password?token=" + otp, {
+        email,
         password,
-        confirm_password: confirmPassword,
+        confirmPassword,
       });
-      console.log(res.data);
 
       // Error handling
       if (res.data.status !== 200) {
@@ -38,7 +37,7 @@ const ResetPassword = ({ route, navigation }) => {
         return;
       }
 
-      alert("Password reset successfully. Please log in");
+      alert("Password reset successful. Please log in");
       navigation.navigate("Login");
     } catch (error) {
       console.log(error);
@@ -52,7 +51,9 @@ const ResetPassword = ({ route, navigation }) => {
     <View style={globalStyles.container}>
       <View style={styles.header}>
         <Text style={globalStyles.h1}>Reset Password</Text>
-        <Text style={styles.subHeading}>Set the new password for your account</Text>
+        <Text style={styles.subHeading}>
+          Set the new password for your account
+        </Text>
       </View>
 
       <View style={styles.formGroup}>
@@ -62,7 +63,10 @@ const ResetPassword = ({ route, navigation }) => {
 
       <View style={styles.formGroup}>
         <Text style={globalStyles.label}>Confirm Password</Text>
-        <PasswordField password={confirmPassword} setPassword={setConfirmPassword} />
+        <PasswordField
+          password={confirmPassword}
+          setPassword={setConfirmPassword}
+        />
       </View>
 
       <Button onPress={handleSubmit} loading={loading}>
