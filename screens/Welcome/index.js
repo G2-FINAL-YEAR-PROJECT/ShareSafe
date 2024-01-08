@@ -1,4 +1,10 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
 import { COLORS, globalStyles } from "../../constants";
 import { useAuth } from "../../store";
 import { Button } from "../../ui";
@@ -45,14 +51,19 @@ const Welcome = () => {
     }
     setLoading(true);
     try {
-      const res = await apiClient.put("/users/follow", { users: selectedItems });
+      const res = await apiClient.put("/users/follow", {
+        users: selectedItems,
+      });
       if (res.data.status !== 200) {
         alert("An error occurred. Please try again");
         return;
       }
       // Go to home screen
       await AsyncStorage.removeItem("@showWelcomeScreen");
-      navigator.navigate("BottomTabStack");
+      navigator.reset({
+        index: 0,
+        routes: [{ name: "BottomTabStack" }],
+      });
     } catch (error) {
       console.log("showWelcomeScreen: ", error);
       alert("An error occurred. Please try again");
@@ -64,12 +75,19 @@ const Welcome = () => {
   return (
     <ScrollView>
       <View style={styles.container}>
-        <Text style={[globalStyles.h2, { textAlign: "center", textTransform: "capitalize" }]}>
+        <Text
+          style={[
+            globalStyles.h2,
+            { textAlign: "center", textTransform: "capitalize" },
+          ]}
+        >
           Welcome, {userData?.fullName}
         </Text>
 
         <Text style={styles.heading}>Select who to follow</Text>
-        <Text style={styles.sub}>We have made available the reliable sources just for you</Text>
+        <Text style={styles.sub}>
+          We have made available the reliable sources just for you
+        </Text>
 
         <View style={styles.welcomeGrid}>
           {welcomeData.map((item) => (
@@ -79,14 +97,23 @@ const Welcome = () => {
               style={{ marginBottom: 16, marginRight: 15 }}
               onPress={() => onItemClick(item.id)}
             >
-              <Text style={[styles.gridItem, selectedItems.includes(item.id) && styles.selected]}>
+              <Text
+                style={[
+                  styles.gridItem,
+                  selectedItems.includes(item.id) && styles.selected,
+                ]}
+              >
                 {item.fullName}
               </Text>
             </TouchableOpacity>
           ))}
         </View>
 
-        <Button onPress={handleSubmit} loading={loading} buttonStyle={{ marginTop: 45 }}>
+        <Button
+          onPress={handleSubmit}
+          loading={loading}
+          buttonStyle={{ marginTop: 45 }}
+        >
           Continue
         </Button>
       </View>
