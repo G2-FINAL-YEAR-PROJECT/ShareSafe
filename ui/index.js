@@ -9,3 +9,4 @@ export { default as SearchMessageInput } from "./SearchMessageInput";
 export { default as TextAreaInput } from "./TextAreaInput";
 export { default as ChatList } from "./ChatList";
 export { default as CommentCard } from "./CommentCard";
+export { default as UserCard } from "./UserCard";

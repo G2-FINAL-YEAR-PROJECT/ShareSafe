@@ -49,6 +49,7 @@ const Report = ({ navigation, route }) => {
         if (res.data.status !== 200) {
           throw new Error(res.data.message);
         }
+
         setFilteredChannel(res.data.data.results);
       } catch (error) {
         console.log(error.message);
@@ -86,12 +87,15 @@ const Report = ({ navigation, route }) => {
     try {
       const imageUrl = await uploadToCloudinary(previewImage);
       const address = await fetchAddress(locationPosition);
+
+      const boundingBox = address?.boundingbox?.map((item) => Number(item));
+
       let payload = {
         location: locationText,
         status: "PENDING",
         channel: channelValue?.id,
         description: reportText,
-        boundaryPoint: address?.boundingbox,
+        boundaryPoint: boundingBox,
       };
 
       if (previewImage?.trim().length > 0) {

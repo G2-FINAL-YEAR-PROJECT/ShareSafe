@@ -5,3 +5,4 @@ export * from "./formatTime";
 export * from "./formatTime";
 export * from "./capitalize";
 export * from "./uploadToCloudinary";
+export * from "./sendPasswordResetOTP";

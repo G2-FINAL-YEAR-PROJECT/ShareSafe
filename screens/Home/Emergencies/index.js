@@ -1,14 +1,16 @@
-import { View, FlatList } from "react-native";
+import { View, FlatList, Text } from "react-native";
 import { useState } from "react";
 import { EmergencyPostCard, SearchInput } from "../../../ui";
-import { COLORS, SIZES } from "../../../constants";
+import { COLORS, SIZES, globalStyles } from "../../../constants";
 import { useFetch, useDeletePost } from "../../../hooks";
 import Loading from "../../Loading";
 import ErrorScreen from "../../ErrorScreen";
+import { apiClient } from "../../../config";
 
 const Emergencies = () => {
   const [searchString, setSearchString] = useState("");
   const [inputIsFocused, setInputIsFocused] = useState(false);
+  const [searchResult, setSearchResult] = useState([]);
 
   const {
     data: allEmergencies,
@@ -21,6 +23,16 @@ const Emergencies = () => {
 
   const deletePost = (page, postId) => {
     handlePostDelete(page, "/emergency", postId, setData);
+  };
+
+  const handleSearch = async (text) => {
+    setSearchString(text);
+    if (text.length > 2) {
+      const res = await apiClient.get("emergency?search=" + text);
+      setSearchResult(res.data.data.results);
+    }
+    // Reset search result
+    if (!text) setSearchResult([]);
   };
 
   return (
@@ -45,14 +57,25 @@ const Emergencies = () => {
               value={searchString}
               placeholder="Search emergencies"
               inputIsFocused={inputIsFocused}
-              handleChange={(text) => setSearchString(text)}
+              handleChange={handleSearch}
               handleFocus={() => setInputIsFocused(true)}
               handleBlur={() => setInputIsFocused(false)}
             />
           </View>
 
+          {!searchResult.length && searchString && (
+            <Text
+              style={[
+                globalStyles.h3,
+                { textAlign: "center", marginVertical: 12 },
+              ]}
+            >
+              No search result
+            </Text>
+          )}
+
           <FlatList
-            data={allEmergencies}
+            data={searchString.length ? searchResult : allEmergencies}
             renderItem={({ item }) => (
               <EmergencyPostCard
                 post={item}

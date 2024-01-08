@@ -23,6 +23,7 @@
     "expo-constants": "~14.4.2",
     "expo-device": "~5.4.0",
     "expo-font": "~11.4.0",
+    "expo-image-picker": "~14.3.2",
     "expo-location": "~16.1.0",
     "expo-notifications": "~0.20.1",
     "expo-splash-screen": "~0.20.5",
@@ -39,7 +40,7 @@
     "react-native-screens": "~3.22.0",
     "react-native-select-dropdown": "^3.4.0",
     "react-native-tab-view": "^3.5.2",
-    "expo-image-picker": "~14.3.2"
+    "socket.io-client": "^4.7.3"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

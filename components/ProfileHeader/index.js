@@ -200,7 +200,8 @@ const ProfileHeader = () => {
       {!isLoading && (
         <View style={styles.metric}>
           <Text style={styles.following("regular")}>
-            {currentUser?.followers?.length} followers
+            {currentUser?.followers?.length}{" "}
+            {currentUser?.followers?.length > 1 ? "followers" : "follower"}
           </Text>
           <Text style={styles.following("regular")}>
             {currentUser?.following?.length} following

@@ -3,8 +3,7 @@ import { useState } from "react";
 import { globalStyles } from "../../constants";
 import styles from "./styles";
 import { Button } from "../../ui";
-import { validateEmail } from "../../helpers";
-import axios from "axios";
+import { sendPasswordResetOTP, validateEmail } from "../../helpers";
 
 const ForgotPassword = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
@@ -19,16 +18,7 @@ const ForgotPassword = ({ navigation }) => {
 
     try {
       setLoading(true);
-      const baseUrl = "https://share-safe-kn9v.onrender.com/auth";
-      const res = await axios.post(baseUrl + "/send_verification_email", { email });
-
-      // Error handling
-      if (res.data.status !== 200) {
-        alert(res?.data?.message ?? "An error occurred. Please try again");
-        return;
-      }
-
-      alert("A verification code has been sent to your email.");
+      await sendPasswordResetOTP(email);
       navigation.navigate("VerifyOTP", { email });
     } catch (error) {
       console.log(error);
