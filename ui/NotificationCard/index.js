@@ -5,10 +5,10 @@ const placeholder = require("../../assets/images/placeholder.jpg");
 
 const NotificationCard = ({ item, forPosts }) => {
   const navigation = useNavigation();
-  const profilePicture = item?.user?.profilePicture
+  const profilePicture = item?.postedBy?.profilePicture
     ? { uri: item?.user?.profilePicture }
     : placeholder;
-  const title = `${item?.user?.fullName} reported an emergency`;
+  const title = `${item?.postedBy?.fullName} reported an emergency`;
   return (
     <TouchableOpacity
       onPress={() =>

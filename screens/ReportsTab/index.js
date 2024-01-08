@@ -58,6 +58,7 @@ const ReportsTab = () => {
               />
             )}
             keyExtractor={(item) => item.id}
+            showsVerticalScrollIndicator={false}
           />
         </View>
       )}
