@@ -75,8 +75,8 @@ const Register = ({ navigation }) => {
   };
 
   return (
-    <ScrollView>
-      <View style={globalStyles.container}>
+    <ScrollView style={{ marginTop: 28 }}>
+      <View style={[globalStyles.container, { marginTop: 0 }]}>
         <View style={styles.header}>
           <Text style={globalStyles.h1}>Create and account</Text>
           <Text style={styles.subHeading}>Be a part of SafeShare</Text>
