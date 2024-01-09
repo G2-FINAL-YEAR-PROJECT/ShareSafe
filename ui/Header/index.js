@@ -3,20 +3,46 @@ import { Ionicons } from "@expo/vector-icons";
 import { Recommended } from "../../components";
 import { COLORS } from "../../constants";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import placeHolderImg from "../../assets/images/placeholder.jpg";
 import { useAuth } from "../../store";
+import { useEffect, useState } from "react";
 
 const Header = ({ showBack, showSearchProfile, showLogo, showRecommended }) => {
   const navigation = useNavigation();
 
   const { userData } = useAuth();
 
+  const [userInfo, setUserInfo] = useState(userData);
+
+  const getUserData = async () => {
+    try {
+      const data = await AsyncStorage.getItem("userData");
+      if (data !== null) {
+        setUserInfo(JSON.parse(data)?.userData);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribeFocus = navigation.addListener("focus", getUserData);
+    return () => {
+      unsubscribeFocus();
+    };
+  }, [navigation]);
+
   return (
     <View style={{ marginTop: showRecommended && 30 }}>
       <View style={[styles.header, { width: "100%" }]}>
         <View style={styles.headerLeft}>
           {showLogo && (
-            <Image source={require("../../assets/images/Logo.png")} width={37} height={34} />
+            <Image
+              source={require("../../assets/images/Logo.png")}
+              width={37}
+              height={34}
+            />
           )}
 
           {showBack && (
@@ -50,12 +76,16 @@ const Header = ({ showBack, showSearchProfile, showLogo, showRecommended }) => {
               >
                 <Image
                   source={
-                    userData?.profilePicture ? { uri: userData?.profilePicture } : placeHolderImg
+                    userInfo?.profilePicture
+                      ? { uri: userInfo?.profilePicture }
+                      : placeHolderImg
                   }
                   style={{
                     width: 37,
                     height: 37,
                     borderRadius: 50,
+                    borderWidth: 2,
+                    borderColor: COLORS.respondBg,
                     resizeMode: "contain",
                   }}
                 />

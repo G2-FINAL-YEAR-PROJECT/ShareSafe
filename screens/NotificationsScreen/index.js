@@ -56,8 +56,6 @@ const NotificationsScreen = ({ navigation }) => {
         throw new Error(res.data?.message);
       }
 
-      console.log(res.data?.data);
-
       setAllNotifications(res.data?.data);
       setLoadingNotification(false);
       setNotificationCount(0);

@@ -156,6 +156,7 @@ const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     await AsyncStorage.removeItem("@AuthData");
+    await AsyncStorage.removeItem("userData");
     setToken(null);
     setUserData(null);
     // Remove the Bearer token in the headers
