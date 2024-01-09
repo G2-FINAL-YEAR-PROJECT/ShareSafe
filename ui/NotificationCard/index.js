@@ -6,7 +6,7 @@ const placeholder = require("../../assets/images/placeholder.jpg");
 const NotificationCard = ({ item, forPosts }) => {
   const navigation = useNavigation();
   const profilePicture = item?.postedBy?.profilePicture
-    ? { uri: item?.user?.profilePicture }
+    ? { uri: item?.postedBy?.profilePicture }
     : placeholder;
   const title = `${item?.postedBy?.fullName} reported an emergency`;
   return (

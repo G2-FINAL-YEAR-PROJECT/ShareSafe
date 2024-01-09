@@ -9,18 +9,21 @@ import {
   Alert,
 } from "react-native";
 import { COLORS, SIZES, globalStyles } from "../../constants";
-import React, { useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useState, useEffect } from "react";
 import Button from "../../ui/Button";
 import { PasswordField } from "../../ui";
 import { Ionicons } from "@expo/vector-icons";
-import { uploadToCloudinary, validateEmail } from "../../helpers";
+import { uploadToCloudinary } from "../../helpers";
 import { useAuth } from "../../store";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { apiClient } from "../../config";
 import { usePickImage } from "../../hooks";
+import { useNavigation } from "@react-navigation/native";
 
 const EditProfile = () => {
-  const { userData, setUserData, logout } = useAuth();
+  const navigation = useNavigation();
+  const { userData, logout } = useAuth();
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [loadingProfile, setLoadingProfile] = useState(false);
   const [loadingPW, setLoadingPW] = useState(false);
@@ -34,6 +37,26 @@ const EditProfile = () => {
   const [previewImage, setPreviewImage] = useState(null);
 
   const { pickImage } = usePickImage(setPreviewImage);
+
+  const [userInfo, setUserInfo] = useState(userData);
+
+  const getUserData = async () => {
+    try {
+      const data = await AsyncStorage.getItem("userData");
+      if (data !== null) {
+        setUserInfo(JSON.parse(data)?.userData);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribeFocus = navigation.addListener("focus", getUserData);
+    return () => {
+      unsubscribeFocus();
+    };
+  }, [navigation]);
 
   const handleProfileUpdate = async () => {
     // Validate input fields
@@ -60,7 +83,7 @@ const EditProfile = () => {
       }
       const res = await apiClient.put("/users/update", data);
       const userData = res?.data?.data;
-      setUserData(userData);
+      await AsyncStorage.setItem("userData", JSON.stringify({ userData }));
       setLoadingProfile(false);
       alert("Profile updated successfully!");
     } catch (error) {
@@ -132,8 +155,8 @@ const EditProfile = () => {
     );
   };
 
-  const ProfilePhoto = userData.profilePicture
-    ? { uri: userData?.profilePicture }
+  const ProfilePhoto = userInfo.profilePicture
+    ? { uri: userInfo?.profilePicture }
     : require("../../assets/images/placeholder.jpg");
 
   return (
