@@ -18,8 +18,10 @@ const ForgotPassword = ({ navigation }) => {
 
     try {
       setLoading(true);
-      await sendPasswordResetOTP(email);
-      navigation.navigate("VerifyOTP", { email });
+      const res = await sendPasswordResetOTP(email);
+      if (res?.data?.status == 200) {
+        navigation.navigate("VerifyOTP", { email });
+      }
     } catch (error) {
       console.log(error);
       alert("An error occurred. Please try again");

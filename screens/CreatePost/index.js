@@ -18,6 +18,7 @@ import { useAuth } from "../../store";
 import styles from "./styles";
 import { apiClient } from "../../config";
 import { usePickImage } from "../../hooks";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const placeholder = require("../../assets/images/placeholder.jpg");
 
@@ -30,6 +31,26 @@ const CreatePost = ({ route }) => {
   const { userData } = useAuth();
 
   const postIsValid = comment.trim().length > 0 && previewImage?.length > 0;
+
+  const [userInfo, setUserInfo] = useState(userData);
+
+  const getUserData = async () => {
+    try {
+      const data = await AsyncStorage.getItem("userData");
+      if (data !== null) {
+        setUserInfo(JSON.parse(data)?.userData);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribeFocus = navigation.addListener("focus", getUserData);
+    return () => {
+      unsubscribeFocus();
+    };
+  }, [navigation]);
 
   useEffect(() => {
     setPreviewImage(route?.params?.imageUri);
@@ -124,22 +145,22 @@ const CreatePost = ({ route }) => {
               onPress={() =>
                 navigation.navigate("ProfileTabStack", {
                   screen: "Profile",
-                  params: { user: userData },
+                  params: { user: userInfo },
                 })
               }
             >
               <Image
                 style={styles.image}
                 source={
-                  userData?.profilePicture
-                    ? { uri: userData?.profilePicture }
+                  userInfo?.profilePicture
+                    ? { uri: userInfo?.profilePicture }
                     : placeholder
                 }
               />
             </TouchableOpacity>
             <View>
               <Text style={styles.textStyle(16, COLORS.black2, "semibold")}>
-                {userData?.fullName}
+                {userInfo?.fullName}
               </Text>
               <Text
                 style={[

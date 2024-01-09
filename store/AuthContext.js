@@ -85,7 +85,11 @@ const AuthProvider = ({ children }) => {
   const login = async ({ email, password }) => {
     try {
       setLoadingLogin(true);
-      const res = await apiClient.post("/auth/login", { email, password });
+      const res = await apiClient.post("/auth/login", {
+        email,
+        password,
+        pushToken: deviceExpoPushToken,
+      });
       const token = res?.data?.data?.tokens?.access?.token;
       const userData = res?.data?.data?.user;
 
@@ -152,6 +156,7 @@ const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     await AsyncStorage.removeItem("@AuthData");
+    await AsyncStorage.removeItem("userData");
     setToken(null);
     setUserData(null);
     // Remove the Bearer token in the headers

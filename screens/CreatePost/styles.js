@@ -33,10 +33,12 @@ const styles = StyleSheet.create({
   },
 
   image: {
-    width: 35,
-    height: 35,
+    width: 38,
+    height: 38,
     borderRadius: 50,
     resizeMode: "contain",
+    borderWidth: 2,
+    borderColor: COLORS.respondBg,
   },
   textStyle: (size, color, family) => {
     return {
