@@ -10,19 +10,20 @@ import { SIZES, COLORS } from "../../constants";
 import { useHideKeyBoard } from "../../hooks";
 import { TextAreaInput } from "../../ui";
 // import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRoute } from "@react-navigation/native";
 import styles from "./styles";
-// import { useAuth } from "../../store";
+import { useAuth } from "../../store";
 import { getProfilePic } from "../../helpers";
 import { useHomeContext } from "../../store/HomeContext";
 import { apiClient } from "../../config";
 
 const ChatDetails = ({ navigation }) => {
   const route = useRoute();
-  const { messageItem } = route.params; // Current/selected chat message object
-  const { messagesList, setMessagesList } = useHomeContext();
-  // const { userData } = useAuth();
+  const { targetUser } = route.params;
+  const [messageItem, setMessageItem] = useState(route.params.messageItem);
+  const { messagesList, setMessagesList, socket } = useHomeContext();
+  const { userData } = useAuth();
 
   const [comment, setComment] = useState("");
   const [commentIsFocused, setCommentIsFocused] = useState(false);
@@ -30,7 +31,7 @@ const ChatDetails = ({ navigation }) => {
   const commentIsValid = comment.trim().length > 0;
 
   const messagesWithUser = messagesList.filter(
-    (message) => message.targetUser.id === messageItem.targetUser.id
+    (message) => message?.targetUser?.id === messageItem?.targetUser?.id
   );
 
   const handleSend = async () => {
@@ -64,6 +65,26 @@ const ChatDetails = ({ navigation }) => {
       params: { user: userInfo },
     });
   };
+
+  useEffect(() => {
+    if (!messageItem?.targetUser.id) {
+      // Create new message item object
+      const _messageItem = {
+        currentUser: {
+          fullName: userData?.fullName,
+          id: userData?.id,
+          profilePicture: userData?.profilePicture,
+        },
+        targetUser: {
+          fullName: targetUser?.fullName,
+          id: targetUser?.id,
+          profilePicture: targetUser?.profilePicture,
+        },
+      };
+      setMessageItem(_messageItem);
+      // console.log("messageItem:", messageItem, _messageItem);
+    }
+  }, []);
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.white }}>
