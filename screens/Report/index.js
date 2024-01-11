@@ -85,7 +85,11 @@ const Report = ({ navigation, route }) => {
 
     setIsLoading(true);
     try {
-      const imageUrl = await uploadToCloudinary(previewImage);
+      let imageUrl;
+      if (previewImage?.trim().length > 0) {
+        imageUrl = await uploadToCloudinary(previewImage);
+      }
+
       const address = await fetchAddress(locationPosition);
 
       const boundingBox = address?.boundingbox?.map((item) => Number(item));

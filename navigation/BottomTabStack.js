@@ -3,7 +3,6 @@ import { Text, View } from "react-native";
 import { Report, CreatePost, NotificationsScreen, InboxTab } from "../screens";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import TopTabStack from "./TopTabStack";
-import MessageTabStack from "./MessageTabStack";
 import { COLORS } from "../constants";
 import { Header } from "../ui";
 import { useAuth } from "../store";

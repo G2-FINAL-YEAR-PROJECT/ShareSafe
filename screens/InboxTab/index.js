@@ -1,7 +1,6 @@
 import { StyleSheet, View, Text, FlatList, LogBox } from "react-native";
 import { COLORS, SIZES } from "../../constants";
 import { ChatList, SearchMessageInput } from "../../ui";
-// import { messages } from "../../data";
 import { useEffect, useState } from "react";
 import { useHideKeyBoard } from "../../hooks";
 import Loading from "../Loading";
@@ -115,12 +114,6 @@ const InboxTab = () => {
 
       {/* SEARCH INPUT ENDS */}
 
-      {/* <View style={{ alignSelf: "flex-end", marginTop: 17 }}>
-        <TouchableOpacity>
-          <Text style={styles.markAll}>mark all as read</Text>
-        </TouchableOpacity>
-      </View> */}
-
       {msgLoading ? (
         <Loading />
       ) : (
@@ -138,11 +131,3 @@ const InboxTab = () => {
 };
 
 export default InboxTab;
-
-const styles = StyleSheet.create({
-  markAll: {
-    fontSize: 11.5,
-    color: COLORS.black2,
-    fontFamily: "semibold",
-  },
-});

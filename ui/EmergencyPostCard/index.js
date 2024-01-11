@@ -186,20 +186,22 @@ const EmergencyPostCard = ({
           {/* DESCRIPTION ENDS */}
 
           {/* POST IMAGE STARTS */}
-          <View
-            style={{
-              marginTop: 15,
-              width: "100%",
-              overflow: "hidden",
-              aspectRatio: aspectRatio,
-            }}
-          >
-            <Image
-              source={post?.file ? { uri: post?.file } : oops}
-              style={styles.postImage}
-              resizeMode="contain"
-            />
-          </View>
+          {post?.file && (
+            <View
+              style={{
+                marginTop: 15,
+                width: "100%",
+                overflow: "hidden",
+                aspectRatio: aspectRatio,
+              }}
+            >
+              <Image
+                source={{ uri: post?.file }}
+                style={styles.postImage}
+                resizeMode="contain"
+              />
+            </View>
+          )}
           {/* POST IMAGE ENDS */}
 
           {/* DATE AND STATUS STARTS */}
