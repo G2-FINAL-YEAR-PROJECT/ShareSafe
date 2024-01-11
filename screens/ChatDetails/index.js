@@ -10,7 +10,7 @@ import { SIZES, COLORS } from "../../constants";
 import { useHideKeyBoard } from "../../hooks";
 import { TextAreaInput } from "../../ui";
 // import { Ionicons } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRoute } from "@react-navigation/native";
 import styles from "./styles";
 import { useAuth } from "../../store";
@@ -21,9 +21,10 @@ import { apiClient } from "../../config";
 const ChatDetails = ({ navigation }) => {
   const route = useRoute();
   const { targetUser } = route.params;
+  const scrollViewRef = useRef();
+  const { userData } = useAuth();
   const [messageItem, setMessageItem] = useState(route.params.messageItem);
   const { messagesList, setMessagesList, socket } = useHomeContext();
-  const { userData } = useAuth();
 
   const [comment, setComment] = useState("");
   const [commentIsFocused, setCommentIsFocused] = useState(false);
@@ -101,9 +102,15 @@ const ChatDetails = ({ navigation }) => {
     }
   }, []);
 
+  useEffect(() => {
+    // Scroll to the bottom when messagesWithUser changes
+    scrollViewRef.current.scrollToEnd({ animated: true });
+  }, [messagesList]);
+
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.white }}>
       <ScrollView
+        ref={scrollViewRef}
         style={[
           SIZES.safeAreaView,
           {
