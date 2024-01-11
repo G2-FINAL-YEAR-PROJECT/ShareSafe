@@ -2,7 +2,7 @@ import { Image, StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { COLORS } from "../../constants";
 import { useNavigation } from "@react-navigation/native";
 import { useLocationContext } from "../../store";
-import { getProfilePic } from "../../helpers";
+import { formatHumanFriendlyDate, getProfilePic } from "../../helpers";
 
 const ChatList = ({ item }) => {
   const navigation = useNavigation();
@@ -35,7 +35,9 @@ const ChatList = ({ item }) => {
           </View>
         </View>
 
-        <Text style={styles.time}>{item?.createdAt}</Text>
+        <Text style={styles.time}>
+          {formatHumanFriendlyDate(item?.createdAt)}
+        </Text>
       </View>
     </TouchableOpacity>
   );
@@ -76,7 +78,7 @@ const styles = StyleSheet.create({
   },
 
   textBox: {
-    flexBasis: "60%",
+    flexBasis: "56%",
   },
   text: (size, family) => {
     return {
@@ -88,7 +90,7 @@ const styles = StyleSheet.create({
 
   time: {
     color: COLORS.gray8,
-    fontSize: 12.5,
+    fontSize: 12,
     fontFamily: "medium",
   },
 });

@@ -9,17 +9,20 @@ import {
 import { SIZES, COLORS } from "../../constants";
 import { useHideKeyBoard } from "../../hooks";
 import { TextAreaInput } from "../../ui";
-import { Ionicons } from "@expo/vector-icons";
+// import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { useRoute } from "@react-navigation/native";
 import styles from "./styles";
+// import { useAuth } from "../../store";
 import { getProfilePic } from "../../helpers";
 import { useHomeContext } from "../../store/HomeContext";
+import { apiClient } from "../../config";
 
 const ChatDetails = () => {
   const route = useRoute();
   const { messageItem } = route.params; // Current/selected chat message object
   const { messagesList, setMessagesList } = useHomeContext();
+  // const { userData } = useAuth();
 
   const [comment, setComment] = useState("");
   const [commentIsFocused, setCommentIsFocused] = useState(false);
@@ -30,13 +33,31 @@ const ChatDetails = () => {
     (message) => message.targetUser.id === messageItem.targetUser.id
   );
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!commentIsValid) return;
-    console.log(comment);
-
-    setComment("");
     Keyboard.dismiss();
+
+    // API request
+    const res = await apiClient.post("/message/send", {
+      receiver: messageItem.targetUser.id,
+      message: comment,
+    });
+
+    const newMessage = {
+      createdAt: new Date().toJSON(),
+      currentUser: messageItem.currentUser,
+      targetUser: messageItem.targetUser,
+      sentByCurrentUser: true,
+      id: Math.floor(Math.random() * 9999),
+      message: comment,
+    };
+    setMessagesList([newMessage, ...messagesList]);
+    // console.log("newMessage:", newMessage);
+
+    // Reset
+    setComment("");
   };
+
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.white }}>
       <ScrollView

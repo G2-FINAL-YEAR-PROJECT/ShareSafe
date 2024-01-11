@@ -1,6 +1,6 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Text, View } from "react-native";
-import { Report, CreatePost, NotificationsScreen } from "../screens";
+import { Report, CreatePost, NotificationsScreen, InboxTab } from "../screens";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import TopTabStack from "./TopTabStack";
 import MessageTabStack from "./MessageTabStack";
@@ -131,7 +131,7 @@ const BottomTabStack = () => {
         />
         <Tab.Screen
           name="MessageTabStack"
-          component={MessageTabStack}
+          component={InboxTab}
           options={{
             unmountOnBlur: true,
             tabBarIcon: ({ focused }) => {
