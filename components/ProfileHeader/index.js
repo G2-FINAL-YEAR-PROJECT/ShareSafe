@@ -153,7 +153,7 @@ const ProfileHeader = () => {
                 <TouchableOpacity
                   onPress={() =>
                     navigation.navigate("ChatDetails", {
-                      userId: currentUser?.id,
+                      targetUser: currentUser,
                     })
                   }
                 >

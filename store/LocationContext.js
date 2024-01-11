@@ -13,39 +13,39 @@ const LocationProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (currentPosition) {
-      const updateUser = async () => {
-        try {
-          const data = await fetchAddress(currentPosition);
+    const updateUser = async () => {
+      try {
+        const data = await fetchAddress(currentPosition);
 
-          const location = {
-            position: {
-              lon: currentPosition?.lon,
-              lat: currentPosition?.lat,
-            },
-            name: data?.display_name,
-          };
+        const location = {
+          position: {
+            lon: currentPosition?.lon,
+            lat: currentPosition?.lat,
+          },
+          name: data?.display_name,
+        };
 
-          setCurrentLocation([location]);
-          //   console.log(location);
+        setCurrentLocation([location]);
+        //   console.log(location);
 
-          const userAddress = {
-            address: data?.display_name,
-            latitude: currentPosition?.lat?.toString(),
-            longitude: currentPosition?.lon?.toString(),
-          };
+        const userAddress = {
+          address: data?.display_name,
+          latitude: currentPosition?.lat?.toString(),
+          longitude: currentPosition?.lon?.toString(),
+        };
 
-          const res = await apiClient.put("/users/update", userAddress);
+        const res = await apiClient.put("/users/update", userAddress);
 
-          if (res.data?.status !== 200) {
-            throw new Error(res.data?.message);
-          }
-          // console.log(res.data);
-        } catch (error) {
-          console.log(error?.message);
+        if (res.data?.status !== 200) {
+          throw new Error(res.data?.message);
         }
-      };
+        // console.log(res.data);
+      } catch (error) {
+        console.log(error?.message);
+      }
+    };
 
+    if (currentPosition?.lat) {
       updateUser();
     }
   }, [currentPosition]);

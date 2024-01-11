@@ -1,80 +1,154 @@
-import { View, Text, ScrollView, TouchableOpacity, Image } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+  Keyboard,
+} from "react-native";
 import { SIZES, COLORS } from "../../constants";
 import { useHideKeyBoard } from "../../hooks";
 import { TextAreaInput } from "../../ui";
-import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
+// import { Ionicons } from "@expo/vector-icons";
+import { useEffect, useRef, useState } from "react";
 import { useRoute } from "@react-navigation/native";
 import styles from "./styles";
+import { useAuth } from "../../store";
+import { getProfilePic } from "../../helpers";
+import { useHomeContext } from "../../store/HomeContext";
+import { apiClient } from "../../config";
 
-const message = {
-  id: "m1",
-  username: "Fire Service",
-  image: require("../../assets/images/fire_service.jpeg"),
-  status: "online",
-  time: "1 min ago",
-  message:
-    "If you have concerns related to personal safety or believe there is a threat, I strongly advise reaching out to the appropriate authorities or ",
-};
-const ChatDetails = () => {
+const ChatDetails = ({ navigation }) => {
+  const route = useRoute();
+  const { targetUser } = route.params;
+  const scrollViewRef = useRef();
+  const { userData } = useAuth();
+  const [messageItem, setMessageItem] = useState(route.params.messageItem);
+  const { messagesList, setMessagesList, socket } = useHomeContext();
+
   const [comment, setComment] = useState("");
   const [commentIsFocused, setCommentIsFocused] = useState(false);
-
-  const route = useRoute();
-  const { userId } = route.params;
-
+  useHideKeyBoard(setCommentIsFocused);
   const commentIsValid = comment.trim().length > 0;
 
-  useHideKeyBoard(setCommentIsFocused);
+  const messagesWithUser = messagesList.filter(
+    (message) => message?.targetUser?.id === messageItem?.targetUser?.id
+  );
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!commentIsValid) return;
-    console.log(comment);
-
-    setComment("");
     Keyboard.dismiss();
+
+    const newMessage = {
+      createdAt: new Date().toJSON(),
+      currentUser: messageItem.currentUser,
+      targetUser: messageItem.targetUser,
+      sentByCurrentUser: true,
+      id: Math.floor(Math.random() * 9999),
+      message: comment,
+    };
+
+    const socketData = {
+      sender: messageItem.currentUser.id,
+      receiver: messageItem.targetUser.id,
+      message: {
+        createdAt: new Date().toJSON(),
+        currentUser: messageItem.targetUser,
+        targetUser: messageItem.currentUser,
+        sentByCurrentUser: false,
+        id: Math.floor(Math.random() * 9999),
+        message: comment,
+      },
+    };
+    socket.emit("sendMessage", { ...socketData });
+
+    // API request
+    await apiClient.post("/message/send", {
+      receiver: messageItem.targetUser.id,
+      message: comment,
+    });
+
+    setMessagesList([newMessage, ...messagesList]);
+    // console.log("newMessage:", newMessage);
+
+    // Reset
+    setComment("");
   };
+
+  const goToProfile = (userInfo) => {
+    navigation.navigate("ProfileTabStack", {
+      screen: "Profile",
+      params: { user: userInfo },
+    });
+  };
+
+  useEffect(() => {
+    if (!messageItem?.targetUser.id) {
+      // Create new message item object
+      const _messageItem = {
+        currentUser: {
+          fullName: userData?.fullName,
+          id: userData?.id,
+          profilePicture: userData?.profilePicture,
+        },
+        targetUser: {
+          fullName: targetUser?.fullName,
+          id: targetUser?.id,
+          profilePicture: targetUser?.profilePicture,
+        },
+      };
+      setMessageItem(_messageItem);
+      // console.log("messageItem:", messageItem, _messageItem);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Scroll to the bottom when messagesWithUser changes
+    scrollViewRef.current.scrollToEnd({ animated: true });
+  }, [messagesList]);
+
   return (
-    <>
+    <View style={{ flex: 1, backgroundColor: COLORS.white }}>
       <ScrollView
+        ref={scrollViewRef}
         style={[
           SIZES.safeAreaView,
-          { paddingTop: 8, backgroundColor: COLORS.white },
+          {
+            paddingTop: 0,
+            marginBottom: 105,
+            backgroundColor: COLORS.white,
+          },
         ]}
       >
-        <View style={styles.sendBox}>
-          <Text style={[styles.text, styles.sentText]}>
-            Hi Amy, How are you?
-          </Text>
-          <Image
-            style={styles.image}
-            source={require("../../assets/images/girl.jpg")}
-          />
-        </View>
-
-        <View style={styles.receiveBox}>
-          <Image style={styles.image} source={message.image} />
-          <Text style={[styles.text, styles.receivedText]}>
-            {message.message}
-          </Text>
-        </View>
-
-        <View style={styles.sendBox}>
-          <Text style={[styles.text, styles.sentText]}>
-            Hi Amy, How are you?
-          </Text>
-          <Image
-            style={styles.image}
-            source={require("../../assets/images/girl.jpg")}
-          />
-        </View>
-
-        <View style={styles.receiveBox}>
-          <Image style={styles.image} source={message.image} />
-          <Text style={[styles.text, styles.receivedText]}>
-            {message.message}
-          </Text>
-        </View>
+        {messagesWithUser.reverse().map((message) =>
+          message.sentByCurrentUser ? (
+            <View style={styles.sendBox} key={message.id}>
+              <Text style={[styles.text, styles.sentText]}>
+                {message.message}
+              </Text>
+              <TouchableOpacity
+                onPress={() => goToProfile(message.currentUser)}
+              >
+                <Image
+                  style={styles.image}
+                  source={getProfilePic(message.currentUser.profilePicture)}
+                />
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={styles.receiveBox} key={message.id}>
+              <TouchableOpacity onPress={() => goToProfile(message.targetUser)}>
+                <Image
+                  style={styles.image}
+                  source={getProfilePic(message.targetUser.image)}
+                />
+              </TouchableOpacity>
+              <Text style={[styles.text, styles.receivedText]}>
+                {message.message}
+              </Text>
+            </View>
+          )
+        )}
       </ScrollView>
 
       <View
@@ -103,7 +177,7 @@ const ChatDetails = () => {
         {commentIsFocused && (
           <View style={styles.actionBox}>
             <View style={styles.mediaAction}>
-              <TouchableOpacity>
+              {/* <TouchableOpacity>
                 <Ionicons
                   name="camera-outline"
                   size={24}
@@ -118,7 +192,7 @@ const ChatDetails = () => {
                   color={COLORS.primary}
                   style={{ transform: [{ rotate: "45deg" }] }}
                 />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
 
             <TouchableOpacity
@@ -132,7 +206,7 @@ const ChatDetails = () => {
         )}
         {/* ADD COMMENT ACTION ENDS */}
       </View>
-    </>
+    </View>
   );
 };
 

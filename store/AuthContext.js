@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 import * as Notifications from "expo-notifications";
 import { apiClient } from "../config";
 import { registerForPushNotificationsAsync } from "../services/notification";
-import {} from "../services/location";
+import { PanResponder, View } from "react-native";
 
 const AuthContext = createContext();
 
@@ -22,6 +22,24 @@ const AuthProvider = ({ children }) => {
   const [notificationCount, setNotificationCount] = useState(0);
   const notificationListener = useRef();
   const responseListener = useRef();
+  const timerId = useRef(false);
+  const [timeForInactivityInSecond] = useState(120);
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponderCapture: () => {
+        // console.log('user starts touch');
+        resetInactivityTimeout();
+      },
+    })
+  ).current;
+
+  const resetInactivityTimeout = () => {
+    clearTimeout(timerId.current);
+    timerId.current = setTimeout(() => {
+      logout();
+    }, timeForInactivityInSecond * 1000);
+  };
 
   useEffect(() => {
     getAuthData();
@@ -188,7 +206,9 @@ const AuthProvider = ({ children }) => {
         setNotificationCount,
       }}
     >
-      {children}
+      <View style={{ flex: 1 }} {...panResponder.panHandlers}>
+        {children}
+      </View>
     </AuthContext.Provider>
   );
 };
