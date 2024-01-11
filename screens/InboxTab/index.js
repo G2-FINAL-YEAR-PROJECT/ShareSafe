@@ -65,7 +65,6 @@ const InboxTab = () => {
       setMsgLoading(false);
       setMessagesList(data);
       setSortedMessagesList(getUniqueMessages(data));
-      // console.log("message/user:", sortMessagesList(data));
     } catch (error) {
       console.log(error);
     } finally {
@@ -75,17 +74,13 @@ const InboxTab = () => {
 
   useEffect(() => {
     fetchData();
-
-    // Set up interval to fetch data every 10 seconds
-    // const intervalId = setInterval(() => {
-    //   console.log("Interval 20s");
-    //   // setMsgLoading(true);
-    //   fetchData();
-    // }, 20000);
-
-    // Clean up the interval when the component unmounts
-    // return () => clearInterval(intervalId);
   }, []);
+
+  useEffect(() => {
+    if (messagesList.length) {
+      setSortedMessagesList(getUniqueMessages(messagesList));
+    }
+  }, [messagesList]);
 
   const handleSearch = (text) => {
     setSearchValue(text);

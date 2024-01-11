@@ -21,20 +21,21 @@ const HomeContextProvider = ({ children }) => {
       }
     });
 
-    socket.on("chat message", (message) => {
-      console.log("Received message:", message);
+    socket.on(userData?.id, (data) => {
+      console.log("Received message for:", [userData?.fullName, data]);
       // Handle the received message
+
+      // Use the functional form of setMessagesList to correctly update the state
+      setMessagesList((prevMessagesList) => [
+        { ...data.message },
+        ...prevMessagesList,
+      ]);
     });
 
-    socket.on("receivedMessage", ({ sender, message }) => {
-      console.log("Received message from sender:", sender, message);
-      // Handle the received message from sender
-    });
-
-    socket.on("activeUsersList", (activeUsers) => {
-      console.log("Active_Users:", activeUsers);
-      // Update active users list in your app
-    });
+    // socket.on("activeUsersList", (activeUsers) => {
+    //   console.log("Active_Users:", activeUsers);
+    //   // Update active users list in your app
+    // });
 
     socket.on("disconnect", () => {
       console.log("Disconnected from socket server");

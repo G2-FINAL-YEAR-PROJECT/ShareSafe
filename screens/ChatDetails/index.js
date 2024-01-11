@@ -38,12 +38,6 @@ const ChatDetails = ({ navigation }) => {
     if (!commentIsValid) return;
     Keyboard.dismiss();
 
-    // API request
-    const res = await apiClient.post("/message/send", {
-      receiver: messageItem.targetUser.id,
-      message: comment,
-    });
-
     const newMessage = {
       createdAt: new Date().toJSON(),
       currentUser: messageItem.currentUser,
@@ -52,6 +46,27 @@ const ChatDetails = ({ navigation }) => {
       id: Math.floor(Math.random() * 9999),
       message: comment,
     };
+
+    const socketData = {
+      sender: messageItem.currentUser.id,
+      receiver: messageItem.targetUser.id,
+      message: {
+        createdAt: new Date().toJSON(),
+        currentUser: messageItem.targetUser,
+        targetUser: messageItem.currentUser,
+        sentByCurrentUser: false,
+        id: Math.floor(Math.random() * 9999),
+        message: comment,
+      },
+    };
+    socket.emit("sendMessage", { ...socketData });
+
+    // API request
+    await apiClient.post("/message/send", {
+      receiver: messageItem.targetUser.id,
+      message: comment,
+    });
+
     setMessagesList([newMessage, ...messagesList]);
     // console.log("newMessage:", newMessage);
 
