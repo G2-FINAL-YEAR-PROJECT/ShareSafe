@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, FlatList } from "react-native";
+import { StyleSheet, View, Text, FlatList, LogBox } from "react-native";
 import { COLORS, SIZES } from "../../constants";
 import { ChatList, SearchMessageInput } from "../../ui";
 // import { messages } from "../../data";
@@ -9,10 +9,27 @@ import { useHomeContext } from "../../store/HomeContext";
 import { useAuth } from "../../store";
 import { apiClient } from "../../config";
 
+// Create a Map to store unique messages based on receiver ID
+const getUniqueMessages = (messagesList) => {
+  const uniqueMessagesMap = new Map();
+  messagesList.forEach((message) => {
+    const targetUserId = message.targetUser.id;
+    // If receiver ID is not present in the Map, add the message
+    if (!uniqueMessagesMap.has(targetUserId)) {
+      uniqueMessagesMap.set(targetUserId, message);
+    }
+  });
+  // Convert the Map values back to an array
+  return Array.from(uniqueMessagesMap.values());
+};
+
 const InboxTab = () => {
   const { userData } = useAuth();
   const { messagesList, msgLoading, setMessagesList, setMsgLoading } =
     useHomeContext();
+  const [sortedMessagesList, setSortedMessagesList] = useState(
+    getUniqueMessages(messagesList)
+  );
   const [searchValue, setSearchValue] = useState("");
   const [searchIsFocused, setSearchIsFocused] = useState(false);
   useHideKeyBoard(setSearchIsFocused);
@@ -44,9 +61,10 @@ const InboxTab = () => {
   const fetchData = async () => {
     try {
       const res = await apiClient.get("message/user");
-      const data = res?.data?.data;
+      const data = sortMessagesList(res?.data?.data);
       setMsgLoading(false);
-      setMessagesList(sortMessagesList(data));
+      setMessagesList(data);
+      setSortedMessagesList(getUniqueMessages(data));
       // console.log("message/user:", sortMessagesList(data));
     } catch (error) {
       console.log(error);
@@ -69,18 +87,18 @@ const InboxTab = () => {
     // return () => clearInterval(intervalId);
   }, []);
 
-  // Create a Map to store unique messages based on receiver ID
-  const getUniqueMessages = (messagesList) => {
-    const uniqueMessagesMap = new Map();
-    messagesList.forEach((message) => {
-      const targetUserId = message.targetUser.id;
-      // If receiver ID is not present in the Map, add the message
-      if (!uniqueMessagesMap.has(targetUserId)) {
-        uniqueMessagesMap.set(targetUserId, message);
-      }
-    });
-    // Convert the Map values back to an array
-    return Array.from(uniqueMessagesMap.values());
+  const handleSearch = (text) => {
+    setSearchValue(text);
+    // console.log(text);
+    if (text) {
+      setSortedMessagesList(
+        getUniqueMessages(messagesList).filter((item) =>
+          item.targetUser.fullName.includes(text)
+        )
+      );
+    } else {
+      setSortedMessagesList(getUniqueMessages(messagesList));
+    }
   };
 
   return (
@@ -95,7 +113,7 @@ const InboxTab = () => {
         value={searchValue}
         inputIsFocused={searchIsFocused}
         placeholder="Search inbox messages..."
-        handleChange={(text) => setSearchValue(text)}
+        handleChange={handleSearch}
         handleFocus={() => setSearchIsFocused(true)}
         handleBlur={() => setSearchIsFocused(false)}
       />
@@ -113,7 +131,7 @@ const InboxTab = () => {
       ) : (
         <View style={{ marginTop: 26 }}>
           <FlatList
-            data={getUniqueMessages(messagesList)}
+            data={sortedMessagesList}
             renderItem={({ item }) => <ChatList item={item} />}
             keyExtractor={(item) => item.id}
             showsVerticalScrollIndicator={false}

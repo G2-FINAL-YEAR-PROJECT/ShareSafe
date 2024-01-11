@@ -18,7 +18,7 @@ import { getProfilePic } from "../../helpers";
 import { useHomeContext } from "../../store/HomeContext";
 import { apiClient } from "../../config";
 
-const ChatDetails = () => {
+const ChatDetails = ({ navigation }) => {
   const route = useRoute();
   const { messageItem } = route.params; // Current/selected chat message object
   const { messagesList, setMessagesList } = useHomeContext();
@@ -58,6 +58,13 @@ const ChatDetails = () => {
     setComment("");
   };
 
+  const goToProfile = (userInfo) => {
+    navigation.navigate("ProfileTabStack", {
+      screen: "Profile",
+      params: { user: userInfo },
+    });
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.white }}>
       <ScrollView
@@ -76,17 +83,23 @@ const ChatDetails = () => {
               <Text style={[styles.text, styles.sentText]}>
                 {message.message}
               </Text>
-              <Image
-                style={styles.image}
-                source={getProfilePic(message.currentUser.profilePicture)}
-              />
+              <TouchableOpacity
+                onPress={() => goToProfile(message.currentUser)}
+              >
+                <Image
+                  style={styles.image}
+                  source={getProfilePic(message.currentUser.profilePicture)}
+                />
+              </TouchableOpacity>
             </View>
           ) : (
             <View style={styles.receiveBox} key={message.id}>
-              <Image
-                style={styles.image}
-                source={getProfilePic(message.targetUser.image)}
-              />
+              <TouchableOpacity onPress={() => goToProfile(message.targetUser)}>
+                <Image
+                  style={styles.image}
+                  source={getProfilePic(message.targetUser.image)}
+                />
+              </TouchableOpacity>
               <Text style={[styles.text, styles.receivedText]}>
                 {message.message}
               </Text>
