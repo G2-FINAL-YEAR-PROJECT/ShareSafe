@@ -20,6 +20,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ProfileTabStack from "./ProfileTabStack";
+import { HomeContextProvider } from "../store/HomeContext";
 
 const Stack = createNativeStackNavigator();
 
@@ -46,105 +47,63 @@ const HomeStack = () => {
   }, []);
 
   return (
-    <Stack.Navigator screenOptions={{ headerTitle: "" }}>
-      {loading && (
+    <HomeContextProvider>
+      <Stack.Navigator screenOptions={{ headerTitle: "" }}>
+        {loading && (
+          <Stack.Screen
+            name="Loading"
+            component={Loading}
+            options={{ headerShown: false }}
+          />
+        )}
+
+        {showWelcomeScreen && (
+          <Stack.Screen
+            name="Welcome"
+            component={Welcome}
+            options={{ headerShown: false }}
+          />
+        )}
+
         <Stack.Screen
-          name="Loading"
-          component={Loading}
-          options={{ headerShown: false }}
+          name="BottomTabStack"
+          component={BottomTabStack}
+          options={{
+            headerShown: false,
+          }}
         />
-      )}
 
-      {showWelcomeScreen && (
         <Stack.Screen
-          name="Welcome"
-          component={Welcome}
-          options={{ headerShown: false }}
-        />
-      )}
-
-      <Stack.Screen
-        name="BottomTabStack"
-        component={BottomTabStack}
-        options={{
-          headerShown: false,
-        }}
-      />
-
-      <Stack.Screen
-        name="ReportSuccess"
-        component={ReportSuccess}
-        options={{
-          headerShadowVisible: false,
-          headerLeft: () => (
-            <TouchableOpacity
-              style={{ alignItems: "center" }}
-              onPressIn={() => navigation.goBack()}
-            >
-              <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
-            </TouchableOpacity>
-          ),
-        }}
-      />
-
-      <Stack.Screen
-        name="Search"
-        component={Search}
-        options={{
-          headerShadowVisible: false,
-          headerLeft: () => (
-            <TouchableOpacity
-              style={{ alignItems: "center" }}
-              onPressIn={() => navigation.goBack()}
-            >
-              <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
-            </TouchableOpacity>
-          ),
-
-          headerRight: () => (
-            <TouchableOpacity
-              style={{ alignItems: "center" }}
-              onPressIn={() => navigation.navigate("Notifications")}
-            >
-              <Ionicons name="notifications" size={24} color={COLORS.primary} />
-            </TouchableOpacity>
-          ),
-        }}
-      />
-
-      <Stack.Screen
-        name="CameraScreen"
-        component={CameraScreen}
-        options={{
-          headerShown: false,
-        }}
-      />
-
-      <Stack.Screen
-        name="PostDetails"
-        component={PostDetails}
-        options={{
-          headerShadowVisible: false,
-          headerLeft: () => (
-            <TouchableOpacity
-              style={{ alignItems: "center" }}
-              onPressIn={() => navigation.goBack()}
-            >
-              <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
-            </TouchableOpacity>
-          ),
-
-          headerRight: () => (
-            <View
-              style={{ flexDirection: "row", alignItems: "center", gap: 15 }}
-            >
+          name="ReportSuccess"
+          component={ReportSuccess}
+          options={{
+            headerShadowVisible: false,
+            headerLeft: () => (
               <TouchableOpacity
                 style={{ alignItems: "center" }}
-                onPressIn={() => navigation.navigate("Search")}
+                onPressIn={() => navigation.goBack()}
               >
-                <Ionicons name="search" size={24} color={COLORS.primary} />
+                <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
               </TouchableOpacity>
+            ),
+          }}
+        />
 
+        <Stack.Screen
+          name="Search"
+          component={Search}
+          options={{
+            headerShadowVisible: false,
+            headerLeft: () => (
+              <TouchableOpacity
+                style={{ alignItems: "center" }}
+                onPressIn={() => navigation.goBack()}
+              >
+                <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
+              </TouchableOpacity>
+            ),
+
+            headerRight: () => (
               <TouchableOpacity
                 style={{ alignItems: "center" }}
                 onPressIn={() => navigation.navigate("Notifications")}
@@ -155,96 +114,144 @@ const HomeStack = () => {
                   color={COLORS.primary}
                 />
               </TouchableOpacity>
-            </View>
-          ),
-        }}
-      />
+            ),
+          }}
+        />
 
-      <Stack.Screen
-        name="EmergencyDetails"
-        component={EmergencyDetails}
-        options={{
-          headerShadowVisible: false,
+        <Stack.Screen
+          name="CameraScreen"
+          component={CameraScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
 
-          headerLeft: () => (
-            <TouchableOpacity
-              style={{ alignItems: "center" }}
-              onPressIn={() => navigation.goBack()}
-            >
-              <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
-            </TouchableOpacity>
-          ),
-
-          headerRight: () => (
-            <View
-              style={{ flexDirection: "row", alignItems: "center", gap: 15 }}
-            >
+        <Stack.Screen
+          name="PostDetails"
+          component={PostDetails}
+          options={{
+            headerShadowVisible: false,
+            headerLeft: () => (
               <TouchableOpacity
                 style={{ alignItems: "center" }}
-                onPressIn={() => navigation.navigate("Search")}
+                onPressIn={() => navigation.goBack()}
               >
-                <Ionicons name="search" size={24} color={COLORS.primary} />
+                <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
               </TouchableOpacity>
+            ),
 
+            headerRight: () => (
+              <View
+                style={{ flexDirection: "row", alignItems: "center", gap: 15 }}
+              >
+                <TouchableOpacity
+                  style={{ alignItems: "center" }}
+                  onPressIn={() => navigation.navigate("Search")}
+                >
+                  <Ionicons name="search" size={24} color={COLORS.primary} />
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={{ alignItems: "center" }}
+                  onPressIn={() => navigation.navigate("Notifications")}
+                >
+                  <Ionicons
+                    name="notifications"
+                    size={24}
+                    color={COLORS.primary}
+                  />
+                </TouchableOpacity>
+              </View>
+            ),
+          }}
+        />
+
+        <Stack.Screen
+          name="EmergencyDetails"
+          component={EmergencyDetails}
+          options={{
+            headerShadowVisible: false,
+
+            headerLeft: () => (
               <TouchableOpacity
                 style={{ alignItems: "center" }}
-                onPressIn={() => navigation.navigate("Notifications")}
+                onPressIn={() => navigation.goBack()}
               >
-                <Ionicons
-                  name="notifications"
-                  size={24}
-                  color={COLORS.primary}
-                />
+                <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
               </TouchableOpacity>
-            </View>
-          ),
-        }}
-      />
+            ),
 
-      <Stack.Screen
-        name="EditProfile"
-        component={EditProfile}
-        options={{
-          headerShadowVisible: false,
-          headerLeft: () => (
-            <TouchableOpacity
-              style={{ alignItems: "center" }}
-              onPressIn={() => navigation.goBack()}
-            >
-              <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
-            </TouchableOpacity>
-          ),
-        }}
-      />
+            headerRight: () => (
+              <View
+                style={{ flexDirection: "row", alignItems: "center", gap: 15 }}
+              >
+                <TouchableOpacity
+                  style={{ alignItems: "center" }}
+                  onPressIn={() => navigation.navigate("Search")}
+                >
+                  <Ionicons name="search" size={24} color={COLORS.primary} />
+                </TouchableOpacity>
 
-      <Stack.Screen
-        name="ChatDetails"
-        component={ChatDetails}
-        options={{
-          headerShadowVisible: false,
-          headerLeft: () => (
-            <TouchableOpacity
-              style={{ alignItems: "center" }}
-              onPressIn={() => navigation.goBack()}
-            >
-              <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
-            </TouchableOpacity>
-          ),
-        }}
-      />
+                <TouchableOpacity
+                  style={{ alignItems: "center" }}
+                  onPressIn={() => navigation.navigate("Notifications")}
+                >
+                  <Ionicons
+                    name="notifications"
+                    size={24}
+                    color={COLORS.primary}
+                  />
+                </TouchableOpacity>
+              </View>
+            ),
+          }}
+        />
 
-      <Stack.Screen
-        name="ProfileTabStack"
-        component={ProfileTabStack}
-        options={{
-          headerShadowVisible: false,
-          headerBackVisible: false,
-          headerLargeTitle: true,
+        <Stack.Screen
+          name="EditProfile"
+          component={EditProfile}
+          options={{
+            headerShadowVisible: false,
+            headerLeft: () => (
+              <TouchableOpacity
+                style={{ alignItems: "center" }}
+                onPressIn={() => navigation.goBack()}
+              >
+                <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
+              </TouchableOpacity>
+            ),
+          }}
+        />
 
-          headerTitle: () => <ProfileHeader />,
-        }}
-      />
-    </Stack.Navigator>
+        <Stack.Screen
+          name="ChatDetails"
+          component={ChatDetails}
+          options={{
+            headerShadowVisible: false,
+            headerLeft: () => (
+              <TouchableOpacity
+                style={{ alignItems: "center" }}
+                onPressIn={() => navigation.goBack()}
+              >
+                <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
+              </TouchableOpacity>
+            ),
+          }}
+        />
+
+        <Stack.Screen
+          name="ProfileTabStack"
+          component={ProfileTabStack}
+          options={{
+            headerShadowVisible: false,
+            headerBackVisible: false,
+            headerLargeTitle: true,
+
+            headerTitle: () => <ProfileHeader />,
+          }}
+        />
+      </Stack.Navigator>
+    </HomeContextProvider>
   );
 };
 

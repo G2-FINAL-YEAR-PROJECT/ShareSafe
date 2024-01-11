@@ -1,31 +1,41 @@
 import { Image, StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { COLORS } from "../../constants";
 import { useNavigation } from "@react-navigation/native";
+import { useLocationContext } from "../../store";
+import { getProfilePic } from "../../helpers";
 
 const ChatList = ({ item }) => {
   const navigation = useNavigation();
+
   return (
     <TouchableOpacity
-      onPress={() => navigation.navigate("ChatDetails", { message: item })}
+      onPress={() => navigation.navigate("ChatDetails", { messageItem: item })}
     >
       <View style={styles.chatBox}>
         <View style={styles.userData}>
           <View>
-            <Image style={styles.image} source={item.image} />
-            <View style={styles.status(item.status)} />
+            <Image
+              style={styles.image}
+              source={getProfilePic(item?.targetUser?.profilePicture)}
+            />
+            <View style={styles.status("")} />
           </View>
+
           <View style={styles.textBox}>
-            <Text style={styles.text(15, "semibold")}>{item.username}</Text>
+            <Text style={styles.text(15, "semibold")}>
+              {item?.targetUser?.fullName}
+            </Text>
+
             <Text
-              style={[styles.text(11.6, "medium"), { marginTop: -6 }]}
+              style={[styles.text(11.6, "medium"), { marginTop: -2 }]}
               numberOfLines={1}
             >
-              {item.message}
+              {item?.message}
             </Text>
           </View>
         </View>
 
-        <Text style={styles.time}>{item.time}</Text>
+        <Text style={styles.time}>{item?.createdAt}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -43,7 +53,7 @@ const styles = StyleSheet.create({
 
   userData: {
     flexDirection: "row",
-    gap: 5,
+    gap: 8,
     alignItems: "center",
   },
 

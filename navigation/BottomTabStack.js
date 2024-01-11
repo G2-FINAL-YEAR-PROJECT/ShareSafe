@@ -133,6 +133,7 @@ const BottomTabStack = () => {
           name="MessageTabStack"
           component={MessageTabStack}
           options={{
+            unmountOnBlur: true,
             tabBarIcon: ({ focused }) => {
               return (
                 <Ionicons
