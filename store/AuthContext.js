@@ -23,7 +23,7 @@ const AuthProvider = ({ children }) => {
   const notificationListener = useRef();
   const responseListener = useRef();
   const timerId = useRef(false);
-  const [timeForInactivityInSecond] = useState(120);
+  const [timeForInactivityInSecond] = useState(600);
 
   const panResponder = useRef(
     PanResponder.create({
