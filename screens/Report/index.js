@@ -109,6 +109,13 @@ const Report = ({ navigation, route }) => {
       if (res.data?.status !== 200) {
         throw new Error(res.data?.message);
       }
+
+      // Send message to tagged respondent
+      await apiClient.post("/message/send", {
+        receiver: channelValue?.id,
+        message: reportText,
+      });
+
       clearInput();
       setIsLoading(false);
       navigation.navigate("ReportSuccess", {
