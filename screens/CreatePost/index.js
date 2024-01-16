@@ -60,6 +60,7 @@ const CreatePost = ({ route }) => {
 
   const handlePost = async () => {
     setIsLoading(true);
+
     try {
       const imageUrl = await uploadToCloudinary(previewImage);
 

@@ -22,7 +22,7 @@ const HomeContextProvider = ({ children }) => {
     });
 
     socket.on(userData?.id, (data) => {
-      console.log("Received message for:", [userData?.fullName, data]);
+      // console.log("Received message for:", [userData?.fullName, data]);
       // Handle the received message
 
       // Use the functional form of setMessagesList to correctly update the state
@@ -31,11 +31,6 @@ const HomeContextProvider = ({ children }) => {
         ...prevMessagesList,
       ]);
     });
-
-    // socket.on("activeUsersList", (activeUsers) => {
-    //   console.log("Active_Users:", activeUsers);
-    //   // Update active users list in your app
-    // });
 
     socket.on("disconnect", () => {
       console.log("Disconnected from socket server");
