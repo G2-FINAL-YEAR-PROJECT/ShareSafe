@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "292587693098",
+    "project_id": "sharesafe-86d26",
+    "storage_bucket": "sharesafe-86d26.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:292587693098:android:2e37b2d6a7788dd4e1cf53",
+        "android_client_info": {
+          "package_name": "com.shareSafe.www"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyALgwWZ3f1ss-6bELUU4wdlBRxhQ4zSfeg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
